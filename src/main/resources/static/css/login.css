@@ -1,0 +1,184 @@
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR:100,300,400,500,700|Noto+Sans:400,700&display=swap&subset=korean');
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+ul, ol, dl, li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body, a, p, h1, h2, h3, h4, h5, h6, p, pre {
+  margin: 0;
+  padding: 0;
+}
+
+.error.container {
+  width: 1440px;
+  margin: auto;
+  text-align: center;
+}
+
+.error.container h1 {
+  padding-top: 5px;
+  letter-spacing: -0.25px;
+}
+
+.error.container h1 span {
+  color: #f64141;
+}
+
+.error.container p {
+  color: #333;
+  padding-top: 10px;
+  font-size: 17px;
+}
+
+.error-bg {
+  width: 320px;
+  height: 300px;
+  margin: auto;
+  margin-top: 100px;
+  padding-top: 118px;
+  padding-right: 65px;
+  background-size: 80%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.error-bg span {
+  font-size: 50px;
+  font-weight: bold;
+  color: #80deea;
+}
+
+.login.container {
+  width: 1440px;
+  margin: 0 auto;
+}
+
+.login_zone {
+  width: 755px;
+  margin: 0 auto;
+}
+
+.left_zone {
+  float: left;
+  padding-top: 300px;
+  padding-right: 50px;
+}
+
+.left_zone p {
+  padding-bottom: 20px;
+}
+
+.right_zone {
+  padding-top: 350px;
+}
+
+.login_line {
+  width: 28px;
+  border-top: 1px solid #252525;
+  margin: 0 0 8px;
+}
+
+.id, .pw {
+  width: 260px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid rgb(140,143,143);
+  display: block;
+  font-size: 17px;
+  padding-top: 10px;
+  padding-left: 42px;
+  padding-bottom: 10px;
+  margin-top: 7px;
+  margin-bottom: 10px;
+}
+
+.id::placeholder, .pw::placeholder {
+  color: rgb(174,174,174);
+  font-size: 12px;
+}
+
+.id {
+  background-repeat: no-repeat;
+  background-position: 0 45%;
+}
+
+.pw {
+  background-repeat: no-repeat;
+  background-position: 0 45%;
+}
+
+.idsave-zone {
+  padding-top: 0;
+  padding-bottom: 20px;
+  color: #333;
+}
+
+input[id="idsave_chbox"] {
+  display: none;
+}
+
+input[id="idsave_chbox"] + label {
+  display: inline-block;
+  vertical-align: middle;
+  width: 15px;
+  height: 15px;
+  background: transparent;
+  margin-right: 5px;
+  border: 1px solid #929292;
+  cursor: pointer;
+  transition: none;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  position: relative;
+  top: -1px;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  margin-right: 7px;
+}
+
+.login_btn {
+  width: 260px;
+  height: 45px;
+  margin-top: 11px;
+  background: #fff;
+  color: #252525;
+  font-size: 18px;
+  border: 1px solid rgb(140,143,143);
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+}
+
+input[id="idsave_chbox"]:checked + label {
+  background: transparent;
+  background-repeat: no-repeat;
+  background-size: 10px;
+  background-position: 50%;
+}
+
+img {
+    vertical-align: middle;
+    border: 0;
+}
+
