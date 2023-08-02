@@ -115,6 +115,7 @@
                 method: 'POST',
                 dataType: "json",
                 success: function (responseData) {
+                    console.log(responseData)
                     if (responseData.code === 'S00') {
                         alert(responseData.msg)
                         location.href = "/main"
