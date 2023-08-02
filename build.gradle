@@ -32,8 +32,11 @@ dependencies {
     //[Jar] Lib Path 추가
     implementation fileTree(dir: 'libs', includes: ['*.jar'])
 
-    //유효성 검사 추가 valid
+    //유효성 검사 (valid) 추가
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    //Log4j2 추가
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
 }
 
