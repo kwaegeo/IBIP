@@ -1,6 +1,5 @@
 package com.insdiide.ibip.domain.login.vo;
 
-import com.insdiide.ibip.global.annotation.CustomNotBlank;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,9 +9,9 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class LoginVO {
 
-    @CustomNotBlank(message = "필수값이야 id", code= "404")
+    @NotBlank(message = "id는 필수 입력 값입니다.")
     private String id;
 
-    @CustomNotBlank(message = "필수값이야 pwd", code="500")
+    @NotBlank(message = "password는 필수 입력 값입니다.")
     private String pwd;
 }
