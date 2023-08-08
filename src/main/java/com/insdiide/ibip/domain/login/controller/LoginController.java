@@ -67,7 +67,7 @@ public class LoginController {
         httpSession.setAttribute("mstrSessionId", mstrSessionId);
 
 
-        return "redirect: /main";
+        return "redirect:/main";
     }
 
 
