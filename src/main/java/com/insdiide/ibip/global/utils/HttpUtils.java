@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class HttpUtils {
 
-    public boolean checkSession(HttpServletRequest request){
-        request.getSession()
-    }
+//    public boolean checkSession(HttpServletRequest request){
+//        request.getSession();
+//    }
 }

@@ -31,7 +31,7 @@ public class LoginService {
         WebIServerSession serverSession = factory.getIServerSession();
 
         // Set up session properties
-        serverSession.setServerName("localhost"); // Should be replaced with the name of an Intelligence Server
+        serverSession.setServerName("192.168.70.245"); // Should be replaced with the name of an Intelligence Server
         serverSession.setServerPort(0);
         serverSession.setProjectName("MicroStrategy Tutorial"); // Project where session is created
         serverSession.setLocaleID(1042); // 한국어

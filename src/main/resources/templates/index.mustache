@@ -48,23 +48,23 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                folders
+                공유 리포트
             </div>
 
-            {{#folderList}}
+            {{#shareFolders}}
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item" onclick="getFolderInfo('{{id}}')">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo{{id}}"
-                    aria-expanded="true" aria-controls="collapseTwo" id="{{id}}">
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo{{ID}}"
+                    aria-expanded="true" aria-controls="collapseTwo" id="{{ID}}">
                     <i class="fas fa-fw fa-folder"></i>
                     <span>{{name}}</span>
                 </a>
-                <div id="collapseTwo{{id}}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded" id="root{{id}}">
+                <div id="collapseTwo{{ID}}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded" id="root{{ID}}">
                     </div>
                 </div>
             </li>
-            {{/folderList}}
+            {{/shareFolders}}
 
 
 
@@ -83,26 +83,8 @@
             <li class="nav-item">
                 <a class="nav-link" href="charts.html">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>내 리포트</span></a>
+                    <span id="{{myFolders.ID}}">{{myFolders.name}}</span></a>
             </li>
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>내 도씨에</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span onclick="getReportInfo('256263D142248D56446F3A80AD100C06')">고객소득분석</span></a>
-            </li>
-
 
 
             <!-- Sidebar Toggler (Sidebar) -->
@@ -330,6 +312,8 @@
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Main Page</h1>
+
+                        <iframe id="targetFrame"></iframe>
                     </div>
 
                 </div>
@@ -409,19 +393,25 @@
                 method: 'GET',
                 dataType: "json",
                 success: function (responseData) {
-                    if (responseData.code === 'S00') {
+                        console.log(responseData)
                         folderRoot.children().remove();
-                        responseData.folderList.forEach(function (item, index){
+                        responseData.forEach(function (item, index){
+
                             var newHtml = $("<span>", {
                                 "class": "collapse-item",
-                                "id": item.id,
-                                "text": item.name
+                                "text": item.name,
                             });
+                            newHtml.attr("folderId", item.id);
+                            newHtml.attr("type", item.tp);
+
+                            if (item.tp == "3") {
+                                newHtml.click(function () {
+                                    openReport($(this).attr("folderId"));
+                                });
+                            }
+
                         folderRoot.append(newHtml);
                         })
-                    } else {
-                        alert("하위 구성요소를 불러오는 도중에 문제가 발생하였습니다.")
-                    }
                 },
                 error: function () {
                     alert("서버에 접속할 수 없습니다.")
@@ -432,6 +422,53 @@
         function getReportInfo(folderId){
             alert("아직 만드는중이야")
         }
+
+
+        function onNavLinkClicked(link) {
+            // 클래스를 확인하고 분기를 수행합니다.
+            if (link.hasClass('collapsed')) {
+                // collapsed 클래스를 가지고 있을 때
+                link.removeClass('collapsed');
+                // 여기에서 원하는 작업을 수행하세요.
+                console.log("Nav link expanded:", link.attr('id'));
+                getFolderInfo(link.attr('id'));
+            } else {
+                // collapsed 클래스를 가지고 있지 않을 때
+                // 여기에서 다른 작업을 수행하거나 아무 작업도 하지 않을 수 있습니다.
+            }
+        }
+
+        $(document).ready(function () {
+            $('.nav-link').on('click', function (event) {
+                event.preventDefault();
+                onNavLinkClicked($(this));
+            });
+        });
+
+
+        function openReport(reportId){
+
+            const requestData = {'reportId': reportId}
+            var iframe = $("#targetReport");
+            $.ajax({
+                url: '/folder/report',
+                data: requestData,
+                method: 'GET',
+                dataType: "text",
+                success: function (responseData) {
+                    console.log(responseData)
+                    iframe.attr("src", responseData);
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+
+        }
+
+
+
+
     </script>
 </body>
 
