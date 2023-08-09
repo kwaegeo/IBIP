@@ -310,10 +310,9 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4" id="iframeDiv">
                         <h1 class="h3 mb-0 text-gray-800">Main Page</h1>
 
-                        <iframe id="targetFrame"></iframe>
                     </div>
 
                 </div>
@@ -449,7 +448,6 @@
         function openReport(reportId){
 
             const requestData = {'reportId': reportId}
-            var iframe = $("#targetReport");
             $.ajax({
                 url: '/folder/report',
                 data: requestData,
@@ -457,7 +455,15 @@
                 dataType: "text",
                 success: function (responseData) {
                     console.log(responseData)
-                    iframe.attr("src", responseData);
+                    var iframe = $("<iframe>", {
+                        "src": responseData,
+                        "width": "100%",
+                        "height": "500px" // 조절해야 할 크기
+                    });
+
+                    // iframe을 특정 컨테이너에 추가
+                    $("#iframeDiv").append(iframe);
+
                 },
                 error: function () {
                     alert("서버에 접속할 수 없습니다.")
