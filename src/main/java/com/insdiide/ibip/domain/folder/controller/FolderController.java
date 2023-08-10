@@ -73,8 +73,8 @@ public class FolderController {
         urlSB.append("&reportID=").append(reportId); //Report ID
         urlSB.append("&reportViewMode=").append(1);
         urlSB.append("&src=mstrWeb.").append("reportNoHeaderNoFooterNoPath").append(".").append(4001);
+        urlSB.append("&hiddensections=dockTop,dockLeft");
         urlSB.append("&usrSmgr=").append(serverSession.saveState(0));
-
 
         System.out.println(urlSB.toString());
 
@@ -103,6 +103,7 @@ public class FolderController {
         urlSB.append("&documentID=").append(documentId); //Report ID
         urlSB.append("&currentViewMedia=").append(1);
         urlSB.append("&src=mstrWeb").append(".").append(2048001);
+        urlSB.append("&hiddensections=path,dockTop,dockLeft");
         urlSB.append("&usrSmgr=").append(serverSession.saveState(0));
 
 
