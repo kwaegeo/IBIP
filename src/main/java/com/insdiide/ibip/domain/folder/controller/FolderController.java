@@ -81,6 +81,35 @@ public class FolderController {
         return urlSB.toString();
     }
 
+    @GetMapping("/folder/document")
+    @ResponseBody
+    public String openDocument(@RequestParam(name = "documentId") String documentId, HttpServletRequest request) throws WebObjectsException {
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        WebObjectsFactory factory = WebObjectsFactory.getInstance();
+        WebIServerSession serverSession = factory.getIServerSession();
+        serverSession.setSessionID(mstrSessionId);
+
+
+        // Return session
+        StringBuilder urlSB = new StringBuilder();
+        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("/MicroStrategy/servlet/mstrWeb");
+        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        // urlSB.append("&port=0");
+        urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
+        urlSB.append("&evt=").append(2048001);
+        urlSB.append("&documentID=").append(documentId); //Report ID
+        urlSB.append("&currentViewMedia=").append(1);
+        urlSB.append("&src=mstrWeb").append(".").append(2048001);
+        urlSB.append("&usrSmgr=").append(serverSession.saveState(0));
+
+
+        System.out.println(urlSB.toString());
+
+        return urlSB.toString();
+    }
 
 
 }

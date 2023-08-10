@@ -403,10 +403,16 @@
                             newHtml.attr("folderId", item.id);
                             newHtml.attr("type", item.tp);
 
-                            if (item.tp == "3") {
+
+                            if (item.tp == "3") { //3은 report
                                 newHtml.click(function () {
                                     openReport($(this).attr("folderId"));
                                 });
+                            }
+                            else if(item.tp=="55"){
+                                newHtml.click(function(){
+                                    openDocument($(this).attr("folderId"));
+                                })
                             }
 
                         folderRoot.append(newHtml);
@@ -461,6 +467,8 @@
                         "height": "500px" // 조절해야 할 크기
                     });
 
+                    //모든 항목 삭제 후 추가
+                    $("#iframeDiv").empty();
                     // iframe을 특정 컨테이너에 추가
                     $("#iframeDiv").append(iframe);
 
@@ -472,7 +480,34 @@
 
         }
 
+        function openDocument(documentId){
 
+            const requestData = {'documentId': documentId}
+            $.ajax({
+                url: '/folder/document',
+                data: requestData,
+                method: 'GET',
+                dataType: "text",
+                success: function (responseData) {
+                    console.log(responseData)
+                    var iframe = $("<iframe>", {
+                        "src": responseData,
+                        "width": "100%",
+                        "height": "500px" // 조절해야 할 크기
+                    });
+
+                    //모든 항목 삭제 후 추가
+                    $("#iframeDiv").empty();
+                    // iframe을 특정 컨테이너에 추가
+                    $("#iframeDiv").append(iframe);
+
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+
+        }
 
 
     </script>
