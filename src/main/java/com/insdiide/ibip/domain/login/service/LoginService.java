@@ -36,8 +36,8 @@ public class LoginService {
         serverSession.setProjectName("MicroStrategy Tutorial"); // Project where session is created
         serverSession.setLocaleID(1042); // 한국어
         serverSession.setAuthMode(1);
-        serverSession.setLogin("administrator"); // User ID
-        serverSession.setPassword(""); // Password
+        serverSession.setLogin("test1"); // User ID
+        serverSession.setPassword("123456789"); // Password
         String mstrSessionId = "";
         try {
             mstrSessionId = serverSession.getSessionID();

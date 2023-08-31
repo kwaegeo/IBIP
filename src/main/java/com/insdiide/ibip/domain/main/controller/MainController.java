@@ -1,6 +1,7 @@
 package com.insdiide.ibip.domain.main.controller;
 
 import com.microstrategy.web.objects.*;
+import com.microstrategy.webapi.EnumDSSXMLFolderNames;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,8 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.microstrategy.webapi.EnumDSSXMLFolderNames.DssXmlFolderNameProfileReports;
 
 @Controller
 public class MainController {
@@ -37,6 +40,11 @@ public String main(HttpServletRequest request, Model model) throws WebObjectsExc
     List<WebObjectInfo> lstMenu = new ArrayList<>();
 
 
+    String shareReportId = factory.getObjectSource().getFolderID(EnumDSSXMLFolderNames.DssXmlFolderNamePublicReports);
+    System.out.println(shareReportId);
+    System.out.println("공유리포트 ID 확인");
+
+
     //1. 공유 리포트 하위 목록 싹 가져오기
     WebFolder folder = (WebFolder) factory.getObjectSource().getObject("D3C7D461F69C4610AA6BAA5EF51F4125", EnumDSSXMLObjectTypes.DssXmlTypeFolder);
     folder.populate();
@@ -60,10 +68,12 @@ public String main(HttpServletRequest request, Model model) throws WebObjectsExc
 
     model.addAttribute("shareFolders", lstMenu);
 
+    String myReportId = factory.getObjectSource().getFolderID(EnumDSSXMLFolderNames.DssXmlFolderNameProfileReports);
 
-    WebFolder folder2 = (WebFolder) factory.getObjectSource().getObject("8D67909211D3E4981000E787EC6DE8A4", EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+    WebFolder folder2 = (WebFolder) factory.getObjectSource().getObject(myReportId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
     folder2.populate();
-    System.out.println(folder2);
+    System.out.println(myReportId);
+    System.out.println("집에가고싶긴해");
     WebObjectInfo myreport = folder2;
 
     //2. 내리포트 정보 가져와서 넣기
