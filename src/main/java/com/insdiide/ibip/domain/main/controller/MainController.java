@@ -1,9 +1,15 @@
 package com.insdiide.ibip.domain.main.controller;
 
 import com.insdiide.ibip.domain.login.service.LoginService;
+import com.insdiide.ibip.domain.login.vo.FolderVO;
+import com.insdiide.ibip.domain.main.service.MainService;
+import com.insdiide.ibip.domain.main.vo.SideBarItemVO;
+import com.insdiide.ibip.global.exception.CustomException;
+import com.insdiide.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.webapi.EnumDSSXMLFolderNames;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +25,13 @@ import static com.microstrategy.webapi.EnumDSSXMLFolderNames.DssXmlFolderNamePro
 @Controller
 public class MainController {
 
+    @Autowired
+    private MainService mainService;
+
+    @Autowired
+    private ComUtils comUtils;
+
+
 @GetMapping("/sample")
 public String sample(){
     return "/indexOri";
@@ -28,23 +41,32 @@ public String sample(){
 
 
 @GetMapping("/main")
-public String main(HttpServletRequest request, Model model) throws WebObjectsException {
+public String getMainPage(HttpServletRequest request, Model model) throws WebObjectsException {
 
-    LoginService loginService = new LoginService();
+    //1. 사용자 세션 (MSTR) 유효성 검사
+    //2. 좌측 리스트 메뉴 가져오기 (폴더명, 폴더ID)
+    //3. 사용자 정보 가져오기 (이름, 계정ID)
 
     HttpSession httpSession = request.getSession(true);
     String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
-    System.out.println(mstrSessionId);
-    System.out.println("왜?");
+
+    //1. 세션 체크
+    try{
+        comUtils.sessionCheck(mstrSessionId);
+    }catch(CustomException ex){
+        throw ex;
+    }
+
+    //2. 좌측 리스트 가져오기 (하위 목록 가져오는 함수)
+    SideBarItemVO sideBarItems = mainService.getSideBarItems();
+
+
     WebObjectsFactory factory = WebObjectsFactory.getInstance();
     WebIServerSession serverSession = factory.getIServerSession();
-
     serverSession.setSessionID(mstrSessionId);
 
     System.out.println(serverSession.saveState(0));
-    boolean a = loginService.userIsAlive(serverSession.saveState(0));
 
-    System.out.println(a);
 
     List<WebObjectInfo> lstMenu = new ArrayList<>();
 

@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
     //기타 에러 핸들링
     @ExceptionHandler({Exception.class})
     protected ResponseEntity handleException(Exception ex) {
+        ex.printStackTrace();
         return new ResponseEntity(new ErrorVO(ResultCode.ETC_ERROR.getCode(), ResultCode.ETC_ERROR.getMsg()), HttpStatus.OK);
     }
 }

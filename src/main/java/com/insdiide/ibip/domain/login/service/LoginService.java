@@ -87,41 +87,5 @@ public class LoginService {
     }
 
 
-    public boolean userIsAlive(String usrSmgr) {
-        //현재 살아있으면 false 죽어있으면 true임.
-        WebIServerSession userSession = WebObjectsFactory.getInstance().getIServerSession();
-
-        userSession.restoreState(usrSmgr);    //session 가져오기 (복원에 성공하면 true??)
-        userSession.setActive(); //이건 도대체 왜하는거여
-
-        try {
-            if (userSession.isAlive()) { // 살아있으면
-                //closeSession(userSession);
-                return false; //false를 반환해?
-            } else {
-                closeSession(userSession); //죽어있으면 연결을 끊어
-            }
-        } catch (WebObjectsException e) {
-            log.info("WebObjectsException e >> userIsAlive");
-        } catch (Exception e) {
-            log.info("Exception e >> userIsAlive");
-        }
-
-        return true; //연결을 끊고 true를 반환해?
-    }
-
-
-    public void closeSession(WebIServerSession serverSession) {
-        try {
-            serverSession.closeSession();
-        }
-        catch (WebObjectsException e) {
-            log.info("exception.webObjectsException >> closeSession");
-        }
-        catch (Exception e) {
-            log.info("exception.Exception >> closeSession");
-        }
-        log.info("Session closed.");
-    }
 
 }

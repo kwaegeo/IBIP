@@ -70,4 +70,50 @@ public class MstrSession {
         return mstrSessionId;
     }
 
+
+    public boolean userIsAlive(String mstrSessionId) {
+        serverSession = factory.getIServerSession();
+        //현재 살아있으면 false 죽어있으면 true
+        serverSession.setSessionID(mstrSessionId);
+        String usrSmgr = serverSession.saveState(0);
+        serverSession.restoreState(usrSmgr);    //session 가져오기 (복원에 성공하면 true??)
+        serverSession.setActive(); //이건 도대체 왜하는거여
+
+        try {
+            if (serverSession.isAlive()) { // 살아있으면
+                //closeSession(userSession);
+                return false; //false를 반환해?
+            } else {
+                closeSession(serverSession); //죽어있으면 연결을 끊어
+            }
+        } catch (WebObjectsException e) {
+            log.info("WebObjectsException e >> userIsAlive");
+        } catch (Exception e) {
+            log.info("Exception e >> userIsAlive");
+        }
+
+        System.out.println(usrSmgr);
+        System.out.println(mstrSessionId);
+        System.out.println("이거맞는지?");
+
+        return true; //연결을 끊고 true를 반환해?
+    }
+
+
+    public void closeSession(WebIServerSession serverSession) {
+        try {
+            serverSession.closeSession();
+        }
+        catch (WebObjectsException e) {
+            log.info("exception.webObjectsException >> closeSession");
+        }
+        catch (Exception e) {
+            log.info("exception.Exception >> closeSession");
+        }
+        log.info("Session closed.");
+    }
+
+
+
+
 }
