@@ -2,17 +2,13 @@ package com.insdiide.ibip.domain.login.controller;
 
 import com.insdiide.ibip.domain.login.service.LoginService;
 import com.insdiide.ibip.domain.login.vo.LoginVO;
-import com.insdiide.ibip.domain.login.vo.ResponseVO;
-import com.microstrategy.web.objects.WebIServerSession;
-import com.microstrategy.web.objects.WebObjectsException;
-import com.microstrategy.web.objects.WebObjectsFactory;
+import com.insdiide.ibip.global.exception.CustomException;
+import com.insdiide.ibip.global.exception.code.ResultCode;
+import com.insdiide.ibip.global.vo.ResVO;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Map;
 
 @Log4j2
 @Controller
@@ -43,32 +38,47 @@ public class LoginController {
 
     }
 
+    @GetMapping("/a")
+    public String a(HttpServletRequest request){
+
+        loginService.createMstrSession2();
+        return "/login/login";
+
+    }
+
     @PostMapping("/login")
-    public String loginProc(@Valid LoginVO loginVO, Errors errors, Model model, HttpServletRequest request) {
+    @ResponseBody
+    public ResVO loginProc(@Valid @RequestBody LoginVO loginVO, Errors errors, Model model, HttpServletRequest request) {
         log.info("로그인 ID : " + loginVO.getId());
         log.info("로그인 PWD : " + loginVO.getPwd());
 
-        //1. 유효성 검사 (필수 값이 없을 시)
-        if (errors.hasErrors()) {
-            model.addAttribute("loginVO", loginVO);
-
-            //1-1. 핸들링 함수 호출 (에러 키와, 에러메세지 들고옴)
-            Map<String, String> validatorResult = loginService.validateHandling(errors);
-            for (String key : validatorResult.keySet()) {
-                model.addAttribute(key, validatorResult.get(key));
-            }
-            //1-2. 모델에 담은 후 로그인 페이지로 return
-            return "/login/login";
+        //1. 유효성 검사
+        if(errors.hasFieldErrors("id")){
+            return new ResVO(ResultCode.ID_MISSING);
+        } else if (errors.hasFieldErrors("pwd")) {
+            return new ResVO(ResultCode.PASSWORD_MISSING);
         }
 
         //2. MSTR 세션 생성
-        String mstrSessionId = loginService.createMstrSession();
+        String mstrSessionId = "";
+
+        try{
+            mstrSessionId = loginService.CreateMstrSession(loginVO.getId(), loginVO.getPwd());
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        //3. HttpSession에 mstrSessionId 저장
         HttpSession httpSession = request.getSession();
         httpSession.setAttribute("mstrSessionId", mstrSessionId);
 
-
-        return "redirect:/main";
+        //4. 응답
+        return new ResVO(ResultCode.SUCCESS);
     }
 
-
 }
+
+
+// 1. 필수값 입력 안했을 때
+// 2. MSTR 세션 생성에 실패했을 때
+

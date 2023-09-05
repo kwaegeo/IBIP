@@ -1,29 +1,30 @@
 package com.insdiide.ibip.domain.login.service;
 
+import com.insdiide.ibip.global.mstr.MstrSession;
 import com.microstrategy.web.objects.WebIServerSession;
 import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.web.objects.WebObjectsFactory;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import java.util.HashMap;
 import java.util.Map;
-
+@Log4j2
 @Service
 public class LoginService {
 
-    public Map<String, String> validateHandling(Errors errors){
-        Map<String, String> validatorResult = new HashMap<>();
+    @Autowired
+    private MstrSession mstrSession;
 
-        for (FieldError error : errors.getFieldErrors()) {
-            String validKeyName = String.format("valid_%s", error.getField());
-            validatorResult.put(validKeyName, error.getDefaultMessage());
-        }
+    public String CreateMstrSession(String userId, String pwd){
 
-        return validatorResult;
+        return mstrSession.createSession(userId, pwd);
     }
 
-    public String createMstrSession(){
+
+    public String createMstrSession2(){
 
         //2. MSTR 세션 생성 (생성이 되지 않을 시 return)
 
@@ -36,20 +37,18 @@ public class LoginService {
         serverSession.setProjectName("MicroStrategy Tutorial"); // Project where session is created
         serverSession.setLocaleID(1042); // 한국어
         serverSession.setAuthMode(1);
-        serverSession.setLogin("test1"); // User ID
+        serverSession.setLogin("test1222"); // User ID
         serverSession.setPassword("123456789"); // Password
         String mstrSessionId = "";
         try {
             mstrSessionId = serverSession.getSessionID();
-            System.out.println("nSession created with ID: "+ mstrSessionId);
-            System.out.println("Session State: "+ serverSession.saveState(0));
         } catch (WebObjectsException ex) {
             System.out.println( "Error creating session:" + ex.getMessage());
             System.out.println("===============================");
             System.out.println(ex.getLocalizedMessage());
             System.out.println(ex.getErrorCode());
 
-            if(ex.getLocalizedMessage() == "로그인 실패"){
+            if(ex.getErrorCode() == -2147216959){
                 System.out.println("아이디 또는 비밀번호를 잘못 입력했습니다.");
                 return "아이디 또는 비밀번호를 잘못 입력했습니다.";
             }
@@ -87,5 +86,42 @@ public class LoginService {
         return mstrSessionId;
     }
 
+
+    public boolean userIsAlive(String usrSmgr) {
+        //현재 살아있으면 false 죽어있으면 true임.
+        WebIServerSession userSession = WebObjectsFactory.getInstance().getIServerSession();
+
+        userSession.restoreState(usrSmgr);    //session 가져오기 (복원에 성공하면 true??)
+        userSession.setActive(); //이건 도대체 왜하는거여
+
+        try {
+            if (userSession.isAlive()) { // 살아있으면
+                //closeSession(userSession);
+                return false; //false를 반환해?
+            } else {
+                closeSession(userSession); //죽어있으면 연결을 끊어
+            }
+        } catch (WebObjectsException e) {
+            log.info("WebObjectsException e >> userIsAlive");
+        } catch (Exception e) {
+            log.info("Exception e >> userIsAlive");
+        }
+
+        return true; //연결을 끊고 true를 반환해?
+    }
+
+
+    public void closeSession(WebIServerSession serverSession) {
+        try {
+            serverSession.closeSession();
+        }
+        catch (WebObjectsException e) {
+            log.info("exception.webObjectsException >> closeSession");
+        }
+        catch (Exception e) {
+            log.info("exception.Exception >> closeSession");
+        }
+        log.info("Session closed.");
+    }
 
 }

@@ -21,6 +21,9 @@ import java.util.List;
 @Controller
 public class FolderController {
 
+    //Object 파일 들 참조해서 따로 만들기
+    //Prompt만 하면 사실 끝이긴한데
+    //일단
     @GetMapping("/folder/subList")
     @ResponseBody
     public List<FolderVO> subFolder(@RequestParam(name = "folderId") String folderId, HttpServletRequest request) throws WebObjectsException {
@@ -86,6 +89,8 @@ public class FolderController {
         }
         else {
             WebElementsPrompt elementsPrompt = (WebElementsPrompt) webPrompt;
+            System.out.println(elementsPrompt.getDescription());
+            System.out.println("z");
             String anserXml = elementsPrompt.getAnswerXML();
             WebElementSource webElementSource = elementsPrompt.getOrigin().getElementSource();
             String attrId = elementsPrompt.getOrigin().getID(); // attribute id
@@ -158,6 +163,18 @@ public class FolderController {
 
         return urlSB.toString();
     }
+
+//    @GetMapping("/folder/report")
+//    @ResponseBody
+//    public List<PromptDataVO> openReport2(){
+//
+//        //Prompt가 있으면 Prompt들을 반환하고 없으면 리포트 URL을 반환하도록 해야한다.
+//        //        List<PromptDataVO>랑 URL을 들고있는 객체를 만들거나 해야한다.
+//
+//    }
+
+
+
 
     @GetMapping("/folder/document")
     @ResponseBody

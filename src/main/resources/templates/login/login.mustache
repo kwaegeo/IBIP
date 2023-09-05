@@ -38,21 +38,18 @@
                             <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
                             <div class="col-lg-6">
                                 <div class="p-5">
-                                    <form action="/login" method="post">
                                     <div class="text-center">
 <!--                                        <h1 class="h4 text-gray-900 mb-4">INSIDEINFO MSTR PORTAL</h1>-->
                                         <img src="/img/InsideLogo.jpg" style="margin: 4px auto 40px auto; "/>
                                     </div>
                                         <div class="form-group">
                                             <input type="text" class="form-control form-control-user"
-                                                id="id" name="id" aria-describedby="idHelp" value="{{#loginVO}}{{loginVO.id}}{{/loginVO}}"
+                                                id="id" name="id" aria-describedby="idHelp"
                                                 placeholder="아이디를 입력해주세요..">
-                                            <span>{{#valid_id}}{{valid_id}}{{/valid_id}}</span>
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" class="form-control form-control-user" value="{{#loginVO}}{{loginVO.pwd}}{{/loginVO}}"
+                                            <input type="password" class="form-control form-control-user"
                                                 id="pwd" name="pwd" placeholder="비밀번호를 입력해주세요..">
-                                            <span>{{#valid_pwd}}{{valid_pwd}}{{/valid_pwd}}</span>
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
@@ -61,7 +58,7 @@
                                                     Me</label>
                                             </div>
                                         </div>
-                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                        <button type="button" class="btn btn-primary btn-user btn-block" onclick="login()">
                                             Login
                                         </button>
                                     <hr>
@@ -71,7 +68,6 @@
                                     <div class="text-center">
                                         <span class="small" href="register.html" onclick="toBeDeveloped()">Create an Account!</span>
                                     </div>
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -94,45 +90,44 @@
     <!-- Custom scripts for all pages-->
     <script src="/js/sb-admin-2.min.js"></script>
     <script type="text/javascript">
-        // function login(){
-        //     const loginId = $('#id')
-        //     const loginPassword =$('#pwd')
-        //
-        //     // if(!loginId.val()){
-        //     //     loginId.focus()
-        //     //     return alert("ID를 입력해주세요.")
-        //     // }
-        //     // if(!loginPassword.val()){
-        //     //     loginPassword.focus()
-        //     //     return alert("Password를 입력해주세요")
-        //     // }
-        //
-        //     const requestData = {
-        //         'id': loginId.val(),
-        //         'pwd': loginPassword.val(),
-        //     }
-        //
-        //     $.ajax({
-        //         url: '/login',
-        //         data: JSON.stringify(requestData),
-        //         contentType: "application/json",
-        //         method: 'POST',
-        //         dataType: "json",
-        //         success: function (responseData) {
-        //             console.log(responseData)
-        //             if (responseData.code === 'S00') {
-        //                 alert(responseData.msg)
-        //                 location.href = "/main"
-        //             } else {
-        //                 alert("뭔가 잘못되었습니다. \n errorCode :" + responseData.code)
-        //             }
-        //         },
-        //         error: function () {
-        //             alert("서버에 접속할 수 없습니다.")
-        //         }
-        //     })
-        //
-        // }
+        function login(){
+            const loginId = $('#id')
+            const loginPassword =$('#pwd')
+            //
+            // // if(!loginId.val()){
+            // //     loginId.focus()
+            // //     return alert("ID를 입력해주세요.")
+            // // }
+            // // if(!loginPassword.val()){
+            // //     loginPassword.focus()
+            // //     return alert("Password를 입력해주세요")
+            // // }
+            //
+            const requestData = {
+                'id': loginId.val(),
+                'pwd': loginPassword.val(),
+            }
+
+            $.ajax({
+                url: '/login',
+                data: JSON.stringify(requestData),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "json",
+                success: function (responseData) {
+                    console.log(responseData)
+                    if (responseData.code === 'S00') {
+                        location.href = "/main"
+                    } else {
+                        alert(responseData.msg)
+                    }
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+
+        }
 
         function toBeDeveloped(){
             alert("개발예정중입니다.");

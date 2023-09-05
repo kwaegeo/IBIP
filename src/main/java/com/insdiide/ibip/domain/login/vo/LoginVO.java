@@ -9,9 +9,9 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class LoginVO {
 
-    @NotBlank(message = "id는 필수 입력 값입니다.")
+    @NotBlank
     private String id;
 
-    @NotBlank(message = "password는 필수 입력 값입니다.")
+    @NotBlank
     private String pwd;
 }

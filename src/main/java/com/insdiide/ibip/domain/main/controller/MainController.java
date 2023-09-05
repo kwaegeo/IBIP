@@ -1,5 +1,6 @@
 package com.insdiide.ibip.domain.main.controller;
 
+import com.insdiide.ibip.domain.login.service.LoginService;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.webapi.EnumDSSXMLFolderNames;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
@@ -29,13 +30,21 @@ public String sample(){
 @GetMapping("/main")
 public String main(HttpServletRequest request, Model model) throws WebObjectsException {
 
+    LoginService loginService = new LoginService();
+
     HttpSession httpSession = request.getSession(true);
     String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
-
+    System.out.println(mstrSessionId);
+    System.out.println("왜?");
     WebObjectsFactory factory = WebObjectsFactory.getInstance();
     WebIServerSession serverSession = factory.getIServerSession();
 
     serverSession.setSessionID(mstrSessionId);
+
+    System.out.println(serverSession.saveState(0));
+    boolean a = loginService.userIsAlive(serverSession.saveState(0));
+
+    System.out.println(a);
 
     List<WebObjectInfo> lstMenu = new ArrayList<>();
 
