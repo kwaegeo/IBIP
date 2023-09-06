@@ -52,12 +52,14 @@ public class LoginController {
         log.info("로그인 ID : " + loginVO.getId());
         log.info("로그인 PWD : " + loginVO.getPwd());
 
-        //1. 유효성 검사
+        //1. 유효성 검사 (id)
         if(errors.hasFieldErrors("id")){
             return new ResVO(ResultCode.ID_MISSING);
-        } else if (errors.hasFieldErrors("pwd")) {
-            return new ResVO(ResultCode.PASSWORD_MISSING);
         }
+        //1-1. 유효성 검사 (pwd)
+//        else if (errors.hasFieldErrors("pwd")) {
+//            return new ResVO(ResultCode.PASSWORD_MISSING);
+//        }
 
         //2. MSTR 세션 생성
         String mstrSessionId = "";

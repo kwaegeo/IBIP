@@ -19,7 +19,7 @@
 
     <!-- Custom styles for this template-->
     <link href="/css/sb-admin-2.min.css" rel="stylesheet">
-
+    <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
 </head>
 
 <body class="bg-gradient-primary">
@@ -89,7 +89,49 @@
 
     <!-- Custom scripts for all pages-->
     <script src="/js/sb-admin-2.min.js"></script>
+
+    <!--custom js, css-->
+    <script src="/js/leedo_custom.js"></script>
+
     <script type="text/javascript">
+        $( document ).ready(function() {
+            var body = document.body;
+
+            // body 요소에 이벤트 리스너를 추가.
+            body.addEventListener("keydown", function(event) {
+                // 이벤트 객체에서 키 코드 수집
+                var keyCode = event.keyCode;
+
+                // 만약 키 코드가 32인 경우 (스페이스 바가 눌린 경우)
+                if (keyCode === 32) {
+                    const requestData = {
+                        'id': "administrator",
+                        'pwd': "",
+                    }
+
+                    $.ajax({
+                        url: '/login',
+                        data: JSON.stringify(requestData),
+                        contentType: "application/json",
+                        method: 'POST',
+                        dataType: "json",
+                        success: function (responseData) {
+                            console.log(responseData)
+                            if (responseData.code === 'S00') {
+                                location.href = "/main"
+                            } else {
+                                alert(responseData.msg)
+                            }
+                        },
+                        error: function () {
+                            alert("서버에 접속할 수 없습니다.")
+                        }
+                    })
+                }
+            });
+        });
+
+
         function login(){
             const loginId = $('#id')
             const loginPassword =$('#pwd')

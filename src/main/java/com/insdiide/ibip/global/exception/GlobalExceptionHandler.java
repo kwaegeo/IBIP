@@ -12,7 +12,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({CustomException.class})
     protected ResponseEntity<ErrorVO> handleCustomException(CustomException ex) {
-
+        ex.printStackTrace();
         return new ResponseEntity(new ErrorVO(ex.getResultCode().getCode(), ex.getResultCode().getMsg()), HttpStatus.OK);
     }
 
