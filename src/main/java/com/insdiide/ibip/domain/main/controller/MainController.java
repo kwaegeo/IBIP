@@ -31,8 +31,6 @@ public String sample(){
 }
 
 
-
-
 @GetMapping("/main")
 public String getMainPage(HttpServletRequest request, Model model) throws WebObjectsException {
 
@@ -60,7 +58,5 @@ public String getMainPage(HttpServletRequest request, Model model) throws WebObj
 
     return "/index";
 }
-
-
 
 }

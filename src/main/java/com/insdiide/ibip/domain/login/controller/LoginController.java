@@ -46,6 +46,8 @@ public class LoginController {
 
     }
 
+    
+    // login 시 세션에 사용자 정보도 담기
     @PostMapping("/login")
     @ResponseBody
     public ResVO loginProc(@Valid @RequestBody LoginVO loginVO, Errors errors, Model model, HttpServletRequest request) {

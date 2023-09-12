@@ -1,15 +1,23 @@
 package com.insdiide.ibip.domain.folder.controller;
 
+import com.insdiide.ibip.domain.folder.service.FolderService;
+import com.insdiide.ibip.domain.folder.vo.TopItemVO;
 import com.insdiide.ibip.domain.login.vo.FolderVO;
 import com.insdiide.ibip.domain.login.vo.ResponseVO;
+import com.insdiide.ibip.domain.main.service.MainService;
 import com.insdiide.ibip.domain.prompt.VO.PromptDataVO;
+import com.insdiide.ibip.global.exception.CustomException;
+import com.insdiide.ibip.global.utils.ComUtils;
 import com.microstrategy.utils.json.JSONException;
 import com.microstrategy.utils.json.XML;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
 import com.microstrategy.webapi.EnumDSSXMLPrivilegeTypes;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -18,8 +26,16 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Controller
 public class FolderController {
+
+    @Autowired
+    private FolderService folderService;
+
+    @Autowired
+    private ComUtils comUtils;
+
 
     //Object 파일 들 참조해서 따로 만들기
     //Prompt만 하면 사실 끝이긴한데
@@ -207,5 +223,27 @@ public class FolderController {
         return urlSB.toString();
     }
 
+    @GetMapping("/folder")
+    public String getFolderPage(@RequestParam(name = "folderId") String folderId, HttpServletRequest request) throws WebObjectsException {
+
+        //1. 세션 체크
+        //2. 전달 받은 상위 폴더 ID 추출
+        //2-1. 상위 폴더 하위의 모든 폴더 정보 가져오기
+        //2-2. 전달 받은 폴더의 하위 모든 요소들 출력
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId);
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        TopItemVO topItem = folderService.getTopItem(mstrSessionId, folderId);
+
+        return "/folder/folder";
+    }
 
 }

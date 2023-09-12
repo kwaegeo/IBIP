@@ -44,6 +44,13 @@ public class MstrObject extends MstrSession{
         return folderId;
     }
 
+    public String getFolderId(String reqfolderId) throws WebObjectsException{
+        WebFolder folder = (WebFolder) factory.getObjectSource().getObject(reqfolderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+        WebFolder Parent = folder.getParent();
+        System.out.println(Parent);
+        return "";
+    }
+
     public FolderVO getfolderInfo(String folderId) throws WebObjectsException {
         FolderVO folderInfo = new FolderVO();
         WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);

@@ -54,15 +54,11 @@
             {{#sideBarItem.shareFolderItems}}
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo{{id}}"
-                    aria-expanded="true" aria-controls="collapseTwo" id="{{id}}">
+                <a class="nav-link collapsed" href="#"
+                    aria-expanded="true" aria-controls="collapseTwo" id="{{id}}" onclick="openFolder('{{id}}')">
                     <i class="fas fa-fw fa-folder"></i>
                     <span>{{name}}</span>
                 </a>
-                <div id="collapseTwo{{id}}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded" id="root{{id}}">
-                    </div>
-                </div>
             </li>
             {{/sideBarItem.shareFolderItems}}
 
@@ -617,6 +613,9 @@
 
         }
 
+        function openFolder(folderId){
+            window.open("/folder?folderId="+folderId, 'Folder 정보', 'width=1240,height=1100,location=no,status=no,scrollbars=yes')
+        }
 
     </script>
 </body>
