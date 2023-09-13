@@ -22,7 +22,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-mustache'
+//    implementation 'org.springframework.boot:spring-boot-starter-mustache'
+
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.5.5'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.1'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
     compileOnly 'org.projectlombok:lombok'

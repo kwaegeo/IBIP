@@ -1,5 +1,6 @@
 package com.insdiide.ibip.global.mstr;
 
+import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.login.vo.FolderVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.microstrategy.web.objects.*;
@@ -44,11 +45,11 @@ public class MstrObject extends MstrSession{
         return folderId;
     }
 
-    public String getFolderId(String reqfolderId) throws WebObjectsException{
-        WebFolder folder = (WebFolder) factory.getObjectSource().getObject(reqfolderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
-        WebFolder Parent = folder.getParent();
-        System.out.println(Parent);
-        return "";
+    public String getParentFolderId(String reqFolderId) throws WebObjectsException{
+        WebFolder folder = (WebFolder) factory.getObjectSource().getObject(reqFolderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+        WebFolder parent = folder.getParent();
+        System.out.println(parent);
+        return parent.getID();
     }
 
     public FolderVO getfolderInfo(String folderId) throws WebObjectsException {
@@ -67,5 +68,17 @@ public class MstrObject extends MstrSession{
         userInfo.setUserId(webUser.getID());
         userInfo.setUserName(webUser.getName());
         return userInfo;
+    }
+
+    //하위 전체 요소 조회
+    public List<EntityVO> getSubList(String folderId) throws WebObjectsException {
+        List<EntityVO> subList = new ArrayList<>();
+        WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+        folder.populate();
+        for(int i=0; i<folder.getChildCount(); i++){
+                subList.add(new EntityVO(folder.get(i).getName(), folder.get(i).getID(), folder.get(i).getType()));
+                System.out.println(folder.get(i));
+        }
+        return subList;
     }
 }

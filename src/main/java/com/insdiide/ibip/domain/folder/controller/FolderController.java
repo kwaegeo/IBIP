@@ -1,10 +1,12 @@
 package com.insdiide.ibip.domain.folder.controller;
 
 import com.insdiide.ibip.domain.folder.service.FolderService;
+import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.folder.vo.TopItemVO;
 import com.insdiide.ibip.domain.login.vo.FolderVO;
 import com.insdiide.ibip.domain.login.vo.ResponseVO;
 import com.insdiide.ibip.domain.main.service.MainService;
+import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.domain.prompt.VO.PromptDataVO;
 import com.insdiide.ibip.global.exception.CustomException;
 import com.insdiide.ibip.global.utils.ComUtils;
@@ -16,6 +18,7 @@ import com.microstrategy.webapi.EnumDSSXMLPrivilegeTypes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -224,7 +227,7 @@ public class FolderController {
     }
 
     @GetMapping("/folder")
-    public String getFolderPage(@RequestParam(name = "folderId") String folderId, HttpServletRequest request) throws WebObjectsException {
+    public String getFolderPage(@RequestParam(name = "folderId") String folderId, HttpServletRequest request, Model model) throws WebObjectsException {
 
         //1. 세션 체크
         //2. 전달 받은 상위 폴더 ID 추출
@@ -241,7 +244,20 @@ public class FolderController {
             throw ex;
         }
 
+        // 상위 폴더의 하위 폴더 정보 조회
         TopItemVO topItem = folderService.getTopItem(mstrSessionId, folderId);
+
+        //전달 받은 폴더의 하위 목록 조회
+        List<EntityVO> subList = folderService.getSubList(mstrSessionId, folderId);
+
+        UserInfoVO userInfo = comUtils.getUserInfo(mstrSessionId);
+
+
+
+        model.addAttribute("topItem", topItem);
+        model.addAttribute("subList", subList);
+        model.addAttribute("reqFolderId", folderId);
+        model.addAttribute("userInfo", userInfo);
 
         return "/folder/folder";
     }
