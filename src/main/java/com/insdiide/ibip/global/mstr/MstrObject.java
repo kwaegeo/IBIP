@@ -76,7 +76,7 @@ public class MstrObject extends MstrSession{
         WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
         folder.populate();
         for(int i=0; i<folder.getChildCount(); i++){
-                subList.add(new EntityVO(folder.get(i).getName(), folder.get(i).getID(), folder.get(i).getType()));
+                subList.add(new EntityVO(folder.get(i).getID(), folder.get(i).getName(), folder.get(i).getType()));
                 System.out.println(folder.get(i));
         }
         return subList;

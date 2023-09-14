@@ -9,3 +9,29 @@
     text-overflow: ellipsis; /* 텍스트가 버튼 영역을 벗어날 경우 말줄임표(...)를 표시 */
     font-size: 12px; /* 원하는 글자 크기 설정 */
 }
+
+/* CSS 파일 또는 <style> 태그 안에 추가하세요. */
+.btn-text-responsive2 {
+    white-space: nowrap; /* 텍스트가 한 줄로 줄어들도록 설정 */
+    overflow: hidden;    /* 텍스트가 버튼 영역을 벗어나지 않도록 설정 */
+    text-overflow: ellipsis; /* 텍스트가 버튼 영역을 벗어날 경우 말줄임표(...)를 표시 */
+    max-width: 100%; /* 원하는 글자 크기 설정 */
+}
+
+.text-black-bold {
+    color: #FFFFCC !important;
+    font-family: "Font Awesome 5 Free";
+}
+
+.nav-item2 {
+    /* overflow 설정 */
+    overflow: hidden;
+}
+
+.nav-item2 > #jstree > ul > li {
+    /* span 태그 내의 텍스트가 넘칠 때 줄 바꿈 금지 및 숨김 처리 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 넘치는 텍스트에 대한 "..."(말줄임) 표시 */
+    font-size: 12px;
+}

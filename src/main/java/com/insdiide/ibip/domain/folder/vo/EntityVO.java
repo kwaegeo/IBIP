@@ -13,8 +13,8 @@ public class EntityVO {
 
     private String id;
 
-    private String name;
+    private String text;
 
-    private int tp;
+    private int type;
 
 }

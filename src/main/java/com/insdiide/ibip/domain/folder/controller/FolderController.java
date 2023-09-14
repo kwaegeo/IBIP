@@ -54,14 +54,12 @@ public class FolderController {
         WebIServerSession serverSession = factory.getIServerSession();
 
 
-
         serverSession.setSessionID(mstrSessionId);
         List<FolderVO> folderList = new ArrayList<>();
-        if(serverSession.checkUserPrivilege(EnumDSSXMLPrivilegeTypes.DssXmlPrivilegesUseServerAdmin)){
+        if (serverSession.checkUserPrivilege(EnumDSSXMLPrivilegeTypes.DssXmlPrivilegesUseServerAdmin)) {
             System.out.println("관리자입니다");
-        }
-        else {
-           System.out.println("관리자가 아닙니다.");
+        } else {
+            System.out.println("관리자가 아닙니다.");
         }
 
         //1. 공유 리포트 하위 목록 싹 가져오기
@@ -71,11 +69,11 @@ public class FolderController {
 
         System.out.println(folder.getDisplayName());
 
-        for(int i=0; i<folder.getChildCount(); i++){
+        for (int i = 0; i < folder.getChildCount(); i++) {
             folderList.add(FolderVO.builder()
                     .id(folder.get(i).getID())
-                            .name(folder.get(i).getName())
-                            .tp(folder.get(i).getType()).build());
+                    .name(folder.get(i).getName())
+                    .tp(folder.get(i).getType()).build());
             System.out.println(folder.get(i));
 
         }
@@ -101,12 +99,11 @@ public class FolderController {
 
         System.out.println("wait");
 
-        if (webPrompt.getPromptType() == 1){
+        if (webPrompt.getPromptType() == 1) {
             WebConstantPrompt constantPrompt = (WebConstantPrompt) webPrompt;
             String anserXml = constantPrompt.getAnswerXML();
 
-        }
-        else {
+        } else {
             WebElementsPrompt elementsPrompt = (WebElementsPrompt) webPrompt;
             System.out.println(elementsPrompt.getDescription());
             System.out.println("z");
@@ -193,8 +190,6 @@ public class FolderController {
 //    }
 
 
-
-
     @GetMapping("/folder/document")
     @ResponseBody
     public String openDocument(@RequestParam(name = "documentId") String documentId, HttpServletRequest request) throws WebObjectsException {
@@ -238,11 +233,15 @@ public class FolderController {
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
+        try {
             comUtils.sessionCheck(mstrSessionId);
-        }catch(CustomException ex){
+        } catch (CustomException ex) {
             throw ex;
         }
+
+        /**
+         * 상위 메뉴 조회
+         * **/
 
         // 상위 폴더의 하위 폴더 정보 조회
         TopItemVO topItem = folderService.getTopItem(mstrSessionId, folderId);
@@ -250,8 +249,16 @@ public class FolderController {
         //전달 받은 폴더의 하위 목록 조회
         List<EntityVO> subList = folderService.getSubList(mstrSessionId, folderId);
 
+        /**
+         * 왼쪽 사이드 메뉴 조회 (jstree) child yn이 따로 있는지?
+         * **/
+
+        //사용자 정보 조회
         UserInfoVO userInfo = comUtils.getUserInfo(mstrSessionId);
 
+        //왼쪽 폴더메뉴 트리형태로 구현
+        //펼치기, 눌렀을 때 펼쳐지는 것은 Ajax요청으로
+        //처음에는 일단 그것만 있으면 되잖아;(폴더의 하위목록전체 뽑는 것)
 
 
         model.addAttribute("topItem", topItem);
@@ -259,7 +266,7 @@ public class FolderController {
         model.addAttribute("reqFolderId", folderId);
         model.addAttribute("userInfo", userInfo);
 
-        return "/folder/folder";
+        return "/folder/zzz";
     }
 
 }
