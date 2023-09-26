@@ -23,10 +23,20 @@
     <link href="css/custom.css" rel="stylesheet">
 
     <!-- jstree CSS-->
-    <link href="dist/themes/default/style.min.css"/>
+    <link href="dist/themes/default/style.min.css" rel="stylesheet"/>
 
     <!-- Custom styles for this page -->
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+<!--    <link rel="stylesheet" type="text/css" href="assets/css/style.css">-->
+<!--    <link rel="stylesheet" type="text/css" href="assets/js/jqueryui/jquery-ui.min.css">-->
+    <link rel="stylesheet" type="text/css" href="assets/js/treeview/jquery.treeview.css">
+    <script type="text/javascript" src="assets/js/common.js" defer=""></script>
+    <script type="text/javascript" src="assets/js/treeview/jquery.treeview.js"></script>
+    <script type="text/javascript" src="assets/js/treeview/jquery.cookie.js"></script>
+<!--    <script type="text/javascript" src="assets/js/jqueryui/jquery-ui.min.js"></script>-->
+<!--    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet">
 
 </head>
 
@@ -51,7 +61,7 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Interface
+                공유 리포트
             </div>
 
             <!-- Nav Item - Tables -->
@@ -96,7 +106,10 @@
                        th:id="${subFolder.id}">
                         <span class="text btn-text-responsive"
                               th:classappend="${subFolder.id == reqFolderId} ? 'btn-success' : 'btn-primary' "
-                              th:text="${subFolder.name}"></span>
+                              th:text="${subFolder.name}"
+                              th:attr="subFolderId=${subFolder.id}"
+                              onclick="openFolder(this.getAttribute('subFolderId'))"
+                        ></span>
                     </a>
 
 
@@ -162,13 +175,21 @@
                         </li>
 
                     </ul>
-
                 </nav>
-                <!-- End of Topbar -->
+            </div>
 
+            <!-- End of Main Content -->
+            <!-- 본체 시작 -->
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="d-sm-flex align-items-center justify-content-between mb-4" id="iframeDiv">
+
+                </div>
 
             </div>
-            <!-- End of Main Content -->
+
+
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
@@ -235,37 +256,146 @@
     $(document).ready(function(){
 
         var sublistData = [[${subList}]];
+        var reqFolderId = [[${reqFolderId}]];
         console.log(sublistData);
 
         // 6 create an instance when the DOM is ready
         $('#jstree').jstree({
             'core': {
-                'data': sublistData,
+                'data': {
+                    'url': function(node){
+                        return "/getSubFolder?folderId=" + reqFolderId
+                    }
+                },
+                "check_callback":true,
             },
-            'plugins' : ["types"], // plugin 목록에 추가
+            'plugins' : ["types", "contextmenu"], // plugin 목록에 추가
             'types': {
-                55: { // 다큐먼트
+                8: { // tp 8= 폴더
+                    "icon": "jstree-folder",
+                },
+                3:{ // tp 3= 리포트
+                    "icon":"jstree-file", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                55:{ // tp 55= 다큐먼트
+                    "icon":"jstree-file", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                10:{ // tp 10= 프롬프트
+                    "icon":"jstree-file", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                "default":{
                     "icon": "jstree-icon jstree-folder"
-                },
-                3:{ // type이 file인 경우
-                    "icon":"jstree-icon jstree-folder", //file 아이콘
-                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
-                    "max_depth":0,
-                },
-                18:{ // type이 file인 경우
-                    "icon":"jstree-icon jstree-folder", //file 아이콘
-                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
-                    "max_depth":0,
-                },
+                }
+            },
+            'contextmenu': {
+                "items": function($node){
+                    console.log($node)
+                    var tree = $("#tree").jstree(true);
+                    if($node.type == 8){
+                        return {
+                            "Menu1": {
+                                "separator_before": false,
+                                "separator_after": true,
+                                "label": "폴더 상세정보 보기", //메뉴 표기 (제목)
+                                "icon": 'jstree-folder', //menu icon
+                                action: function(obj){
+                                    console.log(obj);
+                                }
+                            }
+                        }
+                    } else if($node.type == 3) {
+                        return {
+                            "Menu1": {
+                                "separator_before": false,
+                                "separator_after": true,
+                                "label": "조회", //메뉴 표기 (제목)
+                                "icon": 'jstree-file', //menu icon
+                                action: function($node){
+                                    console.log($node);
+                                }
+                            },
+                            "Menu2": {
+                                "separator_before": false,
+                                "separator_after": true,
+                                "label": "수정", //메뉴 표기 (제목)
+                                "icon": 'jstree-file', //menu icon
+                                action: function(obj){
+                                    console.log(obj);
+                                }
+                            }
+                        }
+                    }
 
+                }
             }
         });
-        // 7 bind to events triggered on the tree
+
+        // 클릭 된 노드 확인 bind to events triggered on the tree
         $('#jstree').on("changed.jstree", function (e, data) {
             console.log(data.selected);
         });
+
+        $('#jstree').on("select_node.jstree", function(e, data){
+            var node = data.node;
+
+            if (node.type === 3){
+                $.ajax({
+                    url: '/getReport',
+                    method:'GET',
+                    dataType: "json",
+                    data:{"reportId": node.id},
+                    success: function(response){
+                        alert("리포트입니다." + response);
+                        console.log(response);
+                        if(response.ptp === "value"){
+                            var title = $("<h2>").text(response.data[0].title);
+                            var desc = $("<h3>").text(response.data[0].desc1);
+                            var inputHtml = $("<input>").attr("type","text");
+                            var button = $("<button>").text("확인");
+
+                            inputHtml.val(response.data[0].defaultAnswer);
+                            $('#iframeDiv').append(title);
+                            $('#iframeDiv').append(desc);
+                            $('#iframeDiv').append(inputHtml);
+                            $('#iframeDiv').append(button);
+                        }
+                        else if(response.ptp === "element"){
+                            var title = $("<h2>").text(response.pnm);
+                            var desc = $("<h3>").text(response.desc);
+                            for(var i=0; i<response.data.length; i++){
+                                console.log(response.data[i]);
+                                // 체크 박스 생성
+                                var checkbox = $("<input>").attr("type", "checkbox");
+
+                                // 레이블 생성 및 연결
+                                var label = $("<label>").text(response.data[i].title);
+                                label.prepend(checkbox); // 체크 박스를 레이블 앞에 추가
+
+                                $('#iframeDiv').append(label);
+                            }
+                        }
+                    },
+                })
+
+            } else if (node.type === 55){
+                alert("다큐먼트입니다.")
+            }else if (node.type === 10){
+                alert("프롬프트입니다.")
+            }
+        })
+
+
     });
 
+    function openFolder(folderId){
+        location.href = "/folder?folderId="+folderId;
+    }
 
 </script>
 </html>

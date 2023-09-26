@@ -38,7 +38,7 @@ public class FolderService {
         //세션 정보 삽입
         mstrObject.setSession(mstrSessionId);
 
-        List<EntityVO> subList = mstrObject.getSubList(folderId);
+        List<EntityVO> subList = mstrObject.getSubList(folderId, "");
 
         return subList;
     }

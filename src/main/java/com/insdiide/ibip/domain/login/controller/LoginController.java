@@ -5,6 +5,7 @@ import com.insdiide.ibip.domain.login.vo.LoginVO;
 import com.insdiide.ibip.global.exception.CustomException;
 import com.insdiide.ibip.global.exception.code.ResultCode;
 import com.insdiide.ibip.global.vo.ResVO;
+import com.microstrategy.web.objects.WebObjectsException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -70,6 +71,8 @@ public class LoginController {
             mstrSessionId = loginService.CreateMstrSession(loginVO.getId(), loginVO.getPwd());
         }catch(CustomException ex){
             throw ex;
+        } catch (WebObjectsException e) {
+            throw new RuntimeException(e);
         }
 
         //3. HttpSession에 mstrSessionId 저장

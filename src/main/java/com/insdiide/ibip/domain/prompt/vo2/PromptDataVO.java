@@ -1,10 +1,9 @@
-package com.insdiide.ibip.domain.prompt.VO;
+package com.insdiide.ibip.domain.prompt.vo2;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Data
 @ToString
@@ -22,4 +21,9 @@ public class PromptDataVO {
     private String oid = null; // attribute object id
     private int pageCnt = 0;
 
+    private String nm;
+
+    private String desc1;
+    private String title;
+    private String defaultAnswer;
 }

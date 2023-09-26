@@ -15,6 +15,8 @@ public class EntityVO {
 
     private String text;
 
+    private String parent;
+
     private int type;
 
 }

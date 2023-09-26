@@ -15,11 +15,11 @@ import java.util.Map;
 @Service
 public class LoginService {
 
-    @Autowired
-    private MstrSession mstrSession;
+//    @Autowired
+//    private MstrSession mstrSession;
 
-    public String CreateMstrSession(String userId, String pwd){
-
+    public String CreateMstrSession(String userId, String pwd) throws WebObjectsException {
+        MstrSession mstrSession = new MstrSession();
         return mstrSession.createSession(userId, pwd);
     }
 

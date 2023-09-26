@@ -1,0 +1,118 @@
+@charset "UTF-8";
+
+/********************************************* login *********************************************/
+#wrap.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-2);
+}
+.login footer {
+  position: relative;
+  background: transparent;
+  border: 0;
+  margin-top: 30px;
+  color: var(--white);
+  opacity: 0.3;
+}
+#wrap.login header {
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  height: auto;
+  background: transparent;
+}
+#wrap.login header h1 {
+  font-size: 30px;
+  font-weight: 100;
+}
+#wrap.login header h2 {
+  margin-top: 15px;
+  font-size: 60px;
+  color: var(--white);
+  font-weight: 500;
+}
+
+.login__form {
+  margin-top: 30px;
+}
+.login__form .form-input li {
+  margin-top: 10px;
+}
+.login__form .form-input li:first-child {
+  margin-top: 0;
+}
+.login__form .form-input .input-area {
+  margin-left: 0;
+}
+.login__form .form-input input[type='text'],
+.login__form .form-input input[type='password'] {
+  width: 400px;
+  height: 52px;
+  padding: 0 16px;
+  font-size: 17px;
+  color: var(--white);
+  border: 1px solid #385648;
+  border-radius: 0;
+  font-weight: inherit;
+  background: inherit;
+}
+.login__form .form-input input[type='text']:focus,
+.login__form .form-input input[type='password']:focus {
+  border-color: var(--primary);
+}
+.login__form .form-input input::placeholder {
+  font-size: 17px;
+  color: #85bea4;
+}
+.login__form .form-input input:-ms-input-placeholder {
+  font-size: 17px;
+  color: #6a6a6e;
+}
+
+.login__form .form-etc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+}
+.login__form .form-etc li:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.login__form .form-etc button:first-child:before {
+  content: none;
+}
+.login__form .form-etc button::before {
+  content: '';
+  width: 1px;
+  height: 15px;
+  margin-left: 20px;
+  padding-left: 20px;
+  border-left: 1px solid #3a424f;
+}
+.login__form .form-etc button span {
+  font-size: 16px;
+  color: var(--secondary);
+}
+.login__form .btn-login {
+  margin: 0;
+  background: var(--primary);
+  border: 0;
+  width: 434px;
+  height: 54px;
+}
+.login__form .btn-login:hover,
+.login__form .btn-login:active {
+  background: #099c58;
+}
+.login__form .btn-login:disabled {
+  background: #e9edef;
+}
+.login__form .btn-login span {
+  font-size: 20px;
+  color: var(--white);
+}

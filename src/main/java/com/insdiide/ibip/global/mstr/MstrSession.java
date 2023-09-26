@@ -36,12 +36,12 @@ public class MstrSession {
      */
     public String mstrSessionId;
 
-    public String createSession(String userId, String pwd){
+    public String createSession(String userId, String pwd) throws WebObjectsException {
 
         serverSession = factory.getIServerSession();
-        serverSession.setServerName(serverName);
+        serverSession.setServerName("192.168.70.245");
         serverSession.setServerPort(0);
-        serverSession.setProjectName(mstrProjectName);
+        serverSession.setProjectName("MicroStrategy Tutorial");
         serverSession.setLogin(userId);
         serverSession.setPassword(pwd);
         serverSession.setLocaleID(1042);
@@ -62,6 +62,7 @@ public class MstrSession {
                 throw new CustomException(ResultCode.UNREGISTERED_PROJECT);
             }
             else {
+                ex.printStackTrace();
                 log.info("MSTR 세션을 생성하는 도중 문제가 발생하였습니다. ");
                 throw new CustomException(ResultCode.MSTR_ETC_ERROR);
             }

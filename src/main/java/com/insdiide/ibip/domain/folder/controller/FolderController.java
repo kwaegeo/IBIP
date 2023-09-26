@@ -4,10 +4,8 @@ import com.insdiide.ibip.domain.folder.service.FolderService;
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.folder.vo.TopItemVO;
 import com.insdiide.ibip.domain.login.vo.FolderVO;
-import com.insdiide.ibip.domain.login.vo.ResponseVO;
-import com.insdiide.ibip.domain.main.service.MainService;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
-import com.insdiide.ibip.domain.prompt.VO.PromptDataVO;
+import com.insdiide.ibip.domain.prompt.vo2.PromptDataVO;
 import com.insdiide.ibip.global.exception.CustomException;
 import com.insdiide.ibip.global.utils.ComUtils;
 import com.microstrategy.utils.json.JSONException;
@@ -20,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -247,7 +244,7 @@ public class FolderController {
         TopItemVO topItem = folderService.getTopItem(mstrSessionId, folderId);
 
         //전달 받은 폴더의 하위 목록 조회
-        List<EntityVO> subList = folderService.getSubList(mstrSessionId, folderId);
+//        List<EntityVO> subList = folderService.getSubList(mstrSessionId, folderId);
 
         /**
          * 왼쪽 사이드 메뉴 조회 (jstree) child yn이 따로 있는지?
@@ -258,15 +255,33 @@ public class FolderController {
 
         //왼쪽 폴더메뉴 트리형태로 구현
         //펼치기, 눌렀을 때 펼쳐지는 것은 Ajax요청으로
-        //처음에는 일단 그것만 있으면 되잖아;(폴더의 하위목록전체 뽑는 것)
+        //처음에는 일단 그것만 있으면 되잖아(폴더의 하위목록전체 뽑는 것)
 
 
         model.addAttribute("topItem", topItem);
-        model.addAttribute("subList", subList);
+//        model.addAttribute("subList", subList);
         model.addAttribute("reqFolderId", folderId);
         model.addAttribute("userInfo", userInfo);
 
-        return "/folder/zzz";
+        return "/folder/folder";
+    }
+
+    @GetMapping("/getSubFolder")
+    @ResponseBody
+    public List<EntityVO> getSubFolder(@RequestParam(name = "folderId") String folderId, HttpServletRequest request) throws WebObjectsException {
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try {
+            comUtils.sessionCheck(mstrSessionId);
+        } catch (CustomException ex) {
+            throw ex;
+        }
+        //전달 받은 폴더의 하위 목록 조회
+        List<EntityVO> subList = folderService.getSubList(mstrSessionId, folderId);
+        return subList;
     }
 
 }
