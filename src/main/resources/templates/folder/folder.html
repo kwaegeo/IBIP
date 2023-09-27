@@ -306,6 +306,7 @@
                                 "icon": 'jstree-folder', //menu icon
                                 action: function(obj){
                                     console.log(obj);
+                                    alert("이 폴더의 ID는 : "+ $node.id);
                                 }
                             }
                         }
@@ -316,8 +317,32 @@
                                 "separator_after": true,
                                 "label": "조회", //메뉴 표기 (제목)
                                 "icon": 'jstree-file', //menu icon
-                                action: function($node){
-                                    console.log($node);
+                                action: function(obj){
+                                    console.log(obj)
+                                    var requestData = {'reportId': $node.id}
+
+                                    $.ajax({
+                                        url: '/folder/report',
+                                        data: requestData,
+                                        method: 'GET',
+                                        dataType: "text",
+                                        success: function (responseData) {
+                                            console.log(responseData)
+                                            var iframe = $("<iframe>", {
+                                                "src": responseData,
+                                                "width": "100%",
+                                                "height": "720px" // 조절해야 할 크기
+                                            });
+                                            // iframe을 한번 비운 뒤에
+                                            $("#iframeDiv").empty();
+                                            // iframe을 특정 컨테이너에 추가
+                                            $("#iframeDiv").append(iframe);
+
+                                        },
+                                        error: function () {
+                                            alert("서버에 접속할 수 없습니다.")
+                                        }
+                                    })
                                 }
                             },
                             "Menu2": {
@@ -344,76 +369,55 @@
         $('#jstree').on("select_node.jstree", function(e, data){
             var node = data.node;
 
-            if (node.type === 3){
-                $.ajax({
-                    url: '/getReport',
-                    method:'GET',
-                    dataType: "json",
-                    data:{"reportId": node.id},
-                    success: function(response){
-                        alert("리포트입니다." + response);
-                        console.log(response);
-                        if(response.ptp === "value"){
-                            var title = $("<h2>").text(response.data[0].title);
-                            var desc = $("<h3>").text(response.data[0].desc1);
-                            var inputHtml = $("<input>").attr("type","text");
-                            var button = $("<button>").text("확인");
+        //     if (node.type === 3){
+        //         $.ajax({
+        //             url: '/getReport',
+        //             method:'GET',
+        //             dataType: "json",
+        //             data:{"reportId": node.id},
+        //             success: function(response){
+        //                 alert("리포트입니다." + response);
+        //                 console.log(response);
+        //                 if(response.ptp === "value"){
+        //                     var title = $("<h2>").text(response.data[0].title);
+        //                     var desc = $("<h3>").text(response.data[0].desc1);
+        //                     var inputHtml = $("<input>").attr("type","text");
+        //                     var button = $("<button>").text("확인");
+        //
+        //                     inputHtml.val(response.data[0].defaultAnswer);
+        //                     $('#iframeDiv').append(title);
+        //                     $('#iframeDiv').append(desc);
+        //                     $('#iframeDiv').append(inputHtml);
+        //                     $('#iframeDiv').append(button);
+        //                 }
+        //                 else if(response.ptp === "element"){
+        //                     var title = $("<h2>").text(response.pnm);
+        //                     var desc = $("<h3>").text(response.desc);
+        //                     for(var i=0; i<response.data.length; i++){
+        //                         console.log(response.data[i]);
+        //                         // 체크 박스 생성
+        //                         var checkbox = $("<input>").attr("type", "checkbox");
+        //
+        //                         // 레이블 생성 및 연결
+        //                         var label = $("<label>").text(response.data[i].title);
+        //                         label.prepend(checkbox); // 체크 박스를 레이블 앞에 추가
+        //
+        //                         $('#iframeDiv').append(label);
+        //                     }
+        //                 }
+        //             },
+        //         })
+        //
+        //     } else if (node.type === 55){
+        //         alert("다큐먼트입니다.")
+        //     }else if (node.type === 10){
+        //         alert("프롬프트입니다.")
+        //     }
+        // })
 
-                            inputHtml.val(response.data[0].defaultAnswer);
-                            $('#iframeDiv').append(title);
-                            $('#iframeDiv').append(desc);
-                            $('#iframeDiv').append(inputHtml);
-                            $('#iframeDiv').append(button);
-                        }
-                        else if(response.ptp === "element"){
-                            var title = $("<h2>").text(response.pnm);
-                            var desc = $("<h3>").text(response.desc);
-                            for(var i=0; i<response.data.length; i++){
-                                console.log(response.data[i]);
-                                // 체크 박스 생성
-                                var checkbox = $("<input>").attr("type", "checkbox");
-
-                                // 레이블 생성 및 연결
-                                var label = $("<label>").text(response.data[i].title);
-                                label.prepend(checkbox); // 체크 박스를 레이블 앞에 추가
-
-                                $('#iframeDiv').append(label);
-                            }
-                        }
-                    },
-                })
-
-            } else if (node.type === 55){
-                alert("다큐먼트입니다.")
-            }else if (node.type === 10){
-                alert("프롬프트입니다.")
-            }
-        })
-        const requestData = {'reportId': "412150894CDDAD320F7539A78A369DFF"}
-
-        $.ajax({
-            url: '/folder/report',
-            data: requestData,
-            method: 'GET',
-            dataType: "text",
-            success: function (responseData) {
-                console.log(responseData)
-                var iframe = $("<iframe>", {
-                    "src": responseData,
-                    "width": "100%",
-                    "height": "500px" // 조절해야 할 크기
-                });
-
-                // iframe을 특정 컨테이너에 추가
-                $("#iframeDiv").append(iframe);
-
-            },
-            error: function () {
-                alert("서버에 접속할 수 없습니다.")
-            }
-        })
     });
 
+    });
     function openFolder(folderId){
         location.href = "/folder?folderId="+folderId;
     }

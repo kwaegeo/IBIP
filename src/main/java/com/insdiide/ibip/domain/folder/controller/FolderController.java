@@ -168,6 +168,7 @@ public class FolderController {
         urlSB.append("&evt=").append(4001);
         urlSB.append("&reportID=").append(reportId); //Report ID
         urlSB.append("&reportViewMode=").append(1);
+//        urlSB.append("&Hiddensections=dockTop");
         urlSB.append("&src=mstrWeb.").append("reportNoHeaderNoFooterNoPath").append(".").append(4001);
         urlSB.append("&usrSmgr=").append(serverSession.saveState(0));
 
