@@ -35,5 +35,13 @@ public class PromptVO {
     private int totalPage = 0;
     private String desc = null;
 
+//    private List<PromptDataVO> data; //프롬포트 데이터 리스트
 
+    private String title; //프롬프트 설명
+
+    private String promptName; //프롬프트 명
+
+    private String promptType; //프롬프트 타입
+
+    private String promptId; //프롬프트 ID
 }

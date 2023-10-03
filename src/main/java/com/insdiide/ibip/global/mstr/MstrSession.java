@@ -39,13 +39,20 @@ public class MstrSession {
     public String createSession(String userId, String pwd) throws WebObjectsException {
 
         serverSession = factory.getIServerSession();
-        serverSession.setServerName("192.168.70.245");
+        System.out.println("이건처음이에용" + serverSession.getLogin());
+        if(!(serverSession.getLogin().isEmpty())){
+            serverSession.closeSession();
+            System.out.println(serverSession);
+        }
+        serverSession.setServerName("localhost");
         serverSession.setServerPort(0);
         serverSession.setProjectName("MicroStrategy Tutorial");
         serverSession.setLogin(userId);
         serverSession.setPassword(pwd);
         serverSession.setLocaleID(1042);
         serverSession.setAuthMode(1);
+        System.out.println("이건 둘째에용" + serverSession.getLogin());
+
         try {
             mstrSessionId = serverSession.getSessionID();
         }catch (WebObjectsException ex){

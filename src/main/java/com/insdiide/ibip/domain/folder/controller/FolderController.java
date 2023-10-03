@@ -13,6 +13,7 @@ import com.microstrategy.utils.json.XML;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
 import com.microstrategy.webapi.EnumDSSXMLPrivilegeTypes;
+import com.microstrategy.webapi.EnumDSSXMLStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -89,7 +90,13 @@ public class FolderController {
         serverSession.setSessionID(mstrSessionId);
 
         WebPrompts webPrompts = serverSession.getFactory().getReportSource().getNewInstance(reportId).getPrompts();
-
+        WebReportInstance webReportInstance = serverSession.getFactory().getReportSource().getNewInstance(reportId);
+        System.out.println(webReportInstance.pollStatus());
+        System.out.println(webReportInstance.pollStatus());
+        if(webReportInstance.pollStatus() != EnumDSSXMLStatus.DssXmlStatusPromptXML){
+            System.out.println("프롬프트가 없는거임");
+        }
+        System.out.println(webPrompts.size());
         System.out.println(webPrompts);
 
         WebPrompt webPrompt = webPrompts.get(0);
@@ -102,6 +109,19 @@ public class FolderController {
 
         } else {
             WebElementsPrompt elementsPrompt = (WebElementsPrompt) webPrompt;
+            System.out.println("이게 프롬프트의 ID인가?");
+            System.out.println(elementsPrompt.getID());
+
+            System.out.println("이게 에트리뷰트의 ID인가??");
+            System.out.println(elementsPrompt.getOrigin().getID());
+            System.out.println("아래가 닶");
+            System.out.println(elementsPrompt.getShortAnswerXML());
+            System.out.println(elementsPrompt.getShortAnswerXML(true));
+            System.out.println(elementsPrompt.getShortPa());
+            System.out.println(elementsPrompt.getAnswerXML());
+            System.out.println(elementsPrompt);
+            System.out.println("아래ㅠㅠ");
+
             System.out.println(elementsPrompt.getDescription());
             System.out.println("z");
             String anserXml = elementsPrompt.getAnswerXML();
@@ -112,6 +132,22 @@ public class FolderController {
             System.out.println("음");
             System.out.println(elementsPrompt.getTitle());
 //        System.out.println(elementsPrompt.get);
+            System.out.println(elementsPrompt.getSuggestedAnswers());
+
+            System.out.println(elementsPrompt.getPIN());
+            System.out.println(elementsPrompt.getKey());
+
+            WebElements elementzs = elementsPrompt.getSuggestedAnswers();
+            elementzs = webElementSource.getElements();
+
+            for (int i=0; i<elementzs.size(); i++){
+                WebElement element = elementzs.get(i);
+                System.out.println("엘리먼트들이다~");
+                System.out.println(element.getID());
+                System.out.println(element.getElementID());
+                System.out.println(element.getDisplayName());
+
+            }
 
 
             System.out.println(anserXml);
@@ -160,9 +196,9 @@ public class FolderController {
 
         // Return session
         StringBuilder urlSB = new StringBuilder();
-        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("http").append("://").append("localhost:8090"); //Web Server name and port
         urlSB.append("/MicroStrategy/servlet/mstrWeb");
-        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        urlSB.append("?server=").append("localhost"); //I Server name
         // urlSB.append("&port=0");
         urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
         urlSB.append("&evt=").append(4001);
@@ -201,9 +237,9 @@ public class FolderController {
 
         // Return session
         StringBuilder urlSB = new StringBuilder();
-        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("http").append("://").append("localhost:8090"); //Web Server name and port
         urlSB.append("/MicroStrategy/servlet/mstrWeb");
-        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        urlSB.append("?server=").append("localhost"); //I Server name
         // urlSB.append("&port=0");
         urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
         urlSB.append("&evt=").append(2048001);

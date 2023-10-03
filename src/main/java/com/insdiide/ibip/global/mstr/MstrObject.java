@@ -3,17 +3,22 @@ package com.insdiide.ibip.global.mstr;
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.login.vo.FolderVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
+import com.insdiide.ibip.domain.prompt.vo.PromptVO;
 import com.insdiide.ibip.domain.prompt.vo2.PromptDataVO;
-import com.insdiide.ibip.domain.prompt.vo2.PromptVO;
+import com.insdiide.ibip.domain.report.vo.ReportVO;
+import com.insdiide.ibip.global.mstr.prompt.ElementPrompt;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.web.objects.admin.users.WebUser;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
+import com.microstrategy.webapi.EnumDSSXMLStatus;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Log4j2
 public class MstrObject extends MstrSession{
 
     /**
@@ -23,12 +28,14 @@ public class MstrObject extends MstrSession{
 
     public WebIServerSession serverSession;
 
+    //세션 정보 입력
     public void setSession(String mstrSessionId){
         serverSession = factory.getIServerSession();
         serverSession.setSessionID(mstrSessionId);
     }
 
 
+    //하위 폴더 요소 가져오기
     public List<FolderVO> getSubfolderList(String folderId) throws WebObjectsException {
         List<FolderVO> subFolderList = new ArrayList<>();
         WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
@@ -42,11 +49,13 @@ public class MstrObject extends MstrSession{
         return subFolderList;
     }
 
+    //폴더 ID 불러오기
     public String getFolderId(int folderNum) throws WebObjectsException {
         String folderId = factory.getObjectSource().getFolderID(folderNum);
         return folderId;
     }
 
+    //부모의 폴더 ID 불러오기
     public String getParentFolderId(String reqFolderId) throws WebObjectsException{
         WebFolder folder = (WebFolder) factory.getObjectSource().getObject(reqFolderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
         WebFolder parent = folder.getParent();
@@ -54,6 +63,7 @@ public class MstrObject extends MstrSession{
         return parent.getID();
     }
 
+    //폴더 정보 불러오기
     public FolderVO getfolderInfo(String folderId) throws WebObjectsException {
         FolderVO folderInfo = new FolderVO();
         WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
@@ -64,6 +74,7 @@ public class MstrObject extends MstrSession{
         return folderInfo;
     }
 
+    //사용자 정보 불러오기
     public UserInfoVO getUserInfo() throws WebObjectsException {
         UserInfoVO userInfo = new UserInfoVO();
         WebUser webUser = (WebUser)serverSession.getUserInfo();
@@ -72,7 +83,7 @@ public class MstrObject extends MstrSession{
         return userInfo;
     }
 
-    //하위 전체 요소 조회
+    //하위 전체 요소 조회 (TreeVO로 저장)
     public List<EntityVO> getSubList(String folderId, String parentId) throws WebObjectsException {
         List<EntityVO> subList = new ArrayList<>();
         WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
@@ -97,27 +108,42 @@ public class MstrObject extends MstrSession{
         return subList;
     }
 
-    // 프롬프트 데이터 가져오기 (유형에 맞게 나눠서)
-    public PromptVO getPromptData(String reportId) throws WebObjectsException {
-        WebPrompts webPrompts = serverSession.getFactory().getReportSource().getNewInstance(reportId).getPrompts();
-        System.out.println(webPrompts.size());
-        PromptVO prompt = new PromptVO();
-        List<PromptDataVO>promptData = new ArrayList<PromptDataVO>();
 
+    // 리포트 정보 가져오기 (프롬프트 데이터 포함) (유형에 맞게 나눠서)
+    public ReportVO getReportInfo(String reportId) throws WebObjectsException {
+
+        ReportVO reportInfo = new ReportVO();
+
+        //프롬프트들의 인스턴스 만들기
+        WebReportInstance webReportInstance = serverSession.getFactory().getReportSource().getNewInstance(reportId);
+
+        //프롬프트가 있는지 없는지 확인 없으면 return
+        if(webReportInstance.pollStatus() != EnumDSSXMLStatus.DssXmlStatusPromptXML){
+            reportInfo.setPromptExist(false);
+            return reportInfo;
+        }
+
+        //프롬프트 사이즈가 0이 아니라면 (1개 이상이라면) 있다
+        reportInfo.setPromptExist(true);
+
+        //프롬프트들의 객체 생성
+        WebPrompts webPrompts = webReportInstance.getPrompts();
+        List<PromptVO> promptList = new ArrayList<>();
+        //프롬프트 개수만큼 반복
         for(int i=0; i<webPrompts.size(); i++){
-            WebPrompt webPrompt = webPrompts.get(i);
 
-            System.out.println("아니 왜 타입이 계속다른거 같지?" + webPrompt.getPromptType());
+            //프롬프트 객체 생성
+            WebPrompt webPrompt = webPrompts.get(i);
+            PromptVO prompt = new PromptVO();
 
             /**
              *
              * prompt 타입에 따라 분기 처리
              * TYPE = 1 날짜 프롬프트
-             * TYPE = 2 구성요소 프롬프트
+             * TYPE = 2 구성요소 프롬프트 (화면 꾸려야 하니까 먼저 처리)
              * TYPE = 3 계층 프롬프트
              * TYPE = 4 개체 프롬프트
              * **/
-
 
                 if(webPrompt.getPromptType() == 1){ //값 프롬프트
                     WebConstantPrompt constantPrompt = (WebConstantPrompt) webPrompt;
@@ -143,19 +169,15 @@ public class MstrObject extends MstrSession{
                     //pin
                     //did
                     //tp
-                    promptData.add(promptVO);
-                    prompt.setData(promptData);
-                    prompt.setPtp("value");
+//                    promptData.add(promptVO);
+//                    prompt.setData(promptData);
+//                    prompt.setPtp("value");
 
                 } else if(webPrompt.getPromptType() == 2) { // 구성요소 프롬프트
-                    WebElementsPrompt elementsPrompt = (WebElementsPrompt) webPrompt;
-                    elementsPrompt.populate();
-                    System.out.println(elementsPrompt);
-                    WebElementSource webElementSource = elementsPrompt.getOrigin().getElementSource();
-                    WebElements webElements = webElementSource.getElements();
-                    for(int k=0; k<webElements.size(); k++){
-                        System.out.println(webElements.get(k).getElementID());
-                    }
+                    ElementPrompt elementPrompt = new ElementPrompt();
+                    prompt = elementPrompt.getElementPromptInfo(prompt, webPrompt);
+                    System.out.println(prompt);
+
                 } else if(webPrompt.getPromptType() == 3) { // 계층 프롬프트
 
                 } else if(webPrompt.getPromptType() == 4) { // 개체 프롬프트
@@ -193,20 +215,20 @@ public class MstrObject extends MstrSession{
                             System.out.println("설명은 : "+folderInfo.getDescription());
 
 
-                            promptVO.setTitle(folderInfo.getName());
-                            promptData.add(promptVO);
+//                            promptVO.setTitle(folderInfo.getName());
+//                            promptData.add(promptVO);
                         }
                     }
-                    prompt.setData(promptData);
-                    prompt.setPtp("element");
-                    prompt.setPnm(objectsPrompt.getTitle());
-                    prompt.setDesc(objectsPrompt.getMeaning());
+//                    prompt.setData(promptData);
+//                    prompt.setPtp("element");
+//                    prompt.setPnm(objectsPrompt.getTitle());
+//                    prompt.setDesc(objectsPrompt.getMeaning());
 
                 }
+                promptList.add(prompt);
             }
-
-            return prompt;
-
+            reportInfo.setPrompts(promptList);
+            return reportInfo;
         }
 
 }

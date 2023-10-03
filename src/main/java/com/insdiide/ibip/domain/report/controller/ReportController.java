@@ -2,7 +2,9 @@ package com.insdiide.ibip.domain.report.controller;
 
 import com.insdiide.ibip.domain.prompt.vo2.PromptDataVO;
 import com.insdiide.ibip.domain.prompt.vo2.PromptVO;
+import com.insdiide.ibip.domain.prompt.vo2.PromptsVO;
 import com.insdiide.ibip.domain.report.service.ReportService;
+import com.insdiide.ibip.domain.report.vo.ReportVO;
 import com.insdiide.ibip.global.exception.CustomException;
 import com.insdiide.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.WebObjectsException;
@@ -25,9 +27,16 @@ public class ReportController {
     @Autowired
     private ComUtils comUtils;
 
+
+    /**
+     * 1. 세션체크
+     * 2. Prompt가 있는지 확인 = 2-1. 없을 시 그대로 retrun 있을 시 Prompt 조회한 다음 return
+     *
+     * **/
+
     @GetMapping("/getReport")
     @ResponseBody
-    public PromptVO getReport(@RequestParam(name = "reportId")String reportId, HttpServletRequest request) throws WebObjectsException {
+    public ReportVO getReport(@RequestParam(name = "reportId")String reportId, HttpServletRequest request) throws WebObjectsException {
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
@@ -39,9 +48,11 @@ public class ReportController {
             throw ex;
         }
 
-        PromptVO promptVO = reportService.getPromptData(mstrSessionId, reportId);
+        //2. Prompt가 있는지 확인하면서 걍 return 때려버려
+        ReportVO reportInfo = reportService.getPromptData(mstrSessionId, reportId);
 
-       return promptVO;
+        System.out.println(reportInfo);
+       return reportInfo;
     }
 
 }

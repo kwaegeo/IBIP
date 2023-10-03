@@ -1,6 +1,4 @@
 package com.insdiide.ibip.global.mstr;
 
-
-public class folder {
-
+public class MstrPrompt {
 }

@@ -322,22 +322,28 @@
                                     var requestData = {'reportId': $node.id}
 
                                     $.ajax({
-                                        url: '/folder/report',
+                                        // url: '/folder/report',
+                                        url: '/getReport',
                                         data: requestData,
                                         method: 'GET',
                                         dataType: "text",
                                         success: function (responseData) {
                                             console.log(responseData)
-                                            var iframe = $("<iframe>", {
-                                                "src": responseData,
-                                                "width": "100%",
-                                                "height": "720px" // 조절해야 할 크기
-                                            });
-                                            // iframe을 한번 비운 뒤에
-                                            $("#iframeDiv").empty();
-                                            // iframe을 특정 컨테이너에 추가
-                                            $("#iframeDiv").append(iframe);
+                                            if(responseData.promptsExists == false){
+                                                console.log("이 리포트는 프롬프트가 없습니다.");
+                                                var iframe = $("<iframe>", {
+                                                    "src": responseData,
+                                                    "width": "100%",
+                                                    "height": "720px" // 조절해야 할 크기
+                                                });
+                                                // iframe을 한번 비운 뒤에
+                                                $("#iframeDiv").empty();
+                                                // iframe을 특정 컨테이너에 추가
+                                                $("#iframeDiv").append(iframe);
+                                            }
+                                            else{
 
+                                            }
                                         },
                                         error: function () {
                                             alert("서버에 접속할 수 없습니다.")
@@ -421,6 +427,11 @@
     function openFolder(folderId){
         location.href = "/folder?folderId="+folderId;
     }
+
+    function promptSetting(reportInfo){
+
+    }
+
 
 </script>
 </html>
