@@ -28,20 +28,22 @@
     <!-- Custom styles for this page -->
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
-<!--    <link rel="stylesheet" type="text/css" href="assets/css/style.css">-->
-<!--    <link rel="stylesheet" type="text/css" href="assets/js/jqueryui/jquery-ui.min.css">-->
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="assets/js/jqueryui/jquery-ui.min.css">
     <link rel="stylesheet" type="text/css" href="assets/js/treeview/jquery.treeview.css">
-    <script type="text/javascript" src="assets/js/common.js" defer=""></script>
+
+    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/jqueryui/jquery-ui.min.js"></script>
     <script type="text/javascript" src="assets/js/treeview/jquery.treeview.js"></script>
     <script type="text/javascript" src="assets/js/treeview/jquery.cookie.js"></script>
-<!--    <script type="text/javascript" src="assets/js/jqueryui/jquery-ui.min.js"></script>-->
-<!--    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>-->
+    <script type="text/javascript" src="assets/js/common.js" defer=""></script>
+
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet">
 
 </head>
 
 <body id="page-top">
-
     <!-- Page Wrapper -->
     <div id="wrapper">
 
@@ -75,11 +77,6 @@
 <!--                    </ul>-->
                 </div>
             </li>
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
 
         </ul>
         <!-- End of Sidebar -->
@@ -180,33 +177,13 @@
 
             <!-- End of Main Content -->
             <!-- 본체 시작 -->
-            <div class="container-fluid">
-
-                <!-- Page Heading -->
-                <div class="d-sm-flex align-items-center justify-content-between mb-4" id="iframeDiv">
-
-                </div>
-
+            <div class="container-fluid" id="promptDiv">
             </div>
-
-
-
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2020</span>
-                    </div>
-                </div>
-            </footer>
-            <!-- End of Footer -->
-
+                <!-- End of Content Wrapper -->
         </div>
-        <!-- End of Content Wrapper -->
-
-    </div>
     <!-- End of Page Wrapper -->
 
+    </div>
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
@@ -249,7 +226,6 @@
     <script src="dist/jstree.min.js"></script>
     <!-- Page level custom scripts -->
     <script src="js/demo/datatables-demo.js"></script>
-
 </body>
 <script th:inline="javascript">
 
@@ -326,10 +302,10 @@
                                         url: '/getReport',
                                         data: requestData,
                                         method: 'GET',
-                                        dataType: "text",
+                                        dataType: "json",
                                         success: function (responseData) {
                                             console.log(responseData)
-                                            if(responseData.promptsExists == false){
+                                            if(responseData.promptsExists == "N"){
                                                 console.log("이 리포트는 프롬프트가 없습니다.");
                                                 var iframe = $("<iframe>", {
                                                     "src": responseData,
@@ -342,7 +318,7 @@
                                                 $("#iframeDiv").append(iframe);
                                             }
                                             else{
-
+                                                promptSetting(responseData);
                                             }
                                         },
                                         error: function () {
@@ -429,9 +405,123 @@
     }
 
     function promptSetting(reportInfo){
+        console.log(reportInfo);
+        alert(reportInfo.prompts[0].promptType);
+        if(reportInfo.prompts[0].promptType === "element"){
+            elementPromptSetting(reportInfo) //구성요소 프롬프트 세팅 함수 호출
+        }
+    }
+
+    function trToggles(tr){
+        console.log("찍히긴했니?")
+        console.log($(tr))
+        $(tr).toggleClass('choice');
+    }
+
+    function addElement(tableId){
 
     }
 
 
+    function removeElement(tableId){
+
+    }
+
+
+    function elementPromptSetting(reportInfo){
+        //1. 2개의 리스트 생성 (구성요소, 기본값)
+        var elementList = [];
+        var defaultList = [];
+
+        //2. element수만큼 반복하여 리스트에 나눠넣기
+        var elementsArray = reportInfo.prompts[0].data[0].attr.elements;
+        console.log(elementsArray);
+
+        for(var i=0; i<elementsArray.length; i++){
+            var element = elementsArray[i];
+            if(element.defaultAnswerYn === "Y"){
+                defaultList.push(element)
+            }else{
+                elementList.push(element)
+            }
+        }
+        console.log(elementList);
+        console.log(defaultList);
+
+        var makeHtml = `
+                    <div class="popup-window black-border">
+                        <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+                        <div class="popup__head">
+                            <h1>${reportInfo.prompts[0].title}</h1>
+                        </div>
+                        <div class="popup__body">
+                            <h2>${reportInfo.prompts[0].promptName}</h2>
+                            <section class="row gap-10 center">
+                                <!-- 왼쪽 -->
+                                <div class="w40p">
+                                    <!-- //트리 -->
+                                    <div class="box">
+                                        <div class="tbl-list select-list scroll h196">
+                                            <table>
+                                                <colgroup>
+                                                    <col style="width: 100%" />
+                                                </colgroup>
+                                                <tbody>`;
+        for(var i=0; i<elementList.length; i++){
+            makeHtml += `
+                <tr id="${elementList[i].elementId}" onclick="trToggles(this)">
+                    <td>${elementList[i].elementNm}</td>
+                </tr>
+            `;
+        }
+        makeHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="btn-wrap">
+                                    <button type="button" onclick="addElement()"><i class="material-icons md-green md-36">arrow_circle_right</i><span class="hide">추가</span></button>
+                                    <button type="button" onclick="removeElement()"><i class="material-icons md-green md-36">arrow_circle_left</i><span class="hide">취소</span></button>
+                                </div>
+
+                                <!-- 오른쪽 -->
+                                <div class="w40p">
+                                    <div class="box">
+                                        <div class="tbl-list select-list scroll h196">
+                                            <table>
+                                                <colgroup>
+                                                    <col style="width: 100%" />
+                                                </colgroup>
+                                                <tbody>`;
+        for(var j=0; j<defaultList.length; j++){
+            makeHtml += `
+                <tr id="${defaultList[j].elementId}" onclick="trToggles(this)">
+                    <td>${defaultList[j].elementNm}</td>
+                </tr>
+            `;
+        }
+        makeHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <div class="right">
+                                <button type="button" class="btn btn-close js-close custom-lee-bg-green"><span>조회</span></button> <!-- 변수 삽입 -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+        $("#promptDiv").prepend(makeHtml);
+    }
+
+
+
+
+
 </script>
 </html>
+

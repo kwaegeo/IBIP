@@ -18,7 +18,7 @@ public class ReportVO {
 
     private String reportNm; //리포트 명
 
-    private boolean promptExist; //프롬프트 유무
+    private String promptExist; //프롬프트 유무
 
     private List<PromptVO> prompts; //프롬프트 리스트
 

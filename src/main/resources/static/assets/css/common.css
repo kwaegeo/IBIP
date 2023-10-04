@@ -374,6 +374,12 @@ button:focus {
 .bg-green {
   background-color: var(--secondary) !important;
 }
+
+.custom-lee-bg-green {
+  background-color: var(--secondary) !important;
+  color: #fff;
+}
+
 .bg-greenlight {
   background-color: var(--primary) !important;
 }

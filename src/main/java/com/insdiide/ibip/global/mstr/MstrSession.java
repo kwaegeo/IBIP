@@ -44,9 +44,9 @@ public class MstrSession {
             serverSession.closeSession();
             System.out.println(serverSession);
         }
-        serverSession.setServerName("localhost");
+        serverSession.setServerName(serverName);
         serverSession.setServerPort(0);
-        serverSession.setProjectName("MicroStrategy Tutorial");
+        serverSession.setProjectName(mstrProjectName);
         serverSession.setLogin(userId);
         serverSession.setPassword(pwd);
         serverSession.setLocaleID(1042);

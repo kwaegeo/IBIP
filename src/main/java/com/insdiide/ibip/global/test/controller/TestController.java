@@ -15,7 +15,12 @@ public class TestController {
 
     @GetMapping("/test3")
     private String test3(){
-
         return "/test3";
     }
+
+    @GetMapping("/test4")
+    private String test4(){
+        return "/prompt/elementPrompt";
+    }
+
 }

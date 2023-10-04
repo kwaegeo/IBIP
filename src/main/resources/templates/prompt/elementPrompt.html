@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VBAC_결재선 지정</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="assets/js/jqueryui/jquery-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="assets/js/treeview/jquery.treeview.css"></link>
+    <!-- JS -->
+    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/jqueryui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="assets/js/treeview/jquery.treeview.js"></script>
+    <script type="text/javascript" src="assets/js/treeview/jquery.cookie.js"></script>
+    <script type="text/javascript" src="assets/js/common.js" defer></script>
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+      <div class="popup__head">
+        <h1>결재선 지정</h1>
+        <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+      </div>
+      <div class="popup__body">
+        <section class="row gap-10 center">
+          <!-- 왼쪽 -->
+          <div class="w40p">
+            <h2>조직도</h2>
+            <!-- 트리 -->
+            <div class="treebox">
+              <ul class="treeview">
+                <li class="open">
+                  <span>관리자 그룹</span>
+                  <!-- 기본셋팅 모두 닫힌상태로 하려면 class="open" 삭제하면됨-->
+                  <ul>
+                    <li>
+                      <a href="#" class="on"><span>관리자그룹1</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>관리자그룹2</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>관리자그룹3</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>관리자그룹4</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>관리자그룹5</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>관리자그룹6</span></a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <span>처리자 그룹</span>
+                  <ul>
+                    <li>
+                      <a href="#"><span>처리자 그룹1</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>처리자 그룹2</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>처리자 그룹3</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>처리자 그룹4</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>처리자 그룹5</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>처리자 그룹6</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>처리자 그룹7</span></a>
+                    </li>
+                    <li>
+                      <a href="#"><span>처리자 그룹8</span></a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <!-- //트리 -->
+            <div class="box">
+              <div class="tbl-top">
+                <div class="right">
+                  <div class="input-area">
+                    <label for="name" class="hide">그룹 내 검색</label>
+                    <input type="text" id="name" placeholder="그룹 내 검색" />
+                  </div>
+                  <button type="button" class="btn-search"><span>조회</span></button>
+                </div>
+              </div>
+              <div class="tbl-list select-list scroll h196">
+                <table summary="성명, 그룹, 전화번호 항목으로 구성된 조직도 리스트 입니다.">
+                  <caption>
+                    token 정책 관리 리스트
+                  </caption>
+                  <colgroup>
+                    <col style="width: 30%" />
+                    <col style="width: 35%" />
+                    <col style="width: 35%" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th scope="col">성명</th>
+                      <th scope="col">그룹</th>
+                      <th scope="col">전화번호</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>홍길동</td>
+                      <td>관리자그룹</td>
+                      <td>010-2345-3456</td>
+                    </tr>
+                    <tr>
+                      <td>홍길동</td>
+                      <td>관리자그룹</td>
+                      <td>010-2345-3456</td>
+                    </tr>
+                    <tr>
+                      <td>홍길동</td>
+                      <td>관리자그룹</td>
+                      <td>010-2345-3456</td>
+                    </tr>
+                    <tr>
+                      <td>홍길동</td>
+                      <td>관리자그룹</td>
+                      <td>010-2345-3456</td>
+                    </tr>
+                    <tr>
+                      <td>홍길동</td>
+                      <td>관리자그룹</td>
+                      <td>010-2345-3456</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="btn-wrap">
+            <button type="button"><i class="material-icons md-green md-36">arrow_circle_right</i><span class="hide">추가</span></button>
+            <button type="button"><i class="material-icons md-green md-36">arrow_circle_left</i><span class="hide">취소</span></button>
+          </div>
+
+          <!-- 오른쪽 -->
+          <div class="w55p">
+            <h2>결재선 리스트</h2>
+            <div class="box h533">
+              <div class="tbl-list select-list scroll maxh100p">
+                <table summary="no,이름,그룹,결재상태,결재일자로 구성된 결재선 리스트 입니다.">
+                  <caption>
+                    결재선 리스트
+                  </caption>
+                  <colgroup>
+                    <col style="width: 10%" />
+                    <col style="width: 20%" />
+                    <col style="width: 25%" />
+                    <col style="width: 20%" />
+                    <col style="width: 25%" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th scope="col">No.</th>
+                      <th scope="col">이름</th>
+                      <th scope="col">그룹</th>
+                      <th scope="col">결재상태</th>
+                      <th scope="col">결재일자</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>홍길동</td>
+                      <td>처리자 그룹</td>
+                      <td>대기</td>
+                      <td>2021-12-23</td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>홍길동</td>
+                      <td>처리자 그룹</td>
+                      <td>대기</td>
+                      <td>2021-12-23</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="popup__footer">
+        <button type="button" class="pop-close bg-gray"><span>취소</span></button>
+        <button type="button"><span>저장</span></button>
+      </div>
+    </div>
+  </body>
+</html>

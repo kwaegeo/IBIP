@@ -16,8 +16,11 @@ public class ElementPrompt {
         // 구성요소 프롬프트 객체 생성
         WebElementsPrompt elementsPrompt = (WebElementsPrompt) webPrompt;
         prompt.setPromptId(elementsPrompt.getID());
-        prompt.setPromptName(elementsPrompt.getName());
+        prompt.setPromptName(elementsPrompt.getMeaning());
         prompt.setTitle(elementsPrompt.getTitle());
+        prompt.setMinValue(elementsPrompt.getMin());
+        prompt.setMaxValue(elementsPrompt.getMax());
+        prompt.setPromptType("element");
 
         // 프롬프트 채우기
         elementsPrompt.populate();

@@ -119,12 +119,12 @@ public class MstrObject extends MstrSession{
 
         //프롬프트가 있는지 없는지 확인 없으면 return
         if(webReportInstance.pollStatus() != EnumDSSXMLStatus.DssXmlStatusPromptXML){
-            reportInfo.setPromptExist(false);
+            reportInfo.setPromptExist("N");
             return reportInfo;
         }
 
         //프롬프트 사이즈가 0이 아니라면 (1개 이상이라면) 있다
-        reportInfo.setPromptExist(true);
+        reportInfo.setPromptExist("Y");
 
         //프롬프트들의 객체 생성
         WebPrompts webPrompts = webReportInstance.getPrompts();
