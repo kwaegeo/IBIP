@@ -412,19 +412,26 @@
         }
     }
 
+    //선택 시 토글 변경
     function trToggles(tr){
-        console.log("찍히긴했니?")
         console.log($(tr))
         $(tr).toggleClass('choice');
     }
 
+    // 요소 옮기기 (왼쪽 -> 오른쪽)
     function addElement(tableId){
-
+        var elementTagString = '#' + tableId + '1' + ' .choice';
+        var defaultTagString = '#' + tableId + '2' + ' tbody';
+        var choiceRows = $(elementTagString);
+        $(defaultTagString).append(choiceRows);
     }
 
-
+    // 요소 옮기기 (오른쪽 -> 왼쪽)
     function removeElement(tableId){
-
+        var defaultTagString = '#' + tableId + '2' + ' .choice';
+        var elementTagString = '#' + tableId + '1' + ' tbody';
+        var choiceRows = $(defaultTagString);
+        $(elementTagString).append(choiceRows);
     }
 
 
@@ -435,6 +442,7 @@
 
         //2. element수만큼 반복하여 리스트에 나눠넣기
         var elementsArray = reportInfo.prompts[0].data[0].attr.elements;
+        var attrId = reportInfo.prompts[0].data[0].attr.attrId
         console.log(elementsArray);
 
         for(var i=0; i<elementsArray.length; i++){
@@ -462,7 +470,7 @@
                                     <!-- //트리 -->
                                     <div class="box">
                                         <div class="tbl-list select-list scroll h196">
-                                            <table>
+                                            <table id="${attrId}1">
                                                 <colgroup>
                                                     <col style="width: 100%" />
                                                 </colgroup>
@@ -481,15 +489,15 @@
                                     </div>
                                 </div>
                                 <div class="btn-wrap">
-                                    <button type="button" onclick="addElement()"><i class="material-icons md-green md-36">arrow_circle_right</i><span class="hide">추가</span></button>
-                                    <button type="button" onclick="removeElement()"><i class="material-icons md-green md-36">arrow_circle_left</i><span class="hide">취소</span></button>
+                                    <button type="button" onclick="addElement('${attrId}')"><i class="material-icons md-green md-36">arrow_circle_right</i><span class="hide">추가</span></button>
+                                    <button type="button" onclick="removeElement('${attrId}')"><i class="material-icons md-green md-36">arrow_circle_left</i><span class="hide">취소</span></button>
                                 </div>
 
                                 <!-- 오른쪽 -->
                                 <div class="w40p">
                                     <div class="box">
                                         <div class="tbl-list select-list scroll h196">
-                                            <table>
+                                            <table id="${attrId}2">
                                                 <colgroup>
                                                     <col style="width: 100%" />
                                                 </colgroup>
