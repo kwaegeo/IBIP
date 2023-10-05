@@ -27,6 +27,10 @@ public class PromptVO {
 
     private String maxValue; //최대 허용 값
 
+    private String val; // 값 프롬프트 전용 (데이터)
+
+    private String pt; // DSSPromptType (XML에 들어가는 Type)
+
     /**
      * 구성요소 프롬프트의 데이터들
      * **/

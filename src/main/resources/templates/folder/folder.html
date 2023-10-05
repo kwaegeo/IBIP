@@ -412,95 +412,145 @@
         if(reportInfo.prompts[0].promptType === "element"){
             elementPromptSetting(reportInfo) //구성요소 프롬프트 세팅 함수 호출
         }
+        else if(reportInfo.prompts[0].promptType === "value"){
+            valuePromptSetting(reportInfo)
+        }
     }
 
     // 리포트 호출 URL 생성
-    function getReportURL(reportId, promptId, attrId){
-        var promptTagString = "#"+promptId;
-        var attrTagString = "#"+attrId;
+    function getReportURL(reportId, promptId, attrId, promptType){
 
-        var promptTag = $(promptTagString);
-        var attrTag = $(attrTagString);
+        if(promptType === 'element'){
+            var promptTagString = "#"+promptId;
+            var attrTagString = "#"+attrId;
 
-        console.log(promptId);
-        console.log(attrId);
+            var promptTag = $(promptTagString);
+            var attrTag = $(attrTagString);
 
-        var reportInfo = {};
-        var promptInfo = {};
-        var attrInfo = {};
+            console.log(promptId);
+            console.log(attrId);
 
-        var min = promptTag.attr("minValue");
-        var max = promptTag.attr("maxValue");
-        var elementTable = $(attrTagString+"2");
-        var elementNum = elementTable.find("tr").length;
+            var reportInfo = {};
+            var promptInfo = {};
+            var attrInfo = {};
 
-        var validResult = validMinMax(min, max, elementNum);
+            var min = promptTag.attr("minValue");
+            var max = promptTag.attr("maxValue");
+            var elementTable = $(attrTagString+"2");
+            var elementNum = elementTable.find("tr").length;
 
-        if(validResult == "min"){
-            alert("최소 "+ min + "개 이상 선택하여야합니다.")
-            return
-        }
-        else if(validResult == "max"){
-            alert("최대 "+ max + "개 이하 선택하여야합니다.")
-            return
-        }
+            var validResult = validMinMax(min, max, elementNum);
 
-        //리포트 필요한 것
-        reportInfo.reportId = reportId;
-
-        //프롬프트 필요한 것
-        promptInfo.promptId = promptId;
-        promptInfo.promptType = promptTag.attr("promptType");
-
-        //애트리뷰트 필요한 것
-        attrInfo.attrId = attrId;
-        attrInfo.attrType = attrTag.attr("attrType");
-
-        var elements = [];
-
-        elementTable.find("tr").each(function(){
-            var elementId = $(this).attr("id");
-            var elementNm = $(this).attr("text");
-
-            elements.push({elementId: elementId, elementNm: elementNm})
-        })
-
-        console.log(elements);
-        attrInfo.elements=elements;
-
-        var data = {}
-        data.attr = attrInfo;
-
-        promptInfo.data = [];
-        promptInfo.data.push(data);
-
-        reportInfo.prompts = [];
-        reportInfo.prompts.push(promptInfo);
-
-        console.log(reportInfo);
-
-        $.ajax({
-            url: '/getReportURL',
-            data: JSON.stringify(reportInfo),
-            contentType: "application/json",
-            method: 'POST',
-            dataType: "text",
-            success: function (responseData) {
-                console.log(responseData)
-                var iframe = $("<iframe>", {
-                    "src": responseData,
-                    "width": "100%",
-                    "height": "720px" // 조절해야 할 크기
-                });
-                // iframe을 한번 비운 뒤에
-                $("#promptDiv").empty();
-                // iframe을 특정 컨테이너에 추가
-                $("#promptDiv").prepend(iframe);
-            },
-            error: function () {
-                alert("서버에 접속할 수 없습니다.")
+            if(validResult == "min"){
+                alert("최소 "+ min + "개 이상 선택하여야합니다.")
+                return
             }
-        })
+            else if(validResult == "max"){
+                alert("최대 "+ max + "개 이하 선택하여야합니다.")
+                return
+            }
+
+            //리포트 필요한 것
+            reportInfo.reportId = reportId;
+
+            //프롬프트 필요한 것
+            promptInfo.promptId = promptId;
+            promptInfo.promptType = promptTag.attr("promptType");
+            promptInfo.pt = promptTag.attr("pt");
+
+            //애트리뷰트 필요한 것
+            attrInfo.attrId = attrId;
+            attrInfo.attrType = attrTag.attr("attrType");
+
+            var elements = [];
+
+            elementTable.find("tr").each(function(){
+                var elementId = $(this).attr("id");
+                var elementNm = $(this).attr("text");
+
+                elements.push({elementId: elementId, elementNm: elementNm})
+            })
+
+            console.log(elements);
+            attrInfo.elements=elements;
+
+            var data = {}
+            data.attr = attrInfo;
+
+            promptInfo.data = [];
+            promptInfo.data.push(data);
+
+            reportInfo.prompts = [];
+            reportInfo.prompts.push(promptInfo);
+
+            console.log(reportInfo);
+
+            $.ajax({
+                url: '/getReportURL',
+                data: JSON.stringify(reportInfo),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "text",
+                success: function (responseData) {
+                    console.log(responseData)
+                    var iframe = $("<iframe>", {
+                        "src": responseData,
+                        "width": "100%",
+                        "height": "720px" // 조절해야 할 크기
+                    });
+                    // iframe을 한번 비운 뒤에
+                    $("#promptDiv").empty();
+                    // iframe을 특정 컨테이너에 추가
+                    $("#promptDiv").prepend(iframe);
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+        }
+        else if(promptType === 'value'){
+            var promptTagString = "#"+promptId;
+            var promptTag = $(promptTagString);
+            var value = promptTag.attr("value");
+
+            var reportInfo = {}
+            var promptInfo = {}
+
+            //리포트 필요한 것
+            reportInfo.reportId = reportId;
+
+            //프롬프트 필요한 것
+            promptInfo.promptId = promptId;
+            promptInfo.promptType = promptTag.attr("promptType");
+            promptInfo.val = promptTag.val();
+            promptInfo.pt = promptTag.attr("pt");
+
+            reportInfo.prompts = [];
+            reportInfo.prompts.push(promptInfo);
+
+            $.ajax({
+                url: '/getReportURL',
+                data: JSON.stringify(reportInfo),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "text",
+                success: function (responseData) {
+                    console.log(responseData)
+                    var iframe = $("<iframe>", {
+                        "src": responseData,
+                        "width": "100%",
+                        "height": "720px" // 조절해야 할 크기
+                    });
+                    // iframe을 한번 비운 뒤에
+                    $("#promptDiv").empty();
+                    // iframe을 특정 컨테이너에 추가
+                    $("#promptDiv").prepend(iframe);
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+        }
     }
 
     //최소, 최대 값 유효성 검사
@@ -538,6 +588,35 @@
         $(elementTagString).append(choiceRows);
     }
 
+    // 값 프롬프트 세팅
+    function valuePromptSetting(reportInfo){
+        var promptId = reportInfo.prompts[0].promptId;
+
+        //1. 값 프롬프트 적재 HTML 생성
+        var makeHtml = `
+                    <div class="popup-window black-border" id="${reportInfo.reportId}">
+                        <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+                        <div class="popup__head">
+                            <h1>${reportInfo.prompts[0].title}</h1>
+                        </div>
+                        <div class="popup__body">
+                            <h2>${reportInfo.prompts[0].promptName}</h2>
+                            <section class="row gap-10 center">
+                                <input type="date" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="value"
+                                min="${reportInfo.prompts[0].minValue}" max="${reportInfo.prompts[0].maxValue}" value="${reportInfo.prompts[0].val}" pt="${reportInfo.prompts[0].pt}">
+                            </section>
+                            <div class="right">
+                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${reportInfo.reportId}','${promptId}', '', 'value')"><span>조회</span></button> <!-- 변수 삽입 -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+        $("#promptDiv").prepend(makeHtml);
+
+    }
+
+
     // 구성요소 프롬프트 세팅
     function elementPromptSetting(reportInfo){
         //1. 2개의 리스트 생성 (구성요소, 기본값)
@@ -565,7 +644,7 @@
         var makeHtml = `
                     <div class="popup-window black-border" id="${reportInfo.reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
-                        <div class="popup__head" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="element">
+                        <div class="popup__head" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="element" pt="${reportInfo.prompts[0].pt}">
                             <h1>${reportInfo.prompts[0].title}</h1>
                         </div>
                         <div class="popup__body">
@@ -623,7 +702,7 @@
                                 </div>
                             </section>
                             <div class="right">
-                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${reportInfo.reportId}','${promptId}', '${attrId}')"><span>조회</span></button> <!-- 변수 삽입 -->
+                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${reportInfo.reportId}','${promptId}', '${attrId}', 'element')"><span>조회</span></button> <!-- 변수 삽입 -->
                             </div>
                         </div>
                     </div>

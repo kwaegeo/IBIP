@@ -6,6 +6,7 @@ import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.domain.prompt.vo.PromptVO;
 import com.insdiide.ibip.domain.prompt.vo2.PromptDataVO;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
+import com.insdiide.ibip.global.mstr.prompt.ConstantPrompt;
 import com.insdiide.ibip.global.mstr.prompt.ElementPrompt;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.web.objects.admin.users.WebUser;
@@ -134,12 +135,17 @@ public class MstrObject extends MstrSession{
         //프롬프트들의 객체 생성
         WebPrompts webPrompts = webReportInstance.getPrompts();
         List<PromptVO> promptList = new ArrayList<>();
+
+        System.out.println(webPrompts.size());
         //프롬프트 개수만큼 반복
         for(int i=0; i<webPrompts.size(); i++){
 
             //프롬프트 객체 생성
             WebPrompt webPrompt = webPrompts.get(i);
             PromptVO prompt = new PromptVO();
+            System.out.println("타입이?");
+            System.out.println(webPrompt.getPromptType());
+
 
             /**
              *
@@ -151,32 +157,9 @@ public class MstrObject extends MstrSession{
              * **/
 
                 if(webPrompt.getPromptType() == 1){ //값 프롬프트
-                    WebConstantPrompt constantPrompt = (WebConstantPrompt) webPrompt;
-                    System.out.println(constantPrompt.getAnswer());
-                    PromptDataVO promptVO = new PromptDataVO();
-
-                    //제목
-                    System.out.println(constantPrompt.getTitle());
-                    promptVO.setTitle(constantPrompt.getTitle());
-                    //설명
-                    System.out.println(webPrompt.getDescription());
-                    System.out.println(constantPrompt.getMeaning());
-                    promptVO.setDesc1(constantPrompt.getMeaning());
-                    //기본값
-                    System.out.println(constantPrompt.getAnswer());
-                    promptVO.setDefaultAnswer(constantPrompt.getAnswer());
-
-                    /**
-                     *  XML 처리 4가지 값
-                     *
-                     * **/
-                    //pt
-                    //pin
-                    //did
-                    //tp
-//                    promptData.add(promptVO);
-//                    prompt.setData(promptData);
-//                    prompt.setPtp("value");
+                    ConstantPrompt constantPrompt = new ConstantPrompt();
+                    prompt = constantPrompt.getConstantPromptInfo(prompt, webPrompt);
+                    System.out.println(prompt);
 
                 } else if(webPrompt.getPromptType() == 2) { // 구성요소 프롬프트
                     ElementPrompt elementPrompt = new ElementPrompt();

@@ -15,46 +15,51 @@ public class UrlUtils {
     }
 
     public static String generateXML(ReportVO reportVO) {
+
         StringWriter sw = new StringWriter();
         try {
             XMLOutputFactory xof = XMLOutputFactory.newFactory();
             XMLStreamWriter xsw = xof.createXMLStreamWriter(sw);
 
-            // xsw.writeStartDocument("1.0"); // 이 부분을 주석 처리하여 선언을 제외
             xsw.writeStartElement("rsl");
 
-            xsw.writeStartElement("pa");
-            xsw.writeAttribute("pt", "7");
-            xsw.writeAttribute("pin", "0");
-            xsw.writeAttribute("did", reportVO.getPrompts().get(0).getPromptId());
-            xsw.writeAttribute("tp", "10");
+            for(int i=0; i< reportVO.getPrompts().size(); i++){
+                xsw.writeStartElement("pa");
+                xsw.writeAttribute("pt", reportVO.getPrompts().get(i).getPt());
+                xsw.writeAttribute("pin", "0");
+                xsw.writeAttribute("did", reportVO.getPrompts().get(0).getPromptId());
+                xsw.writeAttribute("tp", "10");
+                if("value".equals(reportVO.getPrompts().get(i).getPromptType())){
+                    xsw.writeCharacters(reportVO.getPrompts().get(i).getVal());
+                    xsw.writeEndElement(); // pa
+                    xsw.writeEndElement(); // rsl
+                }
+                else if("element".equals(reportVO.getPrompts().get(i).getPromptType())){
+                    xsw.writeStartElement("mi");
+                    xsw.writeStartElement("es");
+                    xsw.writeStartElement("at");
 
-            xsw.writeStartElement("mi");
+                    xsw.writeAttribute("did", reportVO.getPrompts().get(0).getData().get(0).getAttr().getAttrId());
+                    xsw.writeAttribute("tp", "12");
+                    xsw.writeEndElement(); // at
+                    for (ElementVO element : reportVO.getPrompts().get(0).getData().get(0).getAttr().getElements()) {
+                        xsw.writeStartElement("e");
+                        xsw.writeAttribute("emt", "1");
+                        xsw.writeAttribute("ei", element.getElementId());
+                        xsw.writeAttribute("art", "1");
+                        xsw.writeAttribute("disp_n", element.getElementNm());
+                        xsw.writeEndElement(); // e
+                    }
 
-            xsw.writeStartElement("es");
+                    xsw.writeEndElement(); // es
 
+                    xsw.writeEndElement(); // mi
 
-            xsw.writeStartElement("at");
-            xsw.writeAttribute("did", reportVO.getPrompts().get(0).getData().get(0).getAttr().getAttrId());
-            xsw.writeAttribute("tp", "12");
-            xsw.writeEndElement(); // at
+                    xsw.writeEndElement(); // pa
 
-            for (ElementVO element : reportVO.getPrompts().get(0).getData().get(0).getAttr().getElements()) {
-                xsw.writeStartElement("e");
-                xsw.writeAttribute("emt", "1");
-                xsw.writeAttribute("ei", element.getElementId());
-                xsw.writeAttribute("art", "1");
-                xsw.writeAttribute("disp_n", element.getElementNm());
-                xsw.writeEndElement(); // e
+                    xsw.writeEndElement(); // rsl
+                }
             }
-
-            xsw.writeEndElement(); // es
-
-            xsw.writeEndElement(); // mi
-
-            xsw.writeEndElement(); // pa
-
-            xsw.writeEndElement(); // rsl
 
             xsw.flush();
             xsw.close();

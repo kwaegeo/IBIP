@@ -21,6 +21,7 @@ public class ElementPrompt {
         prompt.setMinValue(elementsPrompt.getMin());
         prompt.setMaxValue(elementsPrompt.getMax());
         prompt.setPromptType("element");
+        prompt.setPt(String.valueOf(elementsPrompt.getDSSPromptType()));
 
         // 프롬프트 채우기
         elementsPrompt.populate();
