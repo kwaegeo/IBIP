@@ -415,15 +415,104 @@
     }
 
     // 리포트 호출 URL 생성
-    function getReportURL(promptId, attrId){
+    function getReportURL(reportId, promptId, attrId){
+        var promptTagString = "#"+promptId;
+        var attrTagString = "#"+attrId;
+
+        var promptTag = $(promptTagString);
+        var attrTag = $(attrTagString);
+
         console.log(promptId);
         console.log(attrId);
+
         var reportInfo = {};
         var promptInfo = {};
         var attrInfo = {};
 
-        //필요한 것
-        promptInfo.prompt
+        var min = promptTag.attr("minValue");
+        var max = promptTag.attr("maxValue");
+        var elementTable = $(attrTagString+"2");
+        var elementNum = elementTable.find("tr").length;
+
+        var validResult = validMinMax(min, max, elementNum);
+
+        if(validResult == "min"){
+            alert("최소 "+ min + "개 이상 선택하여야합니다.")
+            return
+        }
+        else if(validResult == "max"){
+            alert("최대 "+ max + "개 이하 선택하여야합니다.")
+            return
+        }
+
+        //리포트 필요한 것
+        reportInfo.reportId = reportId;
+
+        //프롬프트 필요한 것
+        promptInfo.promptId = promptId;
+        promptInfo.promptType = promptTag.attr("promptType");
+
+        //애트리뷰트 필요한 것
+        attrInfo.attrId = attrId;
+        attrInfo.attrType = attrTag.attr("attrType");
+
+        var elements = [];
+
+        elementTable.find("tr").each(function(){
+            var elementId = $(this).attr("id");
+            var elementNm = $(this).attr("text");
+
+            elements.push({elementId: elementId, elementNm: elementNm})
+        })
+
+        console.log(elements);
+        attrInfo.elements=elements;
+
+        var data = {}
+        data.attr = attrInfo;
+
+        promptInfo.data = [];
+        promptInfo.data.push(data);
+
+        reportInfo.prompts = [];
+        reportInfo.prompts.push(promptInfo);
+
+        console.log(reportInfo);
+
+        $.ajax({
+            url: '/getReportURL',
+            data: JSON.stringify(reportInfo),
+            contentType: "application/json",
+            method: 'POST',
+            dataType: "text",
+            success: function (responseData) {
+                console.log(responseData)
+                var iframe = $("<iframe>", {
+                    "src": responseData,
+                    "width": "100%",
+                    "height": "720px" // 조절해야 할 크기
+                });
+                // iframe을 한번 비운 뒤에
+                $("#promptDiv").empty();
+                // iframe을 특정 컨테이너에 추가
+                $("#promptDiv").prepend(iframe);
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        })
+    }
+
+    //최소, 최대 값 유효성 검사
+    function validMinMax(min, max, elementNum){
+        var parseMin = parseInt(min);
+        var parseMax = parseInt(max);
+        var parseEleNum = parseInt(elementNum);
+        console.log("잘들어가고 있는지?")
+        console.log(parseMin)
+        console.log(parseMax)
+        console.log(elementNum)
+        return parseEleNum < parseMin ? "min" : parseEleNum > parseMax ? "max" : true;
     }
 
 
@@ -474,9 +563,9 @@
 
         // 구성요소 적재 테이블 생성
         var makeHtml = `
-                    <div class="popup-window black-border">
+                    <div class="popup-window black-border" id="${reportInfo.reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
-                        <div class="popup__head" id="${promptId}" minValue="" maxValue="" promptType="element">
+                        <div class="popup__head" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="element">
                             <h1>${reportInfo.prompts[0].title}</h1>
                         </div>
                         <div class="popup__body">
@@ -494,7 +583,7 @@
                                                 <tbody>`;
         for(var i=0; i<elementList.length; i++){
             makeHtml += `
-                <tr id="${elementList[i].elementId}" onclick="trToggles(this)">
+                <tr id="${elementList[i].elementId}" text="${elementList[i].elementNm}" onclick="trToggles(this)">
                     <td>${elementList[i].elementNm}</td>
                 </tr>
             `;
@@ -521,7 +610,7 @@
                                                 <tbody>`;
         for(var j=0; j<defaultList.length; j++){
             makeHtml += `
-                <tr id="${defaultList[j].elementId}" onclick="trToggles(this)">
+                <tr id="${defaultList[j].elementId}" text="${defaultList[j].elementNm}" onclick="trToggles(this)">
                     <td>${defaultList[j].elementNm}</td>
                 </tr>
             `;
@@ -534,7 +623,7 @@
                                 </div>
                             </section>
                             <div class="right">
-                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${promptId}', '${attrId}')"><span>조회</span></button> <!-- 변수 삽입 -->
+                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${reportInfo.reportId}','${promptId}', '${attrId}')"><span>조회</span></button> <!-- 변수 삽입 -->
                             </div>
                         </div>
                     </div>

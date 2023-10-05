@@ -10,9 +10,7 @@ import com.insdiide.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -53,6 +51,37 @@ public class ReportController {
 
         System.out.println(reportInfo);
        return reportInfo;
+    }
+
+    @PostMapping("/getReportURL")
+    @ResponseBody
+    public String getReportURL(@RequestBody ReportVO reportInfo, HttpServletRequest request){
+        System.out.println("어우 너무추웡?");
+        System.out.println(reportInfo);
+        
+        
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try {
+            comUtils.sessionCheck(mstrSessionId);
+        } catch (CustomException ex) {
+            throw ex;
+        }
+
+        //2. prompt 확인 (이걸 해 말아?) 하는게 맞긴 해
+
+        //3. xml 생성
+        String promptXml = reportService.getPromptXml(reportInfo);
+
+        //3.5 usrSmgr 가져오기
+        String usrSmgr = reportService.getUsrSmgr();
+
+        //4. URL 생성
+        String reportURL = reportService.getReportURL(reportInfo, promptXml, usrSmgr);
+        //5. return
+        return reportURL;
     }
 
 }
