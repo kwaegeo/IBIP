@@ -436,6 +436,12 @@
         }
     }
 
+    function getReportURLMulti(){
+        // 특정 div 하위 모든 정보를 파싱
+        // div의 name은 prompt이며, type이 존재 각 type별로 다른 파싱방법으로 데이터를 모두 긁어온다.
+        // 모은 정보를 통해 URL 요청 (리포트 promptAnswerXML)
+        // 모든 프롬프트에 대하여 Valid를 실행 (유효성 검사 모두 통과 시 정상 호출)
+    }
 
     // 리포트 호출 URL 생성
     function getReportURL(reportId, promptId, attrId, promptType){
