@@ -409,14 +409,18 @@
     // 프롬프트 세팅
     function promptSetting(reportInfo){
         console.log(reportInfo);
-        if(reportInfo.prompts[0].promptType === "element"){
-            elementPromptSetting(reportInfo) //구성요소 프롬프트 세팅 함수 호출
-        }
-        else if(reportInfo.prompts[0].promptType === "value"){
-            valuePromptSetting(reportInfo) // 값 프롬프트 세팅 함수 호출
-        }
-        else if(reportInfo.prompts[0].promptType === "object"){
-            objectPromptSetting(reportInfo) // 개체 프롬프트 세팅 함수 호출
+
+        //프롬프트 개수만큼 반복함.
+        for(var i=0; i<reportInfo.prompts.length; i++){
+            if(reportInfo.prompts[i].promptType === "element"){
+                elementPromptSetting(reportInfo.reportId, reportInfo.prompts[i]) //구성요소 프롬프트 세팅 함수 호출  (프롬프트 보내기)
+            }
+            else if(reportInfo.prompts[i].promptType === "value"){
+                valuePromptSetting(reportInfo.reportId, reportInfo.prompts[i]) // 값 프롬프트 세팅 함수 호출
+            }
+            else if(reportInfo.prompts[i].promptType === "object"){
+                objectPromptSetting(reportInfo.reportId, reportInfo.prompts[i]) // 개체 프롬프트 세팅 함수 호출
+            }
         }
     }
 
@@ -669,14 +673,14 @@
     }
 
     // 개체 프롬프트 세팅
-    function objectPromptSetting(reportInfo){
+    function objectPromptSetting(reportId, promptInfo){
         //1. 2개의 리스트 생성 (개체, 기본값)
         var entityList = [];
         var defaultList = [];
 
         //2. 개체수만큼 반복하여 리스트에 나눠넣기
-        var entitiesArray = reportInfo.prompts[0].entity;
-        var promptId = reportInfo.prompts[0].promptId;
+        var entitiesArray = promptInfo.entity;
+        var promptId = promptInfo.promptId;
 
         for(var i=0; i<entitiesArray.length; i++){
             var entity = entitiesArray[i];
@@ -692,13 +696,13 @@
 
         // 개체 적재 테이블 생성
         var makeHtml = `
-                    <div class="popup-window black-border" id="${reportInfo.reportId}">
+                    <div class="popup-window black-border" id="${reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
-                        <div class="popup__head" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="object" pt="${reportInfo.prompts[0].pt}">
-                            <h1>${reportInfo.prompts[0].title}</h1>
+                        <div class="popup__head" id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
+                            <h1>${promptInfo.title}</h1>
                         </div>
                         <div class="popup__body">
-                            <h2>${reportInfo.prompts[0].promptNm}</h2>
+                            <h2>${promptInfo.promptNm}</h2>
                             <section class="row gap-10 center">
                                 <!-- 왼쪽 -->
                                 <div class="w40p">
@@ -751,9 +755,6 @@
                                     </div>
                                 </div>
                             </section>
-                            <div class="right">
-                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${reportInfo.reportId}','${promptId}', '', 'object')"><span>조회</span></button> <!-- 변수 삽입 -->
-                            </div>
                         </div>
                     </div>
                 `;
@@ -763,25 +764,22 @@
     }
 
     // 값 프롬프트 세팅
-    function valuePromptSetting(reportInfo){
-        var promptId = reportInfo.prompts[0].promptId;
+    function valuePromptSetting(reportId, promptInfo){
+        var promptId = promptInfo.promptId;
 
         //1. 값 프롬프트 적재 HTML 생성
         var makeHtml = `
-                    <div class="popup-window black-border" id="${reportInfo.reportId}">
+                    <div class="popup-window black-border" id="${reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
                         <div class="popup__head">
-                            <h1>${reportInfo.prompts[0].title}</h1>
+                            <h1>${promptInfo.title}</h1>
                         </div>
                         <div class="popup__body">
-                            <h2>${reportInfo.prompts[0].promptNm}</h2>
+                            <h2>${promptInfo.promptNm}</h2>
                             <section class="row gap-10 center">
-                                <input type="date" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="value"
-                                min="${reportInfo.prompts[0].minValue}" max="${reportInfo.prompts[0].maxValue}" value="${reportInfo.prompts[0].val}" pt="${reportInfo.prompts[0].pt}">
+                                <input type="date" id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value"
+                                min="${promptInfo.minValue}" max="${promptInfo.maxValue}" value="${promptInfo.val}" pt="${promptInfo.pt}">
                             </section>
-                            <div class="right">
-                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${reportInfo.reportId}','${promptId}', '', 'value')"><span>조회</span></button> <!-- 변수 삽입 -->
-                            </div>
                         </div>
                     </div>
                 `;
@@ -792,15 +790,15 @@
 
 
     // 구성요소 프롬프트 세팅
-    function elementPromptSetting(reportInfo){
+    function elementPromptSetting(reportId, promptInfo){
         //1. 2개의 리스트 생성 (구성요소, 기본값)
         var elementList = [];
         var defaultList = [];
 
         //2. element수만큼 반복하여 리스트에 나눠넣기
-        var elementsArray = reportInfo.prompts[0].attr.elements;
-        var promptId = reportInfo.prompts[0].promptId;
-        var attrId = reportInfo.prompts[0].attr.attrId
+        var elementsArray = promptInfo.attr.elements;
+        var promptId = promptInfo.promptId;
+        var attrId = promptInfo.attr.attrId
         console.log(elementsArray);
         console.log(attrId);
 
@@ -817,13 +815,13 @@
 
         // 구성요소 적재 테이블 생성
         var makeHtml = `
-                    <div class="popup-window black-border" id="${reportInfo.reportId}">
+                    <div class="popup-window black-border" id="${reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
-                        <div class="popup__head" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="element" pt="${reportInfo.prompts[0].pt}">
-                            <h1>${reportInfo.prompts[0].title}</h1>
+                        <div class="popup__head" id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="element" pt="${promptInfo.pt}">
+                            <h1>${promptInfo.title}</h1>
                         </div>
                         <div class="popup__body">
-                            <h2>${reportInfo.prompts[0].promptNm}</h2>
+                            <h2>${promptInfo.promptNm}</h2>
                             <section class="row gap-10 center">
                                 <!-- 왼쪽 -->
                                 <div class="w40p">
@@ -876,9 +874,6 @@
                                     </div>
                                 </div>
                             </section>
-                            <div class="right">
-                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${reportInfo.reportId}','${promptId}', '${attrId}', 'element')"><span>조회</span></button> <!-- 변수 삽입 -->
-                            </div>
                         </div>
                     </div>
                 `;
