@@ -173,11 +173,23 @@
 
                     </ul>
                 </nav>
-            </div>
 
             <!-- End of Main Content -->
             <!-- 본체 시작 -->
-            <div class="container-fluid" id="promptDiv">
+            <div class="container-fluid">
+                <h1 class="h3 mb-0 text-gray-800 md-4">이도현 리포트</h1>
+                <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 조회</a>
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 템플릿 저장</a>
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 템플릿 불러오기</a>
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</a>
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</a>
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</a>
+                </div>
+                <div id="promptDiv">
+
+                </div>
+            </div>
             </div>
                 <!-- End of Content Wrapper -->
         </div>
@@ -313,9 +325,9 @@
                                                     "height": "720px" // 조절해야 할 크기
                                                 });
                                                 // iframe을 한번 비운 뒤에
-                                                $("#iframeDiv").empty();
+                                                $("#promptDiv").empty();
                                                 // iframe을 특정 컨테이너에 추가
-                                                $("#iframeDiv").append(iframe);
+                                                $("#promptDiv").append(iframe);
                                             }
                                             else{
                                                 promptSetting(responseData);
@@ -423,6 +435,7 @@
             }
         }
     }
+
 
     // 리포트 호출 URL 생성
     function getReportURL(reportId, promptId, attrId, promptType){
@@ -696,6 +709,7 @@
 
         // 개체 적재 테이블 생성
         var makeHtml = `
+                    <div class="row">
                     <div class="popup-window black-border" id="${reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
                         <div class="popup__head" id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
@@ -757,6 +771,7 @@
                             </section>
                         </div>
                     </div>
+                    </div>
                 `;
 
         $("#promptDiv").prepend(makeHtml);
@@ -769,6 +784,7 @@
 
         //1. 값 프롬프트 적재 HTML 생성
         var makeHtml = `
+                    <div class="row">
                     <div class="popup-window black-border" id="${reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
                         <div class="popup__head">
@@ -781,6 +797,7 @@
                                 min="${promptInfo.minValue}" max="${promptInfo.maxValue}" value="${promptInfo.val}" pt="${promptInfo.pt}">
                             </section>
                         </div>
+                    </div>
                     </div>
                 `;
 
@@ -815,6 +832,7 @@
 
         // 구성요소 적재 테이블 생성
         var makeHtml = `
+                    <div class="row.center">
                     <div class="popup-window black-border" id="${reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
                         <div class="popup__head" id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="element" pt="${promptInfo.pt}">
@@ -875,6 +893,7 @@
                                 </div>
                             </section>
                         </div>
+                    </div>
                     </div>
                 `;
 
