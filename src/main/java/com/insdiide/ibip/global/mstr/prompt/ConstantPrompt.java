@@ -13,7 +13,7 @@ public class ConstantPrompt {
         // 값 프롬프트 객체 생성
         WebConstantPrompt constantPrompt = (WebConstantPrompt) webPrompt;
         prompt.setPromptId(constantPrompt.getID());
-        prompt.setPromptName(constantPrompt.getMeaning());
+        prompt.setPromptNm(constantPrompt.getMeaning());
         prompt.setTitle(constantPrompt.getTitle());
         prompt.setMinValue(constantPrompt.getMin());
         prompt.setMaxValue(constantPrompt.getMax());

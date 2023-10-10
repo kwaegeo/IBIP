@@ -413,7 +413,10 @@
             elementPromptSetting(reportInfo) //구성요소 프롬프트 세팅 함수 호출
         }
         else if(reportInfo.prompts[0].promptType === "value"){
-            valuePromptSetting(reportInfo)
+            valuePromptSetting(reportInfo) // 값 프롬프트 세팅 함수 호출
+        }
+        else if(reportInfo.prompts[0].promptType === "object"){
+            objectPromptSetting(reportInfo) // 개체 프롬프트 세팅 함수 호출
         }
     }
 
@@ -474,11 +477,7 @@
             console.log(elements);
             attrInfo.elements=elements;
 
-            var data = {}
-            data.attr = attrInfo;
-
-            promptInfo.data = [];
-            promptInfo.data.push(data);
+            promptInfo.attr = attrInfo;
 
             reportInfo.prompts = [];
             reportInfo.prompts.push(promptInfo);
@@ -551,6 +550,87 @@
                 }
             })
         }
+        else if(promptType === "object"){
+            var promptTagString = "#"+promptId;
+
+            var promptTag = $(promptTagString);
+
+            console.log(promptId);
+
+            var reportInfo = {};
+            var promptInfo = {};
+            var entityInfo = {};
+
+            var min = promptTag.attr("minValue");
+            var max = promptTag.attr("maxValue");
+            var entityTable = $(promptTagString+"2");
+
+            console.log("잘되는가?퓨")
+            console.log(entityTable);
+            var entityNum = entityTable.find("tr").length;
+
+            var validResult = validMinMax(min, max, entityNum);
+
+            if(validResult == "min"){
+                alert("최소 "+ min + "개 이상 선택하여야합니다.")
+                return
+            }
+            else if(validResult == "max"){
+                alert("최대 "+ max + "개 이하 선택하여야합니다.")
+                return
+            }
+
+            //리포트 필요한 것
+            reportInfo.reportId = reportId;
+
+            //프롬프트 필요한 것
+            promptInfo.promptId = promptId;
+            promptInfo.promptType = promptTag.attr("promptType");
+            promptInfo.pt = promptTag.attr("pt");
+
+            //개체 필요한 것 (entity)
+            entityInfo.entityId = attrId;
+            entityInfo.entityType = promptTag.attr("attrType");
+
+            var entities = [];
+
+            entityTable.find("tr").each(function(){
+                var entityId = $(this).attr("id");
+                var entityNm = $(this).attr("text");
+                var entityType = $(this).attr("entityType");
+                entities.push({entityId: entityId, entityNm: entityNm, entityType: entityType})
+            })
+
+            console.log(entities);
+            promptInfo.entity = entities;
+            reportInfo.prompts = [];
+            reportInfo.prompts.push(promptInfo);
+
+            console.log(reportInfo);
+
+            $.ajax({
+                url: '/getReportURL',
+                data: JSON.stringify(reportInfo),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "text",
+                success: function (responseData) {
+                    console.log(responseData)
+                    var iframe = $("<iframe>", {
+                        "src": responseData,
+                        "width": "100%",
+                        "height": "720px" // 조절해야 할 크기
+                    });
+                    // iframe을 한번 비운 뒤에
+                    $("#promptDiv").empty();
+                    // iframe을 특정 컨테이너에 추가
+                    $("#promptDiv").prepend(iframe);
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+        }
     }
 
     //최소, 최대 값 유효성 검사
@@ -588,6 +668,100 @@
         $(elementTagString).append(choiceRows);
     }
 
+    // 개체 프롬프트 세팅
+    function objectPromptSetting(reportInfo){
+        //1. 2개의 리스트 생성 (개체, 기본값)
+        var entityList = [];
+        var defaultList = [];
+
+        //2. 개체수만큼 반복하여 리스트에 나눠넣기
+        var entitiesArray = reportInfo.prompts[0].entity;
+        var promptId = reportInfo.prompts[0].promptId;
+
+        for(var i=0; i<entitiesArray.length; i++){
+            var entity = entitiesArray[i];
+            if(entity.defaultAnswerYn === "Y"){
+                defaultList.push(entity)
+            }else{
+                entityList.push(entity)
+            }
+        }
+
+        console.log(entityList);
+        console.log(defaultList);
+
+        // 개체 적재 테이블 생성
+        var makeHtml = `
+                    <div class="popup-window black-border" id="${reportInfo.reportId}">
+                        <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+                        <div class="popup__head" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="object" pt="${reportInfo.prompts[0].pt}">
+                            <h1>${reportInfo.prompts[0].title}</h1>
+                        </div>
+                        <div class="popup__body">
+                            <h2>${reportInfo.prompts[0].promptNm}</h2>
+                            <section class="row gap-10 center">
+                                <!-- 왼쪽 -->
+                                <div class="w40p">
+                                    <!-- //트리 -->
+                                    <div class="box">
+                                        <div class="tbl-list select-list scroll h196">
+                                            <table id="${promptId}1">
+                                                <colgroup>
+                                                    <col style="width: 100%" />
+                                                </colgroup>
+                                                <tbody>`;
+        for(var i=0; i<entityList.length; i++){
+            makeHtml += `
+                <tr id="${entityList[i].entityId}" text="${entityList[i].entityNm}" entityType = "${entityList[i].entityType}" onclick="trToggles(this)">
+                    <td>${entityList[i].entityNm}</td>
+                </tr>
+            `;
+        }
+        makeHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="btn-wrap">
+                                    <button type="button" onclick="addElement('${promptId}')"><i class="material-icons md-green md-36">arrow_circle_right</i><span class="hide">추가</span></button>
+                                    <button type="button" onclick="removeElement('${promptId}')"><i class="material-icons md-green md-36">arrow_circle_left</i><span class="hide">취소</span></button>
+                                </div>
+
+                                <!-- 오른쪽 -->
+                                <div class="w40p">
+                                    <div class="box">
+                                        <div class="tbl-list select-list scroll h196">
+                                            <table id="${promptId}2">
+                                                <colgroup>
+                                                    <col style="width: 100%" />
+                                                </colgroup>
+                                                <tbody>`;
+        for(var j=0; j<defaultList.length; j++){
+            makeHtml += `
+                <tr id="${defaultList[j].entityId}" text="${defaultList[j].entityNm}" entityType = "${defaultList[j].entityType}" onclick="trToggles(this)">
+                    <td>${defaultList[j].entityNm}</td>
+                </tr>
+            `;
+        }
+        makeHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <div class="right">
+                                <button type="button" class="btn btn-close js-close custom-lee-bg-green" onclick="getReportURL('${reportInfo.reportId}','${promptId}', '', 'object')"><span>조회</span></button> <!-- 변수 삽입 -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+        $("#promptDiv").prepend(makeHtml);
+
+    }
+
     // 값 프롬프트 세팅
     function valuePromptSetting(reportInfo){
         var promptId = reportInfo.prompts[0].promptId;
@@ -600,7 +774,7 @@
                             <h1>${reportInfo.prompts[0].title}</h1>
                         </div>
                         <div class="popup__body">
-                            <h2>${reportInfo.prompts[0].promptName}</h2>
+                            <h2>${reportInfo.prompts[0].promptNm}</h2>
                             <section class="row gap-10 center">
                                 <input type="date" id="${promptId}" minValue="${reportInfo.prompts[0].minValue}" maxValue="${reportInfo.prompts[0].maxValue}" promptType="value"
                                 min="${reportInfo.prompts[0].minValue}" max="${reportInfo.prompts[0].maxValue}" value="${reportInfo.prompts[0].val}" pt="${reportInfo.prompts[0].pt}">
@@ -624,10 +798,11 @@
         var defaultList = [];
 
         //2. element수만큼 반복하여 리스트에 나눠넣기
-        var elementsArray = reportInfo.prompts[0].data[0].attr.elements;
+        var elementsArray = reportInfo.prompts[0].attr.elements;
         var promptId = reportInfo.prompts[0].promptId;
-        var attrId = reportInfo.prompts[0].data[0].attr.attrId
+        var attrId = reportInfo.prompts[0].attr.attrId
         console.log(elementsArray);
+        console.log(attrId);
 
         for(var i=0; i<elementsArray.length; i++){
             var element = elementsArray[i];
@@ -648,7 +823,7 @@
                             <h1>${reportInfo.prompts[0].title}</h1>
                         </div>
                         <div class="popup__body">
-                            <h2>${reportInfo.prompts[0].promptName}</h2>
+                            <h2>${reportInfo.prompts[0].promptNm}</h2>
                             <section class="row gap-10 center">
                                 <!-- 왼쪽 -->
                                 <div class="w40p">

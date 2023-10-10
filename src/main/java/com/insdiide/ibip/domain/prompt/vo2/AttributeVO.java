@@ -21,6 +21,4 @@ public class AttributeVO {
 
     private List<ElementVO> elements;
 
-
-
 }

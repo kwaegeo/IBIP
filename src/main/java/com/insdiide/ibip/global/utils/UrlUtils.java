@@ -1,5 +1,7 @@
 package com.insdiide.ibip.global.utils;
 
+import com.insdiide.ibip.domain.folder.vo.EntityVO;
+import com.insdiide.ibip.domain.prompt.vo.ObjectVO;
 import com.insdiide.ibip.domain.prompt.vo2.ElementVO;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
 
@@ -17,6 +19,7 @@ public class UrlUtils {
     public static String generateXML(ReportVO reportVO) {
 
         StringWriter sw = new StringWriter();
+        String middleTag = "";
         try {
             XMLOutputFactory xof = XMLOutputFactory.newFactory();
             XMLStreamWriter xsw = xof.createXMLStreamWriter(sw);
@@ -39,10 +42,10 @@ public class UrlUtils {
                     xsw.writeStartElement("es");
                     xsw.writeStartElement("at");
 
-                    xsw.writeAttribute("did", reportVO.getPrompts().get(0).getData().get(0).getAttr().getAttrId());
+                    xsw.writeAttribute("did", reportVO.getPrompts().get(0).getAttr().getAttrId());
                     xsw.writeAttribute("tp", "12");
                     xsw.writeEndElement(); // at
-                    for (ElementVO element : reportVO.getPrompts().get(0).getData().get(0).getAttr().getElements()) {
+                    for (ElementVO element : reportVO.getPrompts().get(0).getAttr().getElements()) {
                         xsw.writeStartElement("e");
                         xsw.writeAttribute("emt", "1");
                         xsw.writeAttribute("ei", element.getElementId());
@@ -58,6 +61,34 @@ public class UrlUtils {
                     xsw.writeEndElement(); // pa
 
                     xsw.writeEndElement(); // rsl
+                }
+                else if("object".equals(reportVO.getPrompts().get(i).getPromptType())){
+                    xsw.writeStartElement("mi");
+                    xsw.writeStartElement("fct");
+                    xsw.writeAttribute("qsr", "0");
+                    xsw.writeAttribute("fcn", "0");
+                    xsw.writeAttribute("sto", "1");
+                    xsw.writeAttribute("pfc", "0");
+                    for(ObjectVO entity : reportVO.getPrompts().get(0).getEntity()){
+                        if(entity.getEntityType() == 12){
+                            middleTag = "at";
+                        }else{
+                            middleTag = "mt";
+                        }
+                        xsw.writeStartElement(middleTag);
+                        xsw.writeAttribute("did", entity.getEntityId());
+                        xsw.writeAttribute("tp", String.valueOf(entity.getEntityType()));
+                        xsw.writeEndElement();
+                    }
+
+                    xsw.writeEndElement(); // fct
+
+                    xsw.writeEndElement(); // mi
+
+                    xsw.writeEndElement(); // pa
+
+                    xsw.writeEndElement(); // rsl
+
                 }
             }
 

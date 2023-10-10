@@ -8,6 +8,7 @@ import com.insdiide.ibip.domain.prompt.vo2.PromptDataVO;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
 import com.insdiide.ibip.global.mstr.prompt.ConstantPrompt;
 import com.insdiide.ibip.global.mstr.prompt.ElementPrompt;
+import com.insdiide.ibip.global.mstr.prompt.ObjectPrompt;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.web.objects.admin.users.WebUser;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
@@ -138,7 +139,7 @@ public class MstrObject extends MstrSession{
 
         System.out.println(webPrompts.size());
         //프롬프트 개수만큼 반복
-        for(int i=0; i<webPrompts.size(); i++){
+        for(int i=0; i<webPrompts.size(); i++) {
 
             //프롬프트 객체 생성
             WebPrompt webPrompt = webPrompts.get(i);
@@ -155,66 +156,26 @@ public class MstrObject extends MstrSession{
              * TYPE = 3 계층 프롬프트
              * TYPE = 4 개체 프롬프트
              * **/
+            if (webPrompt.getPromptType() == EnumWebPromptType.WebPromptTypeConstant) { //값 프롬프트
+                ConstantPrompt constantPrompt = new ConstantPrompt();
+                prompt = constantPrompt.getConstantPromptInfo(prompt, webPrompt);
+                System.out.println(prompt);
 
-                if(webPrompt.getPromptType() == 1){ //값 프롬프트
-                    ConstantPrompt constantPrompt = new ConstantPrompt();
-                    prompt = constantPrompt.getConstantPromptInfo(prompt, webPrompt);
-                    System.out.println(prompt);
+            } else if (webPrompt.getPromptType() == EnumWebPromptType.WebPromptTypeElements) { // 구성요소 프롬프트
+                ElementPrompt elementPrompt = new ElementPrompt();
+                prompt = elementPrompt.getElementPromptInfo(prompt, webPrompt);
+                System.out.println(prompt);
 
-                } else if(webPrompt.getPromptType() == 2) { // 구성요소 프롬프트
-                    ElementPrompt elementPrompt = new ElementPrompt();
-                    prompt = elementPrompt.getElementPromptInfo(prompt, webPrompt);
-                    System.out.println(prompt);
+            } else if (webPrompt.getPromptType() == 3) { // 계층 프롬프트
+                //계층 프롬프트 개발 전
 
-                } else if(webPrompt.getPromptType() == 3) { // 계층 프롬프트
-
-                } else if(webPrompt.getPromptType() == 4) { // 개체 프롬프트
-                    WebObjectsPrompt objectsPrompt = (WebObjectsPrompt) webPrompt;
-                    System.out.println(objectsPrompt);
-                    System.out.println(objectsPrompt.getTitle());
-                    System.out.println(objectsPrompt.getMeaning());
-                    List<String> defaultData= null;
-                    if(objectsPrompt.hasAnswer()){
-                        defaultData = new ArrayList<String>();
-                        WebFolder defaultanswer = objectsPrompt.getAnswer();
-                        for(int n = 0;n<defaultanswer.getChildCount();n++){
-                            if("undefined".equals(defaultanswer.get(0).getDisplayName()) && defaultanswer.size() == 1){
-                                if(objectsPrompt.hasDefaultAnswer()){
-                                    defaultData = new ArrayList<String>();
-                                    defaultanswer = objectsPrompt.getDefaultAnswer();
-                                    for(n = 0;n<defaultanswer.getChildCount();n++){
-                                        defaultData.add(defaultanswer.get(n).getName());
-                                    }
-                                }
-                                break;
-                            }
-                            defaultData.add(defaultanswer.get(n).getName());
-                        }
-                    }
-                    System.out.println(defaultData);
-
-                    WebFolder folder = objectsPrompt.getSuggestedAnswers(true);
-                    if(folder.size()>0){
-                        for(int k=0; k<folder.size(); k++){
-                            PromptDataVO promptVO = new PromptDataVO();
-                            WebObjectInfo folderInfo = folder.get(k);
-                            System.out.println("이름은 : "+folderInfo.getName());
-                            System.out.println("선택되었는지는 : "+folderInfo.isSelected());
-                            System.out.println("설명은 : "+folderInfo.getDescription());
-
-
-//                            promptVO.setTitle(folderInfo.getName());
-//                            promptData.add(promptVO);
-                        }
-                    }
-//                    prompt.setData(promptData);
-//                    prompt.setPtp("element");
-//                    prompt.setPnm(objectsPrompt.getTitle());
-//                    prompt.setDesc(objectsPrompt.getMeaning());
-
-                }
-                promptList.add(prompt);
+            } else if (webPrompt.getPromptType() == EnumWebPromptType.WebPromptTypeObjects) { // 개체 프롬프트
+                ObjectPrompt objectPrompt = new ObjectPrompt();
+                prompt = objectPrompt.getObjectPromptInfo(prompt, webPrompt);
+                System.out.println(prompt);
             }
+            promptList.add(prompt);
+        }
             reportInfo.setPrompts(promptList);
             return reportInfo;
         }

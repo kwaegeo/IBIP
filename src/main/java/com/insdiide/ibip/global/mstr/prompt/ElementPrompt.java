@@ -16,7 +16,7 @@ public class ElementPrompt {
         // 구성요소 프롬프트 객체 생성
         WebElementsPrompt elementsPrompt = (WebElementsPrompt) webPrompt;
         prompt.setPromptId(elementsPrompt.getID());
-        prompt.setPromptName(elementsPrompt.getMeaning());
+        prompt.setPromptNm(elementsPrompt.getMeaning());
         prompt.setTitle(elementsPrompt.getTitle());
         prompt.setMinValue(elementsPrompt.getMin());
         prompt.setMaxValue(elementsPrompt.getMax());
@@ -65,11 +65,7 @@ public class ElementPrompt {
 
         // 애트리뷰트 객체에 저장
         attrInfo.setElements(elements);
-        PromptDataVO promptData = new PromptDataVO();
-        List<PromptDataVO> promptDataList = new ArrayList<>();
-        promptData.setAttr(attrInfo);
-        promptDataList.add(promptData);
-        prompt.setData(promptDataList);
+        prompt.setAttr(attrInfo);
 
         return prompt;
     }

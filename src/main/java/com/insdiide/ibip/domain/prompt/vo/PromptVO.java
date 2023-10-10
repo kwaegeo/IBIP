@@ -1,5 +1,7 @@
 package com.insdiide.ibip.domain.prompt.vo;
 
+import com.insdiide.ibip.domain.folder.vo.EntityVO;
+import com.insdiide.ibip.domain.prompt.vo2.AttributeVO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,28 +14,35 @@ import java.util.List;
 @ToString
 public class PromptVO {
 
-
-    private List<PromptDataVO> data; //프롬포트 데이터 리스트
-
     private String title; //프롬프트 설명
 
-    private String promptName; //프롬프트 명
+    private String promptId; //프롬프트 ID
+
+    private String promptNm; //프롬프트 명
+
+    private String promptDesc; //프롬프트 설명 (ck, rd, sl) 이 값을 통해 표현되는 방식이 달라짐
 
     private String promptType; //프롬프트 타입
-
-    private String promptId; //프롬프트 ID
 
     private String minValue; //최소 허용 값
 
     private String maxValue; //최대 허용 값
 
-    private String val; // 값 프롬프트 전용 (데이터)
-
     private String pt; // DSSPromptType (XML에 들어가는 Type)
 
     /**
-     * 구성요소 프롬프트의 데이터들
+     * 구성요소 프롬프트 전용 (애트리뷰트 정보)
      * **/
-    private String attrId; //애트리뷰트 ID
 
+    private AttributeVO attr; // 구성요소 프롬프트 전용 (애트리뷰트)
+
+    /**
+     * 값 프롬프트 전용 (값 정보)
+     * **/
+    private String val; // 값 프롬프트 전용 (데이터)
+
+    /**
+     * 개체 프롬프트 전용 (개체 정보)
+     * **/
+    private List<ObjectVO> entity; // 개체 프롬프트 전용 (개체 정보)
 }
