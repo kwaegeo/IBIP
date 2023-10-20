@@ -139,6 +139,20 @@
                             </div>
                         </div>
                     </form>
+                    <!-- 관리자인 경우 상단 메뉴 표시 admin yn -->
+                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">그룹 관리</span></a>
+
+                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">사용자 관리</span></a>
+
+                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">보안역할 관리</span></a>
+
+                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">권한 관리</span></a>
+
+                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">라이센스 관리</span></a>
+
+                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">환경설정</span></a>
+
+                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">공지사항</span></a>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
@@ -404,7 +418,7 @@
         }
 
         function openFolder(folderId){
-            window.open("/folder?folderId="+folderId, 'Folder 정보', 'width=1240,height=1100,location=no,status=no,scrollbars=yes')
+            window.location.href = "/folder?folderId="+folderId;
         }
 
     </script>

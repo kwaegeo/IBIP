@@ -115,11 +115,23 @@ public class MstrObject extends MstrSession{
         return usrSmgr;
     }
 
-    // 리포트 정보 가져오기 (프롬프트 데이터 포함) (유형에 맞게 나눠서)
+    //리포트 정보 가져오기 (리포트 정보만)
     public ReportVO getReportInfo(String reportId) throws WebObjectsException {
-
         ReportVO reportInfo = new ReportVO();
         reportInfo.setReportId(reportId);
+
+        WebObjectSource objectSource = this.serverSession.getFactory().getObjectSource();
+        WebObjectInfo report = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition);
+        report.populate();
+        String reportName = report.getName();
+        reportInfo.setReportNm(reportName);
+
+        return reportInfo;
+    }
+
+
+    // 리포트 데이터 정보 가져오기 (프롬프트 데이터 포함) (유형에 맞게 나눠서)
+    public ReportVO getReportDataInfo(String reportId, ReportVO reportInfo) throws WebObjectsException {
 
         //프롬프트들의 인스턴스 만들기
         WebReportInstance webReportInstance = serverSession.getFactory().getReportSource().getNewInstance(reportId);
@@ -135,6 +147,7 @@ public class MstrObject extends MstrSession{
 
         //프롬프트들의 객체 생성
         WebPrompts webPrompts = webReportInstance.getPrompts();
+
         List<PromptVO> promptList = new ArrayList<>();
 
         System.out.println(webPrompts.size());

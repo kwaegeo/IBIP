@@ -176,18 +176,44 @@
 
             <!-- End of Main Content -->
             <!-- 본체 시작 -->
-            <div class="container-fluid">
-                <h1 class="h3 mb-0 text-gray-800 md-4">이도현 리포트</h1>
+            <div id="main-content">
+            <div class="container-fluid" id="reportDiv">
+
+                <h1 class="h3 mb-0 text-gray-800 md-4">이도현 개발 > 이도현 프롬프트 테스트</h1>
+
                 <div class="d-sm-flex align-items-center justify-content-end mb-4">
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 템플릿 저장</a>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 템플릿 불러오기</a>
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 조회</a>
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</a>
+                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</a>
                     <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</a>
                     <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</a>
                     <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</a>
                 </div>
-                <div id="promptDiv">
 
+                <div id="promptDiv">
+                    <div class="rows">
+                        <div class="popup-window black-border">
+
+                            <div class="popup__head" id="${reportId}">
+                                <h3>이도현 리포트</h3>
+                            </div>
+                            <div id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
+                            </div>
+                                <div class="popup__body_custom">
+                                    <h3 class="font-weight-bold">범주</h3>
+                                        <div class="checkbox-container">
+                                            <input type="checkbox" id="checkbox" name="checkbox">
+                                            <label for="checkbox">Check this box:</label>
+                                        </div>
+                                        <div class="checkbox-container">
+                                            <input type="checkbox" id="checkbox2" name="checkbox">
+                                            <label for="checkbox2">Check this box222:</label>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 </div>
             </div>
             </div>
@@ -413,6 +439,12 @@
 
     });
 
+    var tagTypeMap = {
+        "radio": "radio",
+        "checkbox": "checkbox",
+        "selectbox": "select"
+    };
+
     // 폴더 열기
     function openFolder(folderId){
         location.href = "/folder?folderId="+folderId;
@@ -424,19 +456,34 @@
 
         //프롬프트 개수만큼 반복함.
         for(var i=0; i<reportInfo.prompts.length; i++){
+            var reportDetail = {'reportId': reportInfo.reportId, 'reportNm': reportInfo.reportNm}
+
             if(reportInfo.prompts[i].promptType === "element"){
-                elementPromptSetting(reportInfo.reportId, reportInfo.prompts[i]) //구성요소 프롬프트 세팅 함수 호출  (프롬프트 보내기)
+                elementPromptSetting(reportDetail, reportInfo.prompts[i]) //구성요소 프롬프트 세팅 함수 호출  (프롬프트 보내기)
             }
             else if(reportInfo.prompts[i].promptType === "value"){
-                valuePromptSetting(reportInfo.reportId, reportInfo.prompts[i]) // 값 프롬프트 세팅 함수 호출
+                valuePromptSetting(reportDetail, reportInfo.prompts[i]) // 값 프롬프트 세팅 함수 호출
             }
             else if(reportInfo.prompts[i].promptType === "object"){
-                objectPromptSetting(reportInfo.reportId, reportInfo.prompts[i]) // 개체 프롬프트 세팅 함수 호출
+                objectPromptSetting(reportDetail, reportInfo.prompts[i]) // 개체 프롬프트 세팅 함수 호출
             }
         }
     }
 
-    function getReportURLMulti(){
+    function getReportURLMulti(reportId, promptId, promptType){
+        // ID만 가지고 태그를 파싱한다. 단 태그 타입이 무엇인지 확인
+        var tagType = $('')
+        if(promptType === 'element'){
+
+        }
+        else if(promptType === 'value'){
+
+        }
+        else if(promptType === 'object'){
+
+        }
+
+
         // 특정 div 하위 모든 정보를 파싱
         // div의 name은 prompt이며, type이 존재 각 type별로 다른 파싱방법으로 데이터를 모두 긁어온다.
         // 모은 정보를 통해 URL 요청 (리포트 promptAnswerXML)
@@ -692,106 +739,98 @@
     }
 
     // 개체 프롬프트 세팅
-    function objectPromptSetting(reportId, promptInfo){
-        //1. 2개의 리스트 생성 (개체, 기본값)
-        var entityList = [];
-        var defaultList = [];
+    function objectPromptSetting(reportInfo, promptInfo){
 
-        //2. 개체수만큼 반복하여 리스트에 나눠넣기
+        // 프롬프트의 타입 설정
+        var tagName = tagTypeMap[promptInfo.tagType] || "checkbox";
+
+        // tagName = "selectbox"
+
+        // 구성요소 리스트 선언
         var entitiesArray = promptInfo.entity;
-        var promptId = promptInfo.promptId;
 
-        for(var i=0; i<entitiesArray.length; i++){
-            var entity = entitiesArray[i];
-            if(entity.defaultAnswerYn === "Y"){
-                defaultList.push(entity)
-            }else{
-                entityList.push(entity)
-            }
-        }
-
-        console.log(entityList);
-        console.log(defaultList);
+        //
+        // // radio나 select box는 선택된 목록이 1개 여야함.
+        // if (tagName === "radio" || tagName === "selectbox") {
+        //     // 구성요소 프롬프트에서 defaultAnswerYn 값이 'Y'인 개수를 세기
+        //     var checkedCount = entitiesArray.filter(function(element) {
+        //         return element.defaultAnswerYn === 'Y';
+        //     }).length;
+        //
+        //     var errorMsg = "해당 프롬프트의 설정이 " + tagName + "이지만 기본 값이 2개 이상입니다. 설정 수정 후 재시작하여 주십시오";
+        //     // 만약 checkedCount가 2개 이상인 경우 경고창 표시 후 종료
+        //     if (checkedCount >= 2) {
+        //         alert(errorMsg);
+        //         return;
+        //     }
+        // }
 
         // 개체 적재 테이블 생성
         var makeHtml = `
-                    <div class="row">
-                    <div class="popup-window black-border" id="${reportId}">
-                        <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
-                        <div class="popup__head" id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
-                            <h1>${promptInfo.title}</h1>
-                        </div>
-                        <div class="popup__body">
-                            <h2>${promptInfo.promptNm}</h2>
-                            <section class="row gap-10 center">
-                                <!-- 왼쪽 -->
-                                <div class="w40p">
-                                    <!-- //트리 -->
-                                    <div class="box">
-                                        <div class="tbl-list select-list scroll h196">
-                                            <table id="${promptId}1">
-                                                <colgroup>
-                                                    <col style="width: 100%" />
-                                                </colgroup>
-                                                <tbody>`;
-        for(var i=0; i<entityList.length; i++){
-            makeHtml += `
-                <tr id="${entityList[i].entityId}" text="${entityList[i].entityNm}" entityType = "${entityList[i].entityType}" onclick="trToggles(this)">
-                    <td>${entityList[i].entityNm}</td>
-                </tr>
+
+                    <div class="container-fluid" name="reportDiv" id="${reportInfo.reportId}">
+                        <h1 class="h3 mb-0 text-gray-800 md-4">리포트 경로가 들어갈겁니다.</h1>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 조회</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</a>
+                            </div>
+
+                    <div id="promptDiv">
+                        <div class="rows">
+                            <div class="popup-window black-border">
+                                    <div class="popup__head" id="${reportInfo.reportId}">
+                                        <h3>${reportInfo.reportNm}</h3>
+                                    </div>
+                                    <div id="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="element" pt="${promptInfo.pt}">
+                                        <div class="popup__body_custom">
+                                            <h3 class="font-weight-bold">${promptInfo.title}</h3>
+`;
+        if(tagName === "selectbox"){
+            makeHtml +=`<div className=checkbox-container"><select>`
+
+            for(var i=0; i<entitiesArray.length; i++){
+                makeHtml += `
+                        <option value="${entitiesArray[i].entityId}" ${entitiesArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
+                            ${entitiesArray[i].entityNm}
+                        </option>
             `;
+            }
+            makeHtml += `</select></div>`
+        }
+        else{
+            for(var i=0; i<entitiesArray.length; i++){
+                makeHtml += `
+                <div class=checkbox-container">
+                    <input type="${tagName}" id="${entitiesArray[i].entityId}" value="${entitiesArray[i].entityId}" elementsArray[i].defaultAnswerYn === 'Y' ? 'checked' : '';>
+                    <label for="${entitiesArray[i].entityId}">${entitiesArray[i].entityNm}</label>
+                </div>
+            `;
+            }
         }
         makeHtml += `
-                                                </tbody>
-                                            </table>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="btn-wrap">
-                                    <button type="button" onclick="addElement('${promptId}')"><i class="material-icons md-green md-36">arrow_circle_right</i><span class="hide">추가</span></button>
-                                    <button type="button" onclick="removeElement('${promptId}')"><i class="material-icons md-green md-36">arrow_circle_left</i><span class="hide">취소</span></button>
-                                </div>
-
-                                <!-- 오른쪽 -->
-                                <div class="w40p">
-                                    <div class="box">
-                                        <div class="tbl-list select-list scroll h196">
-                                            <table id="${promptId}2">
-                                                <colgroup>
-                                                    <col style="width: 100%" />
-                                                </colgroup>
-                                                <tbody>`;
-        for(var j=0; j<defaultList.length; j++){
-            makeHtml += `
-                <tr id="${defaultList[j].entityId}" text="${defaultList[j].entityNm}" entityType = "${defaultList[j].entityType}" onclick="trToggles(this)">
-                    <td>${defaultList[j].entityNm}</td>
-                </tr>
-            `;
-        }
-        makeHtml += `
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                            </div>
                         </div>
                     </div>
-                    </div>
-                `;
+`;
 
-        $("#promptDiv").prepend(makeHtml);
+        $("#main-content").prepend(makeHtml);
 
     }
 
     // 값 프롬프트 세팅
-    function valuePromptSetting(reportId, promptInfo){
+    function valuePromptSetting(reportInfo, promptInfo){
         var promptId = promptInfo.promptId;
 
         //1. 값 프롬프트 적재 HTML 생성
         var makeHtml = `
                     <div class="row">
-                    <div class="popup-window black-border" id="${reportId}">
+                    <div class="popup-window black-border" id="${reportInfo.reportId}">
                         <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
                         <div class="popup__head">
                             <h1>${promptInfo.title}</h1>
@@ -813,97 +852,86 @@
 
 
     // 구성요소 프롬프트 세팅
-    function elementPromptSetting(reportId, promptInfo){
-        //1. 2개의 리스트 생성 (구성요소, 기본값)
-        var elementList = [];
-        var defaultList = [];
+    function elementPromptSetting(reportInfo, promptInfo){
+        // 프롬프트의 타입 설정
+        var tagName = tagTypeMap[promptInfo.tagType] || "checkbox";
 
-        //2. element수만큼 반복하여 리스트에 나눠넣기
+        tagName = "selectbox"
+
+        // 구성요소 리스트 선언
         var elementsArray = promptInfo.attr.elements;
-        var promptId = promptInfo.promptId;
-        var attrId = promptInfo.attr.attrId
-        console.log(elementsArray);
-        console.log(attrId);
 
-        for(var i=0; i<elementsArray.length; i++){
-            var element = elementsArray[i];
-            if(element.defaultAnswerYn === "Y"){
-                defaultList.push(element)
-            }else{
-                elementList.push(element)
+
+        // radio나 select box는 선택된 목록이 1개 여야함.
+        if (tagName === "radio" || tagName === "selectbox") {
+            // 구성요소 프롬프트에서 defaultAnswerYn 값이 'Y'인 개수를 세기
+            var checkedCount = elementsArray.filter(function(element) {
+                return element.defaultAnswerYn === 'Y';
+            }).length;
+
+            var errorMsg = "해당 프롬프트의 설정이 " + tagName + "이지만 기본 값이 2개 이상입니다. 설정 수정 후 재시작하여 주십시오";
+            // 만약 checkedCount가 2개 이상인 경우 경고창 표시 후 종료
+            if (checkedCount >= 2) {
+                alert(errorMsg);
+                return;
             }
         }
-        console.log(elementList);
-        console.log(defaultList);
 
         // 구성요소 적재 테이블 생성
         var makeHtml = `
-                    <div class="row.center">
-                    <div class="popup-window black-border" id="${reportId}">
-                        <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
-                        <div class="popup__head" id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="element" pt="${promptInfo.pt}">
-                            <h1>${promptInfo.title}</h1>
-                        </div>
-                        <div class="popup__body">
-                            <h2>${promptInfo.promptNm}</h2>
-                            <section class="row gap-10 center">
-                                <!-- 왼쪽 -->
-                                <div class="w40p">
-                                    <!-- //트리 -->
-                                    <div class="box">
-                                        <div class="tbl-list select-list scroll h196">
-                                            <table id="${attrId}1">
-                                                <colgroup>
-                                                    <col style="width: 100%" />
-                                                </colgroup>
-                                                <tbody>`;
-        for(var i=0; i<elementList.length; i++){
-            makeHtml += `
-                <tr id="${elementList[i].elementId}" text="${elementList[i].elementNm}" onclick="trToggles(this)">
-                    <td>${elementList[i].elementNm}</td>
-                </tr>
+
+                    <div class="container-fluid" name="reportDiv" id="${reportInfo.reportId}">
+                        <h1 class="h3 mb-0 text-gray-800 md-4">리포트 경로가 들어갈겁니다.</h1>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 조회</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</a>
+                            </div>
+
+                    <div id="promptDiv">
+                        <div class="rows">
+                            <div class="popup-window black-border">
+                                    <div class="popup__head" id="${reportInfo.reportId}">
+                                        <h3>${reportInfo.reportNm}</h3>
+                                    </div>
+                                    <div id="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="element" pt="${promptInfo.pt}">
+                                        <div class="popup__body_custom">
+                                            <h3 class="font-weight-bold">${promptInfo.attr.attrNm}</h3>
+`;
+        if(tagName === "selectbox"){
+            makeHtml +=`<div className=checkbox-container"><select>`
+
+            for(var i=0; i<elementsArray.length; i++){
+                makeHtml += `
+                        <option value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
+                            ${elementsArray[i].elementNm}
+                        </option>
             `;
+            }
+            makeHtml += `</select></div>`
+        }
+        else{
+            for(var i=0; i<elementsArray.length; i++){
+                makeHtml += `
+                <div class=checkbox-container">
+                    <input type="${tagName}" id="${elementsArray[i].elementId}" value="${elementsArray[i].elementId}" elementsArray[i].defaultAnswerYn === 'Y' ? 'checked' : '';>
+                    <label for="${elementsArray[i].elementId}">${elementsArray[i].elementNm}</label>
+                </div>
+            `;
+            }
         }
         makeHtml += `
-                                                </tbody>
-                                            </table>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="btn-wrap">
-                                    <button type="button" onclick="addElement('${attrId}')"><i class="material-icons md-green md-36">arrow_circle_right</i><span class="hide">추가</span></button>
-                                    <button type="button" onclick="removeElement('${attrId}')"><i class="material-icons md-green md-36">arrow_circle_left</i><span class="hide">취소</span></button>
-                                </div>
-
-                                <!-- 오른쪽 -->
-                                <div class="w40p">
-                                    <div class="box">
-                                        <div class="tbl-list select-list scroll h196">
-                                            <table id="${attrId}2">
-                                                <colgroup>
-                                                    <col style="width: 100%" />
-                                                </colgroup>
-                                                <tbody>`;
-        for(var j=0; j<defaultList.length; j++){
-            makeHtml += `
-                <tr id="${defaultList[j].elementId}" text="${defaultList[j].elementNm}" onclick="trToggles(this)">
-                    <td>${defaultList[j].elementNm}</td>
-                </tr>
-            `;
-        }
-        makeHtml += `
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                            </div>
                         </div>
                     </div>
-                    </div>
-                `;
+`;
 
-        $("#promptDiv").prepend(makeHtml);
+        $("#main-content").prepend(makeHtml);
     }
 
 

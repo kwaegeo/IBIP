@@ -21,6 +21,7 @@ public class ReportService {
         mstrObject.setSession(mstrSessionId);
 
         ReportVO reportInfo = mstrObject.getReportInfo(reportId);
+        reportInfo = mstrObject.getReportDataInfo(reportId, reportInfo);
 
         return reportInfo;
     }

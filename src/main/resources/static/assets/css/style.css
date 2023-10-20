@@ -35,6 +35,20 @@
   flex-direction: column;
   gap: 25px;
 }
+
+.popup__body_custom {
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.checkbox-container{
+  display: flex;
+  align-items: center;
+  gap: 2px; /* 각 체크박스와 라벨 사이의 간격 조절 */
+}
+
 .popup__footer {
   display: flex;
   align-items: center;

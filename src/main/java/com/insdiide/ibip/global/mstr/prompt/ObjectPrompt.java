@@ -22,6 +22,7 @@ public class ObjectPrompt {
         prompt.setMaxValue(objectPrompt.getMax());
         prompt.setPromptType("object");
         prompt.setPt(String.valueOf(objectPrompt.getDSSPromptType()));
+        prompt.setTagType(objectPrompt.getDescription());
 
         //프롬프트 채우기
         objectPrompt.populate();
@@ -30,6 +31,7 @@ public class ObjectPrompt {
         System.out.println(objectPrompt.getMeaning());
         System.out.println(objectPrompt.getTitle());
         System.out.println("현재 기본 세팅된 PromptAnswerXML: " +objectPrompt.getShortAnswerXML(true));
+        System.out.println(objectPrompt.getDescription());
 
         // 개체 리스트 객체 생성
         WebFolder webFolder = objectPrompt.getSuggestedAnswers(true);

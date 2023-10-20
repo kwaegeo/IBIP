@@ -30,6 +30,9 @@ public class PromptVO {
 
     private String pt; // DSSPromptType (XML에 들어가는 Type)
 
+    private String tagType; // 프롬프트 설명에 들어간 InputTag의 종류 (타입)
+
+
     /**
      * 구성요소 프롬프트 전용 (애트리뷰트 정보)
      * **/

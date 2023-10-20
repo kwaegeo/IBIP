@@ -56,7 +56,6 @@ public class ReportController {
     @PostMapping("/getReportURL")
     @ResponseBody
     public String getReportURL(@RequestBody ReportVO reportInfo, HttpServletRequest request){
-        System.out.println("어우 너무추웡?");
         System.out.println(reportInfo);
         
         
