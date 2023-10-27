@@ -30,22 +30,24 @@ public class UrlUtils {
                 xsw.writeStartElement("pa");
                 xsw.writeAttribute("pt", reportVO.getPrompts().get(i).getPt());
                 xsw.writeAttribute("pin", "0");
-                xsw.writeAttribute("did", reportVO.getPrompts().get(0).getPromptId());
+                xsw.writeAttribute("did", reportVO.getPrompts().get(i).getPromptId());
                 xsw.writeAttribute("tp", "10");
+
                 if("value".equals(reportVO.getPrompts().get(i).getPromptType())){
                     xsw.writeCharacters(reportVO.getPrompts().get(i).getVal());
                     xsw.writeEndElement(); // pa
                     xsw.writeEndElement(); // rsl
                 }
+
                 else if("element".equals(reportVO.getPrompts().get(i).getPromptType())){
                     xsw.writeStartElement("mi");
                     xsw.writeStartElement("es");
                     xsw.writeStartElement("at");
 
-                    xsw.writeAttribute("did", reportVO.getPrompts().get(0).getAttr().getAttrId());
+                    xsw.writeAttribute("did", reportVO.getPrompts().get(i).getAttr().getAttrId());
                     xsw.writeAttribute("tp", "12");
                     xsw.writeEndElement(); // at
-                    for (ElementVO element : reportVO.getPrompts().get(0).getAttr().getElements()) {
+                    for (ElementVO element : reportVO.getPrompts().get(i).getAttr().getElements()) {
                         xsw.writeStartElement("e");
                         xsw.writeAttribute("emt", "1");
                         xsw.writeAttribute("ei", element.getElementId());
@@ -59,9 +61,9 @@ public class UrlUtils {
                     xsw.writeEndElement(); // mi
 
                     xsw.writeEndElement(); // pa
-
-                    xsw.writeEndElement(); // rsl
                 }
+
+
                 else if("object".equals(reportVO.getPrompts().get(i).getPromptType())){
                     xsw.writeStartElement("mi");
                     xsw.writeStartElement("fct");
@@ -69,7 +71,7 @@ public class UrlUtils {
                     xsw.writeAttribute("fcn", "0");
                     xsw.writeAttribute("sto", "1");
                     xsw.writeAttribute("pfc", "0");
-                    for(ObjectVO entity : reportVO.getPrompts().get(0).getEntity()){
+                    for(ObjectVO entity : reportVO.getPrompts().get(i).getEntity()){
                         if(entity.getEntityType() == 12){
                             middleTag = "at";
                         }else{
@@ -90,8 +92,9 @@ public class UrlUtils {
                     xsw.writeEndElement(); // rsl
 
                 }
-            }
 
+            }
+            xsw.writeEndElement(); // rsl
             xsw.flush();
             xsw.close();
         } catch (Exception e) {

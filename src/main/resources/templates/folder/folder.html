@@ -174,49 +174,12 @@
                     </ul>
                 </nav>
 
-            <!-- End of Main Content -->
+            <!-- Start of Main Content -->
+
             <!-- 본체 시작 -->
             <div id="main-content">
-            <div class="container-fluid" id="reportDiv">
-
-                <h1 class="h3 mb-0 text-gray-800 md-4">이도현 개발 > 이도현 프롬프트 테스트</h1>
-
-                <div class="d-sm-flex align-items-center justify-content-end mb-4">
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 조회</a>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</a>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</a>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</a>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</a>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</a>
-                </div>
-
-                <div id="promptDiv">
-                    <div class="rows">
-                        <div class="popup-window black-border">
-
-                            <div class="popup__head" id="${reportId}">
-                                <h3>이도현 리포트</h3>
-                            </div>
-                            <div id="${promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
-                            </div>
-                                <div class="popup__body_custom">
-                                    <h3 class="font-weight-bold">범주</h3>
-                                        <div class="checkbox-container">
-                                            <input type="checkbox" id="checkbox" name="checkbox">
-                                            <label for="checkbox">Check this box:</label>
-                                        </div>
-                                        <div class="checkbox-container">
-                                            <input type="checkbox" id="checkbox2" name="checkbox">
-                                            <label for="checkbox2">Check this box222:</label>
-                                        </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </div>
             </div>
-            </div>
+
                 <!-- End of Content Wrapper -->
         </div>
     <!-- End of Page Wrapper -->
@@ -452,7 +415,36 @@
 
     // 프롬프트 세팅
     function promptSetting(reportInfo){
+
         console.log(reportInfo);
+
+        //리포트의 기본정보를 화면에 표시
+        // 1. 템플릿 유무에 따른 버튼? (아니면 일단 버튼은 다 나타낼 것)
+        var makeReportInfoHtml = `
+            <div class="container-fluid" name="reportDiv">
+                <h1 class="h3 mb-0 text-gray-800 md-4">리포트의 경로가 들어갑니다. Path</h1>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="getReportURL('${reportInfo.reportId}')"> 조회</button>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</a>
+                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</a>
+                            </div>
+                            <div id="reportDiv">
+                                <div class="rows">
+                                    <div class="popup-window black-border">
+                                        <div class="popup__head id="${reportInfo.reportId}">
+                                            <h3>${reportInfo.reportNm}</h3>
+                                        </div>
+                                        <div id="promptDiv">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+        `
+        //main부분에 리포트 정보 삽입
+        $("#main-content").prepend(makeReportInfoHtml);
 
         //프롬프트 개수만큼 반복함.
         for(var i=0; i<reportInfo.prompts.length; i++){
@@ -490,70 +482,128 @@
         // 모든 프롬프트에 대하여 Valid를 실행 (유효성 검사 모두 통과 시 정상 호출)
     }
 
-    // 리포트 호출 URL 생성
-    function getReportURL(reportId, promptId, attrId, promptType){
+    function promptDataParsing(prompt, index){
+        var promptInfo = {};
+        var attrInfo = {};
+        if(prompt.attr('promptType') === 'element'){
+            promptInfo.promptId = prompt.attr('id');
+            promptInfo.pt = prompt.attr('pt');
+            promptInfo.promptType = 'element';
+            console.log(promptInfo);
 
-        if(promptType === 'element'){
-            var promptTagString = "#"+promptId;
-            var attrTagString = "#"+attrId;
+            var attrParser = $("[name='attr']").eq(index);
 
-            var promptTag = $(promptTagString);
-            var attrTag = $(attrTagString);
-
-            console.log(promptId);
-            console.log(attrId);
-
-            var reportInfo = {};
-            var promptInfo = {};
-            var attrInfo = {};
-
-            var min = promptTag.attr("minValue");
-            var max = promptTag.attr("maxValue");
-            var elementTable = $(attrTagString+"2");
-            var elementNum = elementTable.find("tr").length;
-
-            var validResult = validMinMax(min, max, elementNum);
-
-            if(validResult == "min"){
-                alert("최소 "+ min + "개 이상 선택하여야합니다.")
-                return
-            }
-            else if(validResult == "max"){
-                alert("최대 "+ max + "개 이하 선택하여야합니다.")
-                return
-            }
-
-            //리포트 필요한 것
-            reportInfo.reportId = reportId;
-
-            //프롬프트 필요한 것
-            promptInfo.promptId = promptId;
-            promptInfo.promptType = promptTag.attr("promptType");
-            promptInfo.pt = promptTag.attr("pt");
-
-            //애트리뷰트 필요한 것
-            attrInfo.attrId = attrId;
-            attrInfo.attrType = attrTag.attr("attrType");
+            attrInfo.attrId = attrParser.attr('id');
+            attrInfo.attrType = attrParser.attr('attrType');
+            console.log(attrInfo);
 
             var elements = [];
+            var elementParser = $("[name='" + promptInfo.promptId + "']");
 
-            elementTable.find("tr").each(function(){
-                var elementId = $(this).attr("id");
-                var elementNm = $(this).attr("text");
+            elementParser.each(function(){
+                var elementType = $(this).attr('type');
 
-                elements.push({elementId: elementId, elementNm: elementNm})
+                if((elementType === 'checkbox' || elementType === 'radio') && $(this).is(':checked')){
+                    elements.push({elementId : $(this).attr('id'), elementNm: $(this).next("label").text()})
+                }
             })
 
+            console.log(elementParser);
             console.log(elements);
-            attrInfo.elements=elements;
 
+            attrInfo.elements = elements;
             promptInfo.attr = attrInfo;
 
-            reportInfo.prompts = [];
-            reportInfo.prompts.push(promptInfo);
+            return promptInfo;
+        }
 
-            console.log(reportInfo);
+    }
 
+
+    // 리포트 호출 URL 생성
+    function getReportURL(reportId){
+        //reportId, promptId, attrId, promptType
+        var reportInfo = {};
+        //리포트 필요한 것
+        reportInfo.reportId = reportId;
+        reportInfo.prompts = [];
+
+        var promptInfo = $("[name='prompt']");
+        promptInfo.each(function(index, prompt){
+            reportInfo.prompts.push(promptDataParsing($(prompt), index));
+            console.log("Element :" + $(prompt).attr("promptType"));
+        })
+
+        console.log(reportInfo);
+
+        //구성요소 프롬프트의 경우 프롬프트 ID, attr, pt값
+        //애트리뷰트 필요한 것 attrId, attrType
+        //앨리먼트 까지 필요한 것 id, name
+
+
+
+        //
+        // var promptCount = $(".prompts").length;
+        //
+        // if(promptType === 'element'){
+        //     var promptTagString = "#"+promptId;
+        //     var attrTagString = "#"+attrId;
+        //
+        //     var promptTag = $(promptTagString);
+        //     var attrTag = $(attrTagString);
+        //
+        //     console.log(promptId);
+        //     console.log(attrId);
+        //
+        //     var reportInfo = {};
+        //     var promptInfo = {};
+        //     var attrInfo = {};
+        //
+        //     var min = promptTag.attr("minValue");
+        //     var max = promptTag.attr("maxValue");
+        //     var elementTable = $(attrTagString+"2");
+        //     var elementNum = elementTable.find("tr").length;
+        //
+        //     var validResult = validMinMax(min, max, elementNum);
+        //
+        //     if(validResult == "min"){
+        //         alert("최소 "+ min + "개 이상 선택하여야합니다.")
+        //         return
+        //     }
+        //     else if(validResult == "max"){
+        //         alert("최대 "+ max + "개 이하 선택하여야합니다.")
+        //         return
+        //     }
+        //
+        //
+        //     //프롬프트 필요한 것
+        //     promptInfo.promptId = promptId;
+        //     promptInfo.promptType = promptTag.attr("promptType");
+        //     promptInfo.pt = promptTag.attr("pt");
+        //
+        //     //애트리뷰트 필요한 것
+        //     attrInfo.attrId = attrId;
+        //     attrInfo.attrType = attrTag.attr("attrType");
+        //
+        //     var elements = [];
+        //
+        //     elementTable.find("tr").each(function(){
+        //         var elementId = $(this).attr("id");
+        //         var elementNm = $(this).attr("text");
+        //
+        //         elements.push({elementId: elementId, elementNm: elementNm})
+        //     })
+        //
+        //     console.log(elements);
+        //     attrInfo.elements=elements;
+        //
+        //     promptInfo.attr = attrInfo;
+        //
+        //     reportInfo.prompts = [];
+        //     reportInfo.prompts.push(promptInfo);
+        //
+        //     console.log(reportInfo);
+        //
             $.ajax({
                 url: '/getReportURL',
                 data: JSON.stringify(reportInfo),
@@ -568,139 +618,138 @@
                         "height": "720px" // 조절해야 할 크기
                     });
                     // iframe을 한번 비운 뒤에
-                    $("#promptDiv").empty();
+                    $("#main-content").empty();
                     // iframe을 특정 컨테이너에 추가
-                    $("#promptDiv").prepend(iframe);
+                    $("#main-content").prepend(iframe);
                 },
                 error: function () {
                     alert("서버에 접속할 수 없습니다.")
                 }
             })
-        }
-        else if(promptType === 'value'){
-            var promptTagString = "#"+promptId;
-            var promptTag = $(promptTagString);
-            var value = promptTag.attr("value");
-
-            var reportInfo = {}
-            var promptInfo = {}
-
-            //리포트 필요한 것
-            reportInfo.reportId = reportId;
-
-            //프롬프트 필요한 것
-            promptInfo.promptId = promptId;
-            promptInfo.promptType = promptTag.attr("promptType");
-            promptInfo.val = promptTag.val();
-            promptInfo.pt = promptTag.attr("pt");
-
-            reportInfo.prompts = [];
-            reportInfo.prompts.push(promptInfo);
-
-            $.ajax({
-                url: '/getReportURL',
-                data: JSON.stringify(reportInfo),
-                contentType: "application/json",
-                method: 'POST',
-                dataType: "text",
-                success: function (responseData) {
-                    console.log(responseData)
-                    var iframe = $("<iframe>", {
-                        "src": responseData,
-                        "width": "100%",
-                        "height": "720px" // 조절해야 할 크기
-                    });
-                    // iframe을 한번 비운 뒤에
-                    $("#promptDiv").empty();
-                    // iframe을 특정 컨테이너에 추가
-                    $("#promptDiv").prepend(iframe);
-                },
-                error: function () {
-                    alert("서버에 접속할 수 없습니다.")
-                }
-            })
-        }
-        else if(promptType === "object"){
-            var promptTagString = "#"+promptId;
-
-            var promptTag = $(promptTagString);
-
-            console.log(promptId);
-
-            var reportInfo = {};
-            var promptInfo = {};
-            var entityInfo = {};
-
-            var min = promptTag.attr("minValue");
-            var max = promptTag.attr("maxValue");
-            var entityTable = $(promptTagString+"2");
-
-            console.log("잘되는가?퓨")
-            console.log(entityTable);
-            var entityNum = entityTable.find("tr").length;
-
-            var validResult = validMinMax(min, max, entityNum);
-
-            if(validResult == "min"){
-                alert("최소 "+ min + "개 이상 선택하여야합니다.")
-                return
-            }
-            else if(validResult == "max"){
-                alert("최대 "+ max + "개 이하 선택하여야합니다.")
-                return
-            }
-
-            //리포트 필요한 것
-            reportInfo.reportId = reportId;
-
-            //프롬프트 필요한 것
-            promptInfo.promptId = promptId;
-            promptInfo.promptType = promptTag.attr("promptType");
-            promptInfo.pt = promptTag.attr("pt");
-
-            //개체 필요한 것 (entity)
-            entityInfo.entityId = attrId;
-            entityInfo.entityType = promptTag.attr("attrType");
-
-            var entities = [];
-
-            entityTable.find("tr").each(function(){
-                var entityId = $(this).attr("id");
-                var entityNm = $(this).attr("text");
-                var entityType = $(this).attr("entityType");
-                entities.push({entityId: entityId, entityNm: entityNm, entityType: entityType})
-            })
-
-            console.log(entities);
-            promptInfo.entity = entities;
-            reportInfo.prompts = [];
-            reportInfo.prompts.push(promptInfo);
-
-            console.log(reportInfo);
-
-            $.ajax({
-                url: '/getReportURL',
-                data: JSON.stringify(reportInfo),
-                contentType: "application/json",
-                method: 'POST',
-                dataType: "text",
-                success: function (responseData) {
-                    console.log(responseData)
-                    var iframe = $("<iframe>", {
-                        "src": responseData,
-                        "width": "100%",
-                        "height": "720px" // 조절해야 할 크기
-                    });
-                    // iframe을 한번 비운 뒤에
-                    $("#promptDiv").empty();
-                    // iframe을 특정 컨테이너에 추가
-                    $("#promptDiv").prepend(iframe);
-                },
-                error: function () {
-                    alert("서버에 접속할 수 없습니다.")
-                }
-            })
-        }
+        // else if(promptType === 'value'){
+        //     var promptTagString = "#"+promptId;
+        //     var promptTag = $(promptTagString);
+        //     var value = promptTag.attr("value");
+        //
+        //     var reportInfo = {}
+        //     var promptInfo = {}
+        //
+        //     //리포트 필요한 것
+        //     reportInfo.reportId = reportId;
+        //
+        //     //프롬프트 필요한 것
+        //     promptInfo.promptId = promptId;
+        //     promptInfo.promptType = promptTag.attr("promptType");
+        //     promptInfo.val = promptTag.val();
+        //     promptInfo.pt = promptTag.attr("pt");
+        //
+        //     reportInfo.prompts = [];
+        //     reportInfo.prompts.push(promptInfo);
+        //
+        //     $.ajax({
+        //         url: '/getReportURL',
+        //         data: JSON.stringify(reportInfo),
+        //         contentType: "application/json",
+        //         method: 'POST',
+        //         dataType: "text",
+        //         success: function (responseData) {
+        //             console.log(responseData)
+        //             var iframe = $("<iframe>", {
+        //                 "src": responseData,
+        //                 "width": "100%",
+        //                 "height": "720px" // 조절해야 할 크기
+        //             });
+        //             // iframe을 한번 비운 뒤에
+        //             $("#promptDiv").empty();
+        //             // iframe을 특정 컨테이너에 추가
+        //             $("#promptDiv").prepend(iframe);
+        //         },
+        //         error: function () {
+        //             alert("서버에 접속할 수 없습니다.")
+        //         }
+        //     })
+        // }
+        // else if(promptType === "object"){
+        //     var promptTagString = "#"+promptId;
+        //
+        //     var promptTag = $(promptTagString);
+        //
+        //     console.log(promptId);
+        //
+        //     var reportInfo = {};
+        //     var promptInfo = {};
+        //     var entityInfo = {};
+        //
+        //     var min = promptTag.attr("minValue");
+        //     var max = promptTag.attr("maxValue");
+        //     var entityTable = $(promptTagString+"2");
+        //
+        //     console.log("잘되는가?퓨")
+        //     console.log(entityTable);
+        //     var entityNum = entityTable.find("tr").length;
+        //
+        //     var validResult = validMinMax(min, max, entityNum);
+        //
+        //     if(validResult == "min"){
+        //         alert("최소 "+ min + "개 이상 선택하여야합니다.")
+        //         return
+        //     }
+        //     else if(validResult == "max"){
+        //         alert("최대 "+ max + "개 이하 선택하여야합니다.")
+        //         return
+        //     }
+        //
+        //     //리포트 필요한 것
+        //     reportInfo.reportId = reportId;
+        //
+        //     //프롬프트 필요한 것
+        //     promptInfo.promptId = promptId;
+        //     promptInfo.promptType = promptTag.attr("promptType");
+        //     promptInfo.pt = promptTag.attr("pt");
+        //
+        //     //개체 필요한 것 (entity)
+        //     entityInfo.entityId = attrId;
+        //     entityInfo.entityType = promptTag.attr("attrType");
+        //
+        //     var entities = [];
+        //
+        //     entityTable.find("tr").each(function(){
+        //         var entityId = $(this).attr("id");
+        //         var entityNm = $(this).attr("text");
+        //         var entityType = $(this).attr("entityType");
+        //         entities.push({entityId: entityId, entityNm: entityNm, entityType: entityType})
+        //     })
+        //
+        //     console.log(entities);
+        //     promptInfo.entity = entities;
+        //     reportInfo.prompts = [];
+        //     reportInfo.prompts.push(promptInfo);
+        //
+        //     console.log(reportInfo);
+        //
+        //     $.ajax({
+        //         url: '/getReportURL',
+        //         data: JSON.stringify(reportInfo),
+        //         contentType: "application/json",
+        //         method: 'POST',
+        //         dataType: "text",
+        //         success: function (responseData) {
+        //             console.log(responseData)
+        //             var iframe = $("<iframe>", {
+        //                 "src": responseData,
+        //                 "width": "100%",
+        //                 "height": "720px" // 조절해야 할 크기
+        //             });
+        //             // iframe을 한번 비운 뒤에
+        //             $("#promptDiv").empty();
+        //             // iframe을 특정 컨테이너에 추가
+        //             $("#promptDiv").prepend(iframe);
+        //         },
+        //         error: function () {
+        //             alert("서버에 접속할 수 없습니다.")
+        //         }
+        //     })
+        // }
     }
 
     //최소, 최대 값 유효성 검사
@@ -805,7 +854,7 @@
             for(var i=0; i<entitiesArray.length; i++){
                 makeHtml += `
                 <div class=checkbox-container">
-                    <input type="${tagName}" id="${entitiesArray[i].entityId}" value="${entitiesArray[i].entityId}" elementsArray[i].defaultAnswerYn === 'Y' ? 'checked' : '';>
+                    <input type="${tagName}" id="${entitiesArray[i].entityId}" value="${entitiesArray[i].entityId}" ${elementsArray[i].defaultAnswerYn} === 'Y' ? 'checked' : '';>
                     <label for="${entitiesArray[i].entityId}">${entitiesArray[i].entityNm}</label>
                 </div>
             `;
@@ -856,7 +905,7 @@
         // 프롬프트의 타입 설정
         var tagName = tagTypeMap[promptInfo.tagType] || "checkbox";
 
-        tagName = "selectbox"
+        // tagName = "";
 
         // 구성요소 리스트 선언
         var elementsArray = promptInfo.attr.elements;
@@ -880,26 +929,9 @@
         // 구성요소 적재 테이블 생성
         var makeHtml = `
 
-                    <div class="container-fluid" name="reportDiv" id="${reportInfo.reportId}">
-                        <h1 class="h3 mb-0 text-gray-800 md-4">리포트 경로가 들어갈겁니다.</h1>
-                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 조회</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</a>
-                            </div>
-
-                    <div id="promptDiv">
-                        <div class="rows">
-                            <div class="popup-window black-border">
-                                    <div class="popup__head" id="${reportInfo.reportId}">
-                                        <h3>${reportInfo.reportNm}</h3>
-                                    </div>
-                                    <div id="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="element" pt="${promptInfo.pt}">
-                                        <div class="popup__body_custom">
-                                            <h3 class="font-weight-bold">${promptInfo.attr.attrNm}</h3>
+                        <div name="prompt" id="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="element" pt="${promptInfo.pt}">
+                                <div class="popup__body_custom">
+                                    <h3 class="font-weight-bold" name="attr", id="${promptInfo.attr.attrId}", attrType="${promptInfo.attr.attrType}">${promptInfo.attr.attrNm}</h3>
 `;
         if(tagName === "selectbox"){
             makeHtml +=`<div className=checkbox-container"><select>`
@@ -909,29 +941,34 @@
                         <option value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
                             ${elementsArray[i].elementNm}
                         </option>
-            `;
-            }
+            `
+            };
             makeHtml += `</select></div>`
         }
         else{
-            for(var i=0; i<elementsArray.length; i++){
-                makeHtml += `
+            makeHtml += `
                 <div class=checkbox-container">
-                    <input type="${tagName}" id="${elementsArray[i].elementId}" value="${elementsArray[i].elementId}" elementsArray[i].defaultAnswerYn === 'Y' ? 'checked' : '';>
-                    <label for="${elementsArray[i].elementId}">${elementsArray[i].elementNm}</label>
-                </div>
+                `;
+            for(var i=0; i<elementsArray.length; i++){
+                if (i % 10 === 0) {
+                    makeHtml += '<div class="row" style="margin: 10px">';
+                }
+                makeHtml +=`
+                        <input type="${tagName}" name="${promptInfo.promptId}" id="${elementsArray[i].elementId}" text="${elementsArray[i].elementNm}" value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn} === 'Y' ? 'checked' : '';>
+                        <label style="margin: 5px" for="${elementsArray[i].elementId}">${elementsArray[i].elementNm}</label>
             `;
+                if ((i + 1) % 10 === 0 || i === elementsArray.length - 1) {
+                    makeHtml += '</div>';
+                }
             }
         }
-        makeHtml += `
-                                        </div>
-                                    </div>
+        makeHtml += `           </div>
                             </div>
-                        </div>
-                    </div>
+                       </div>
+
 `;
 
-        $("#main-content").prepend(makeHtml);
+        $("#promptDiv").prepend(makeHtml);
     }
 
 
