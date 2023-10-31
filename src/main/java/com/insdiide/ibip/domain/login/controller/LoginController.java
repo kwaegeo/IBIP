@@ -4,6 +4,7 @@ import com.insdiide.ibip.domain.login.service.LoginService;
 import com.insdiide.ibip.domain.login.vo.LoginVO;
 import com.insdiide.ibip.global.exception.CustomException;
 import com.insdiide.ibip.global.exception.code.ResultCode;
+import com.insdiide.ibip.global.utils.ComUtils;
 import com.insdiide.ibip.global.vo.ResVO;
 import com.microstrategy.web.objects.WebObjectsException;
 import lombok.extern.log4j.Log4j2;
@@ -26,6 +27,9 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
+
+    @Autowired
+    private ComUtils comUtils;
 
     @GetMapping("/login")
     public String getLoginPage(HttpServletRequest request){
@@ -82,6 +86,31 @@ public class LoginController {
         //4. 응답
         return new ResVO(ResultCode.SUCCESS);
     }
+
+    @PostMapping("/logout")
+    @ResponseBody
+    public ResVO logoutProc(Model model, HttpServletRequest request) {
+
+
+        //Session 제거 (MSTR Session 제거 => Web Session 제거)
+        HttpSession httpSession = request.getSession(true);
+        if(httpSession != null){
+            String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+            //MSTR 세션 제거
+            try{
+                comUtils.sessionCheck(mstrSessionId);
+                comUtils.closeSession();
+            }catch(CustomException ex){
+                throw ex;
+            }
+            httpSession.invalidate();
+
+        }
+
+        //4. 응답
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
 
 }
 

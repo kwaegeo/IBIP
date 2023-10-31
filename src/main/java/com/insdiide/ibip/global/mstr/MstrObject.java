@@ -126,8 +126,27 @@ public class MstrObject extends MstrSession{
         String reportName = report.getName();
         reportInfo.setReportNm(reportName);
 
+        SimpleList lst = report.getAncestors();
+        String reportPath = "";
+        for(int i=0; i< lst.size()-3; i++){
+            WebObjectInfo obj = (WebObjectInfo)lst.item(i+3);
+            System.out.println(obj.getName());
+            if ("".equals(reportPath)){
+              reportPath += obj.getName();
+            }
+            else {
+                reportPath += " > " + obj.getName();
+            }
+        }
+        reportPath += " > " + reportName;
+        reportInfo.setReportPath(reportPath);
+
+        System.out.println("아오 졸려");
+        System.out.println(reportPath);
+
         return reportInfo;
     }
+
 
 
     // 리포트 데이터 정보 가져오기 (프롬프트 데이터 포함) (유형에 맞게 나눠서)

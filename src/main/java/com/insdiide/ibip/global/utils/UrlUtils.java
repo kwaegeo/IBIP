@@ -115,8 +115,11 @@ public class UrlUtils {
         urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append(4001);
         urlSB.append("&usrSmgr=").append(usrSmgr);
         urlSB.append("&promptsAnswerXML=").append(promptXML);
-
-        //        urlSB.append("&hiddensections=dockTop,dockLeft"); 조회 모드일 경우에 해당 옵션 추가
+        urlSB.append("&hiddensections=path");
+        if("N".equals(reportInfo.getEditYn())){
+            //조회 모드일 경우에 해당 옵션 추가
+            urlSB.append("&hiddensections=dockTop,dockLeft");
+        }
 
         System.out.println(urlSB.toString());
 

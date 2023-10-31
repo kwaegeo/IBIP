@@ -26,4 +26,6 @@ public class ReportVO {
 
     private List<PromptVO> prompts; //프롬프트 리스트
 
+    private String editYn = "N"; //편집 모드 YN
+
 }

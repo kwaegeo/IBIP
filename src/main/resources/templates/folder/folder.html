@@ -196,15 +196,15 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">로그아웃 하시겠습니까?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-body">현재 세션을 종료할 준비가 되었다면 아래 로그아웃을 클릭해주세요.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" onclick="logout()">Logout</a>
                 </div>
             </div>
         </div>
@@ -418,13 +418,16 @@
 
         console.log(reportInfo);
 
+        $("#main-content").empty();
+
         //리포트의 기본정보를 화면에 표시
         // 1. 템플릿 유무에 따른 버튼? (아니면 일단 버튼은 다 나타낼 것)
         var makeReportInfoHtml = `
             <div class="container-fluid" name="reportDiv">
-                <h1 class="h3 mb-0 text-gray-800 md-4">리포트의 경로가 들어갑니다. Path</h1>
+                <h3 class="h5 text-gray-800 md-18">${reportInfo.reportPath}</h3>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="getReportURL('${reportInfo.reportId}')"> 조회</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'N')"> 조회</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'Y')"> 편집</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="promptToggle()">프롬프트 접기</button>
                                 <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</a>
                                 <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</a>
@@ -552,13 +555,13 @@
 
 
     // 리포트 호출 URL 생성
-    function getReportURL(reportId){
+    function getReportURL(reportId, editYn){
         //reportId, promptId, attrId, promptType
         var reportInfo = {};
         //리포트 필요한 것
         reportInfo.reportId = reportId;
         reportInfo.prompts = [];
-
+        reportInfo.editYn = editYn;
         var promptInfo = $("[name='prompt']");
         promptInfo.each(function(index, prompt){
             reportInfo.prompts.push(promptDataParsing($(prompt), index));
@@ -786,6 +789,26 @@
 `;
 
         $("#promptDiv").prepend(makeHtml);
+    }
+
+    function logout(){
+        $.ajax({
+            url: '/logout',
+            method: 'POST',
+            dataType: "json",
+            success: function (responseData) {
+                console.log(responseData)
+                if (responseData.code === 'S00') {
+                    location.href = "/login"
+                } else {
+                    alert(responseData.msg)
+                }
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        })
+
     }
 
 </script>

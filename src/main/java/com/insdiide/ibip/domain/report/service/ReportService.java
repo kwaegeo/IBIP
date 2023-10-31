@@ -37,7 +37,9 @@ public class ReportService {
     }
 
     public String getReportURL(ReportVO reportInfo, String promptXml, String usrSmgr){
+
         String reportURL = UrlUtils.getReportURL(reportInfo, promptXml, usrSmgr);
+
         return reportURL;
     }
 

@@ -207,7 +207,7 @@
                                     Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                <a class="dropdown-item" data-toggle="modal" data-target="#logoutModal" >
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
@@ -253,15 +253,15 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">로그아웃 하시겠습니까?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-body">현재 세션을 종료할 준비가 되었다면 아래 로그아웃을 클릭해주세요.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" onclick="logout()">Logout</a>
                 </div>
             </div>
         </div>
@@ -425,6 +425,25 @@
             window.location.href = "/folder?folderId="+folderId;
         }
 
+        function logout(){
+            $.ajax({
+                url: '/logout',
+                method: 'POST',
+                dataType: "json",
+                success: function (responseData) {
+                    console.log(responseData)
+                    if (responseData.code === 'S00') {
+                        location.href = "/login"
+                    } else {
+                        alert(responseData.msg)
+                    }
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+
+        }
     </script>
 </body>
 

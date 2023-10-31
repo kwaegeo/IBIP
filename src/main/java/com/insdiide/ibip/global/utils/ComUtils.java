@@ -21,6 +21,14 @@ public class ComUtils {
         };
     }
 
+    public void closeSession(){
+        try {
+            mstrObject.serverSession.closeSession();
+        } catch (WebObjectsException e) {
+            e.printStackTrace();
+        }
+    }
+
     public UserInfoVO getUserInfo(String mstrSessionId) throws WebObjectsException {
         mstrObject.setSession(mstrSessionId);
         UserInfoVO userInfo = mstrObject.getUserInfo();
