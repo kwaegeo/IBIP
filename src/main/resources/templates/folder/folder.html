@@ -311,7 +311,8 @@
                                                 var iframe = $("<iframe>", {
                                                     "src": responseData,
                                                     "width": "100%",
-                                                    "height": "720px" // 조절해야 할 크기
+                                                    "height": "720px", // 조절해야 할 크기
+                                                    "class": "black-border"
                                                 });
                                                 // iframe을 한번 비운 뒤에
                                                 $("#promptDiv").empty();
@@ -428,12 +429,13 @@
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'N')"> 조회</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'Y')"> 편집</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="promptToggle()">프롬프트 접기</button>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</a>
-                                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</a>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N')"> 새창으로 열기</button>
+                                <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="promptToggle()">프롬프트 접기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
                             </div>
                             <div id="reportDiv">
                                 <div class="rows">
@@ -443,6 +445,8 @@
                                         </div>
                                         <div id="promptDiv">
                                         </div>
+                                    </div>
+                                    <div id="contentDiv">
                                     </div>
                                 </div>
                             </div>
@@ -562,13 +566,45 @@
         reportInfo.reportId = reportId;
         reportInfo.prompts = [];
         reportInfo.editYn = editYn;
+
+        var breakLoop = false;
+
         var promptInfo = $("[name='prompt']");
+
         promptInfo.each(function(index, prompt){
+
+            if(validMinMax($(prompt))==='min'){
+                $(prompt).focus();
+                $(prompt).css("color", "red");
+                setTimeout(function(){
+                    $(prompt).css("color","");
+                }, 5000);
+                alert($(prompt).attr("title") + "의 최솟값에 부합하지 않습니다." + "\n최솟값 : " + $(prompt).attr("minValue"));
+                breakLoop = true;
+                return false;
+            }
+            else if(validMinMax($(prompt))==='max'){
+                $(prompt).focus();
+                $(prompt).css("color", "red");
+                setTimeout(function(){
+                    $(prompt).css("color","");
+                }, 5000);
+                alert($(prompt).attr("title") + "의 최댓값에 부합하지 않습니다." + "\n최댓값 : " + $(prompt).attr("maxValue"));
+                breakLoop = true;
+                return false;
+            }
             reportInfo.prompts.push(promptDataParsing($(prompt), index));
             console.log("Element :" + $(prompt).attr("promptType"));
         })
 
+        if(breakLoop){
+            return false;
+        }
+
         console.log(reportInfo);
+        var popupYn = $(event.target).attr('popupYn');
+        console.log(popupYn);
+
 
             $.ajax({
                 url: '/getReportURL',
@@ -583,10 +619,16 @@
                         "width": "100%",
                         "height": "720px" // 조절해야 할 크기
                     });
-                    // iframe을 한번 비운 뒤에
-                    $("#reportDataDiv").empty();
-                    // iframe을 특정 컨테이너에 추가
-                    $("#reportDataDiv").prepend(iframe);
+                    if(popupYn === 'Y'){
+                     window.open(responseData);
+                    }
+                    else{
+                        promptToggle();
+                        // // iframe을 한번 비운 뒤에
+                        $("#contentDiv").empty().addClass("black-border");
+                        // iframe을 특정 컨테이너에 추가
+                        $("#contentDiv").append(iframe);
+                    }
                 },
                 error: function () {
                     alert("서버에 접속할 수 없습니다.")
@@ -594,16 +636,53 @@
             })
     }
 
+    function promptToggle(){
+        var $reportDataDiv = $('#reportDataDiv');
+        $reportDataDiv.toggle();
+        if ($reportDataDiv.css('display') == 'none' ) {
+            $('#foldAndOpen').text('프롬프트 펼치기');
+        }
+        else{
+            $('#foldAndOpen').text('프롬프트 접기');
+        }
+    }
+
     //최소, 최대 값 유효성 검사
-    function validMinMax(min, max, elementNum){
-        var parseMin = parseInt(min);
-        var parseMax = parseInt(max);
-        var parseEleNum = parseInt(elementNum);
+    function validMinMax(prompt){
+        if(prompt.attr("promptType") === 'value'){
+            var parseMin = new Date(prompt.attr("minValue"));
+            var parseMax = new Date(prompt.attr("maxValue"));
+        }
+        else{
+            var parseMin = parseInt(prompt.attr("minValue"));
+            var parseMax = parseInt(prompt.attr("maxValue"));
+        }
+
+        // 각 태그에 맞게 선택 된 갯수로 검증한다.
+        var childSize = 0;
+        var inputType = prompt.find("input").attr("type");
+
+        if(inputType === "checkbox"){
+            childSize = prompt.find("input[type='checkbox']:checked").length;
+        }
+        else if(inputType === "radio"){
+            childSize = prompt.find("input[type='radio']:checked").length;
+        }
+        else if(inputType === "date"){
+            childSize = new Date(prompt.find("input[type='date']").val());
+        }
+        else{
+            childSize = prompt.find("select option:selected").length;
+        }
+
+
         console.log("잘들어가고 있는지?")
+        console.log(inputType);
+
         console.log(parseMin)
         console.log(parseMax)
-        console.log(elementNum)
-        return parseEleNum < parseMin ? "min" : parseEleNum > parseMax ? "max" : true;
+        console.log(childSize)
+        return childSize < parseMin ? "min" : childSize > parseMax ? "max" : true;
     }
 
 
@@ -658,7 +737,7 @@
 
         var makeHtml = `
 
-                        <div name="prompt" id="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
+                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
                                 <div class="popup__body_custom">
                                     <h3 class="font-weight-bold">${promptInfo.title}</h3>
 `;
@@ -707,7 +786,7 @@
         //1. 값 프롬프트 적재 HTML 생성
         var makeHtml = `
 
-                        <div name="prompt" id="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value" pt="${promptInfo.pt}">
+                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value" pt="${promptInfo.pt}">
                                 <div class="popup__body_custom">
                                     <h3 class="font-weight-bold">${promptInfo.promptNm}</h3>
                                     <div class=checkbox-container">
@@ -725,7 +804,7 @@
         // 프롬프트의 타입 설정
         var tagName = tagTypeMap[promptInfo.tagType] || "checkbox";
 
-        tagName = "radio";
+        tagName = "checkbox";
 
         // 구성요소 리스트 선언
         var elementsArray = promptInfo.attr.elements;
@@ -749,7 +828,7 @@
         // 구성요소 적재 테이블 생성
         var makeHtml = `
 
-                        <div name="prompt" id="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="element" pt="${promptInfo.pt}">
+                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" childSize="${promptInfo.childSize}" promptType="element" pt="${promptInfo.pt}">
                                 <div class="popup__body_custom">
                                     <h3 class="font-weight-bold" name="attr", id="${promptInfo.attr.attrId}", attrType="${promptInfo.attr.attrType}">${promptInfo.attr.attrNm}</h3>
 `;

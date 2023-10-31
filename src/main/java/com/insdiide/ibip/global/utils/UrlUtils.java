@@ -118,7 +118,7 @@ public class UrlUtils {
         urlSB.append("&hiddensections=path");
         if("N".equals(reportInfo.getEditYn())){
             //조회 모드일 경우에 해당 옵션 추가
-            urlSB.append("&hiddensections=dockTop,dockLeft");
+            urlSB.append(",dockTop,dockLeft");
         }
 
         System.out.println(urlSB.toString());

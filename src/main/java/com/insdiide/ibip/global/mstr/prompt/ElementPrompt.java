@@ -24,7 +24,6 @@ public class ElementPrompt {
         prompt.setPt(String.valueOf(elementsPrompt.getDSSPromptType()));
         prompt.setTagType(elementsPrompt.getDescription());
 
-
         // 프롬프트 채우기
         elementsPrompt.populate();
 
