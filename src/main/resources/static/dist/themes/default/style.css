@@ -708,6 +708,7 @@
 .jstree-default-small .jstree-folder {
   background: url("32px.png") -263px -7px no-repeat;
 }
+
 .jstree-default-small > .jstree-container-ul > .jstree-node {
   margin-left: 0;
   margin-right: 0;

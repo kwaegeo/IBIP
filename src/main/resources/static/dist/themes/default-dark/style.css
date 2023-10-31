@@ -535,6 +535,10 @@
   line-height: 24px;
   padding: 0 4px;
 }
+
+
+
+
 #jstree-dnd.jstree-default-dark .jstree-ok,
 #jstree-dnd.jstree-default-dark .jstree-er {
   background-image: url("32px.png");
