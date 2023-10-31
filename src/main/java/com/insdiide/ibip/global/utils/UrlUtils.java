@@ -36,7 +36,6 @@ public class UrlUtils {
                 if("value".equals(reportVO.getPrompts().get(i).getPromptType())){
                     xsw.writeCharacters(reportVO.getPrompts().get(i).getVal());
                     xsw.writeEndElement(); // pa
-                    xsw.writeEndElement(); // rsl
                 }
 
                 else if("element".equals(reportVO.getPrompts().get(i).getPromptType())){
@@ -88,9 +87,6 @@ public class UrlUtils {
                     xsw.writeEndElement(); // mi
 
                     xsw.writeEndElement(); // pa
-
-                    xsw.writeEndElement(); // rsl
-
                 }
 
             }
