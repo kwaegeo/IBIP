@@ -419,15 +419,14 @@
             <div class="container-fluid" name="reportDiv">
                 <h3 class="h5 text-gray-800 md-18">${reportInfo.reportPath}</h3>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'N')"> 조회</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'Y')"> 편집</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N')"> 새창으로 열기</button>
-                                <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="promptToggle()">프롬프트 접기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'N', 'E')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'N', 'P')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N')"> 조회</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y')"> 편집</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N')"> 새창으로 열기</button>
+                                <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 저장</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 불러오기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N', 'E')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N', 'P')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
                             </div>
                             <div id="reportDiv">
                                 <div class="rows">
@@ -616,7 +615,12 @@
                      window.open(responseData);
                     }
                     else{
-                        promptToggle();
+                        var $reportDataDiv = $('#reportDataDiv');
+                        if ($reportDataDiv.css('display') != 'none' ) {
+                            $('#foldAndOpen').text('프롬프트 펼치기');
+                            $reportDataDiv.toggle();
+                        }
+                        // promptToggle();
                         // // iframe을 한번 비운 뒤에
                         $("#contentDiv").empty().addClass("black-border");
                         // iframe을 특정 컨테이너에 추가

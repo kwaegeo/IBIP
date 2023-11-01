@@ -71,17 +71,15 @@ public class ReportController {
             throw ex;
         }
 
-        //2. prompt 확인 (이걸 해 말아?) 하는게 맞긴 해
-
-        //3. xml 생성
+        //2. xml 생성
         String promptXml = reportService.getPromptXml(reportInfo);
 
-        //3.5 usrSmgr 가져오기
+        //2.5 usrSmgr 가져오기
         String usrSmgr = reportService.getUsrSmgr();
 
-        //4. URL 생성
+        //3. URL 생성
         String reportURL = reportService.getReportURL(reportInfo, promptXml, usrSmgr);
-        //5. return
+        //4. return
         return reportURL;
     }
 

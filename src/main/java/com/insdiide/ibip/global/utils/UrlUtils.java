@@ -102,10 +102,15 @@ public class UrlUtils {
 
     public static String getReportURL(ReportVO reportInfo, String promptXML, String usrSmgr){
 
-        int evtType = 4001;
-        if(reportInfo.getExportType() == "P"){
+        /**
+         *
+         * 이벤트 타입에 따른 옵션 설정
+         *
+         * **/
+        int evtType = 4001; // 단순 조회
+        if("P".equals(reportInfo.getExportType())){
             evtType = 3062; // PDF 내보내기
-        }else if(reportInfo.getExportType() == "E"){
+        }else if("E".equals(reportInfo.getExportType())){
             evtType = 3067; // Excel 내보내기
         }
 
