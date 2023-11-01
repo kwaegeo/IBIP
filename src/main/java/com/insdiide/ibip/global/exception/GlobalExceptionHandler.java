@@ -7,12 +7,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({CustomException.class})
-    protected ResponseEntity<ErrorVO> handleCustomException(CustomException ex) {
+    protected ResponseEntity<ErrorVO> handleCustomException(CustomException ex) throws IOException {
         ex.printStackTrace();
+
+        if(ex.getResultCode().getCode() == ResultCode.MSTR_NO_SESSION.getCode() && !(isAjaxRequest(ex.getRequest()))){
+//            return new ResponseEntity<>(HttpStatus.SEE_OTHER);
+            ex.getResponse().sendRedirect("/login");
+        }
+
         return new ResponseEntity(new ErrorVO(ex.getResultCode().getCode(), ex.getResultCode().getMsg()), HttpStatus.OK);
     }
 
@@ -21,5 +31,10 @@ public class GlobalExceptionHandler {
     protected ResponseEntity handleException(Exception ex) {
         ex.printStackTrace();
         return new ResponseEntity(new ErrorVO(ResultCode.ETC_ERROR.getCode(), ResultCode.ETC_ERROR.getMsg()), HttpStatus.OK);
+    }
+
+    private boolean isAjaxRequest(HttpServletRequest request){
+        String requestHeader = request.getHeader("X-Requested-With");
+        return "XMLHttpRequest".equals(requestHeader);
     }
 }

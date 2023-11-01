@@ -15,4 +15,7 @@ public class UserInfoVO {
 
     private String userName;
 
+    private String adminYn = "N";  //관리자 권한
+
+
 }

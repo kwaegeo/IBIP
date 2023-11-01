@@ -6,6 +6,7 @@ import com.insdiide.ibip.domain.prompt.vo2.PromptsVO;
 import com.insdiide.ibip.domain.report.service.ReportService;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
 import com.insdiide.ibip.global.exception.CustomException;
+import com.insdiide.ibip.global.exception.code.ResultCode;
 import com.insdiide.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -34,14 +36,14 @@ public class ReportController {
 
     @GetMapping("/getReport")
     @ResponseBody
-    public ReportVO getReport(@RequestParam(name = "reportId")String reportId, HttpServletRequest request) throws WebObjectsException {
+    public ReportVO getReport(@RequestParam(name = "reportId")String reportId, HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
         try {
-            comUtils.sessionCheck(mstrSessionId);
+            comUtils.sessionCheck(mstrSessionId, request, response);
         } catch (CustomException ex) {
             throw ex;
         }
@@ -55,7 +57,7 @@ public class ReportController {
 
     @PostMapping("/getReportURL")
     @ResponseBody
-    public String getReportURL(@RequestBody ReportVO reportInfo, HttpServletRequest request){
+    public String getReportURL(@RequestBody ReportVO reportInfo, HttpServletRequest request, HttpServletResponse response){
         System.out.println(reportInfo);
         
         
@@ -64,7 +66,7 @@ public class ReportController {
 
         //1. 세션 체크
         try {
-            comUtils.sessionCheck(mstrSessionId);
+            comUtils.sessionCheck(mstrSessionId, request, response);
         } catch (CustomException ex) {
             throw ex;
         }

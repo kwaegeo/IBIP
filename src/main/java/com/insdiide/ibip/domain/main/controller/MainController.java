@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 
@@ -32,7 +33,7 @@ public String sample(){
 
 
 @GetMapping("/main")
-public String getMainPage(HttpServletRequest request, Model model) throws WebObjectsException {
+public String getMainPage(HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
 
     //1. 사용자 세션 (MSTR) 유효성 검사
     //2. 좌측 리스트 메뉴 가져오기 (폴더명, 폴더ID)
@@ -43,7 +44,7 @@ public String getMainPage(HttpServletRequest request, Model model) throws WebObj
 
     //1. 세션 체크
     try{
-        comUtils.sessionCheck(mstrSessionId);
+        comUtils.sessionCheck(mstrSessionId, request, response);
     }catch(CustomException ex){
         throw ex;
     }

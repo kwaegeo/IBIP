@@ -94,14 +94,14 @@
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+                <a class="nav-link" href="#" th:attr="myReportId=${sideBarItem.myReport.id}" onclick="openFolder(this.getAttribute('myReportId'))">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span th:id="${sideBarItem.myReport.id}" th:text="${sideBarItem.myReport.name}"></span></a>
+                    <span th:id="${sideBarItem.myReport.id}" th:text="${sideBarItem.myReport.name}" ></span></a>
             </li>
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+                <a class="nav-link" href="#" th:attr="myFavoriteId=${sideBarItem.myFavorite.id}" onclick="openFolder(this.getAttribute('myFavoriteId'))">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span th:id="${sideBarItem.myFavorite.id}" th:text="${sideBarItem.myFavorite.name}"></span></a>
             </li>
@@ -157,20 +157,22 @@
                             </div>
                         </div>
                     </form>
-                    <!-- 관리자인 경우 상단 메뉴 표시 admin yn -->
-                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">그룹 관리</span></a>
+                    <div th:if="${userInfo.adminYn == 'Y'}">
+                        <!-- 관리자인 경우 상단 메뉴 표시 admin yn -->
+                        <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">그룹 관리</span></a>
 
-                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">사용자 관리</span></a>
+                        <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">사용자 관리</span></a>
 
-                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">보안역할 관리</span></a>
+                        <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">보안역할 관리</span></a>
 
-                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">권한 관리</span></a>
+                        <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">권한 관리</span></a>
 
-                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">라이센스 관리</span></a>
+                        <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">라이센스 관리</span></a>
 
-                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">환경설정</span></a>
+                        <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">환경설정</span></a>
 
-                    <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">공지사항</span></a>
+                        <a href="#" class="btn btn-icon-split btn-sm"><span class="text btn-text-responsive">공지사항</span></a>
+                    </div>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">

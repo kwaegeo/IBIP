@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -89,7 +90,7 @@ public class LoginController {
 
     @PostMapping("/logout")
     @ResponseBody
-    public ResVO logoutProc(Model model, HttpServletRequest request) {
+    public ResVO logoutProc(Model model, HttpServletRequest request, HttpServletResponse response) {
 
 
         //Session 제거 (MSTR Session 제거 => Web Session 제거)
@@ -98,7 +99,7 @@ public class LoginController {
             String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
             //MSTR 세션 제거
             try{
-                comUtils.sessionCheck(mstrSessionId);
+                comUtils.sessionCheck(mstrSessionId, request, response);
                 comUtils.closeSession();
             }catch(CustomException ex){
                 throw ex;

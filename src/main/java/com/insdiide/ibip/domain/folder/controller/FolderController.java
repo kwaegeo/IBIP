@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -256,7 +257,7 @@ public class FolderController {
     }
 
     @GetMapping("/folder")
-    public String getFolderPage(@RequestParam(name = "folderId") String folderId, HttpServletRequest request, Model model) throws WebObjectsException {
+    public String getFolderPage(@RequestParam(name = "folderId") String folderId, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
 
         //1. 세션 체크
         //2. 전달 받은 상위 폴더 ID 추출
@@ -268,7 +269,7 @@ public class FolderController {
 
         //1. 세션 체크
         try {
-            comUtils.sessionCheck(mstrSessionId);
+            comUtils.sessionCheck(mstrSessionId, request, response);
         } catch (CustomException ex) {
             throw ex;
         }
@@ -305,14 +306,14 @@ public class FolderController {
 
     @GetMapping("/getSubFolder")
     @ResponseBody
-    public List<EntityVO> getSubFolder(@RequestParam(name = "folderId") String folderId, HttpServletRequest request) throws WebObjectsException {
+    public List<EntityVO> getSubFolder(@RequestParam(name = "folderId") String folderId, HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
         try {
-            comUtils.sessionCheck(mstrSessionId);
+            comUtils.sessionCheck(mstrSessionId, request, response);
         } catch (CustomException ex) {
             throw ex;
         }

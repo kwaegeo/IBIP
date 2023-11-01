@@ -102,6 +102,13 @@ public class UrlUtils {
 
     public static String getReportURL(ReportVO reportInfo, String promptXML, String usrSmgr){
 
+        int evtType = 4001;
+        if(reportInfo.getExportType() == "P"){
+            evtType = 3062; // PDF 내보내기
+        }else if(reportInfo.getExportType() == "E"){
+            evtType = 3067; // Excel 내보내기
+        }
+
         // Return session
         StringBuilder urlSB = new StringBuilder();
         urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
@@ -109,10 +116,10 @@ public class UrlUtils {
         urlSB.append("?server=").append("192.168.70.245"); //I Server name
         // urlSB.append("&port=0");
         urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
-        urlSB.append("&evt=").append(4001);
+        urlSB.append("&evt=").append(evtType);
         urlSB.append("&reportID=").append(reportInfo.getReportId()); //Report ID
         urlSB.append("&currentViewMedia=").append(1);
-        urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append(4001);
+        urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append(evtType);
         urlSB.append("&usrSmgr=").append(usrSmgr);
         urlSB.append("&promptsAnswerXML=").append(promptXML);
         urlSB.append("&hiddensections=path");

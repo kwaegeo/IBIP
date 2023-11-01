@@ -425,9 +425,9 @@
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="promptToggle()">프롬프트 접기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 저장</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"> 템플릿 불러오기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'N', 'E')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> CSV 내보내기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" onclick="getReportURL('${reportInfo.reportId}', 'N', 'P')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
                             </div>
                             <div id="reportDiv">
                                 <div class="rows">
@@ -551,7 +551,7 @@
 
 
     // 리포트 호출 URL 생성
-    function getReportURL(reportId, editYn){
+    function getReportURL(reportId, editYn, exportType){
         //reportId, promptId, attrId, promptType
         var reportInfo = {};
         //리포트 필요한 것
@@ -597,6 +597,7 @@
         var popupYn = $(event.target).attr('popupYn');
         console.log(popupYn);
 
+        reportInfo.exportType = exportType;
 
             $.ajax({
                 url: '/getReportURL',

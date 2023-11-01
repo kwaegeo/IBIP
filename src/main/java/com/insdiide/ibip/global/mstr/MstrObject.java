@@ -12,6 +12,7 @@ import com.insdiide.ibip.global.mstr.prompt.ObjectPrompt;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.web.objects.admin.users.WebUser;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
+import com.microstrategy.webapi.EnumDSSXMLPrivilegeTypes;
 import com.microstrategy.webapi.EnumDSSXMLStatus;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -82,6 +83,10 @@ public class MstrObject extends MstrSession{
         WebUser webUser = (WebUser)serverSession.getUserInfo();
         userInfo.setUserId(webUser.getID());
         userInfo.setUserName(webUser.getName());
+
+        if(serverSession.checkUserPrivilege(EnumDSSXMLPrivilegeTypes.DssXmlPrivilegesUseServerAdmin)&& serverSession.checkUserPrivilege(EnumDSSXMLPrivilegeTypes.DssXmlPrivilegesWebAdministrator)){
+            userInfo.setAdminYn("Y");
+        }
         return userInfo;
     }
 

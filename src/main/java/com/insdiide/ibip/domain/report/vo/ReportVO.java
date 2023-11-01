@@ -28,6 +28,6 @@ public class ReportVO {
 
     private String editYn = "N"; //편집 모드 YN
 
-    private String reportUrl; //프롬프트가 없을 때 설정
+    private String exportType; // 내보내기 타입
 
 }

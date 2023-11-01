@@ -9,16 +9,19 @@ import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @Service
 public class ComUtils {
 
     @Autowired
     private MstrObject mstrObject;
 
-    public void sessionCheck(String mstrSessionId){
+    public void sessionCheck(String mstrSessionId, HttpServletRequest request, HttpServletResponse response){
         if(mstrObject.userIsAlive(mstrSessionId)){
-            throw new CustomException(ResultCode.MSTR_NO_SESSION);
-        };
+            throw new CustomException(ResultCode.MSTR_NO_SESSION, request, response);
+        }
     }
 
     public void closeSession(){
