@@ -425,8 +425,8 @@
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 저장</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 불러오기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N', 'E')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N', 'P')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'P')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
                             </div>
                             <div id="reportDiv">
                                 <div class="rows">
@@ -612,7 +612,7 @@
                         "height": "720px" // 조절해야 할 크기
                     });
                     if(popupYn === 'Y'){
-                     window.open(responseData);
+                     window.open(responseData, '', 'width=1400,height=600');
                     }
                     else{
                         var $reportDataDiv = $('#reportDataDiv');
