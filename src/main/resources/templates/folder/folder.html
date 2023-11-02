@@ -227,6 +227,7 @@
     <script src="dist/jstree.min.js"></script>
     <!-- Page level custom scripts -->
     <script src="js/demo/datatables-demo.js"></script>
+    </div>
 </body>
 <script th:inline="javascript">
 
@@ -387,7 +388,39 @@
                 })
 
             } else if (node.type === 55){
-                alert("다큐먼트입니다.")
+                var requestData = {'reportId': node.id}
+
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/getReport',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        console.log(responseData)
+                        if(responseData.promptsExists == "N"){
+                            console.log("이 리포트는 프롬프트가 없습니다.");
+                            var iframe = $("<iframe>", {
+                                "src": responseData,
+                                "width": "100%",
+                                "height": "720px", // 조절해야 할 크기
+                                "class": "black-border"
+                            });
+                            // iframe을 한번 비운 뒤에
+                            $("#promptDiv").empty();
+                            // iframe을 특정 컨테이너에 추가
+                            $("#promptDiv").append(iframe);
+                        }
+                        else{
+                            promptSetting(responseData);
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
+
+
             }else if (node.type === 10){
                 alert("프롬프트입니다.")
             }

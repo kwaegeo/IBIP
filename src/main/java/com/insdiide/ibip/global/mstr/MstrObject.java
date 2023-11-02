@@ -126,7 +126,11 @@ public class MstrObject extends MstrSession{
         reportInfo.setReportId(reportId);
 
         WebObjectSource objectSource = this.serverSession.getFactory().getObjectSource();
-        WebObjectInfo report = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition);
+//        WebObjectInfo report = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition);
+
+        //다큐먼트 일 경우의 처리 따로 해주기
+        WebObjectInfo report = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition);
+
         report.populate();
         String reportName = report.getName();
         reportInfo.setReportNm(reportName);
@@ -158,7 +162,13 @@ public class MstrObject extends MstrSession{
     public ReportVO getReportDataInfo(String reportId, ReportVO reportInfo) throws WebObjectsException {
 
         //프롬프트들의 인스턴스 만들기
-        WebReportInstance webReportInstance = serverSession.getFactory().getReportSource().getNewInstance(reportId);
+//        WebReportInstance webReportInstance = serverSession.getFactory().getReportSource().getNewInstance(reportId);
+        /**
+         * 다큐먼트 일 경우의 인스턴스 만들기
+         *
+         * **/
+        WebDocumentInstance webReportInstance = serverSession.getFactory().getDocumentSource().getNewInstance(reportId);
+
 
         //프롬프트가 있는지 없는지 확인 없으면 return
         if(webReportInstance.pollStatus() != EnumDSSXMLStatus.DssXmlStatusPromptXML){
