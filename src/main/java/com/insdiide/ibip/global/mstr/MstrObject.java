@@ -121,15 +121,21 @@ public class MstrObject extends MstrSession{
     }
 
     //리포트 정보 가져오기 (리포트 정보만)
-    public ReportVO getReportInfo(String reportId) throws WebObjectsException {
+    public ReportVO getReportInfo(String reportId, String documentType) throws WebObjectsException {
         ReportVO reportInfo = new ReportVO();
         reportInfo.setReportId(reportId);
+        reportInfo.setDocumentType(documentType);
 
         WebObjectSource objectSource = this.serverSession.getFactory().getObjectSource();
-//        WebObjectInfo report = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition);
+        int dssObjectTypes;
 
-        //다큐먼트 일 경우의 처리 따로 해주기
-        WebObjectInfo report = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition);
+        if("D".equals(documentType)){
+            dssObjectTypes = EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition;
+        }
+        else{
+            dssObjectTypes = EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition;
+        }
+        WebObjectInfo report = objectSource.getObject(reportId, dssObjectTypes);
 
         report.populate();
         String reportName = report.getName();
@@ -161,14 +167,14 @@ public class MstrObject extends MstrSession{
     // 리포트 데이터 정보 가져오기 (프롬프트 데이터 포함) (유형에 맞게 나눠서)
     public ReportVO getReportDataInfo(String reportId, ReportVO reportInfo) throws WebObjectsException {
 
-        //프롬프트들의 인스턴스 만들기
-//        WebReportInstance webReportInstance = serverSession.getFactory().getReportSource().getNewInstance(reportId);
-        /**
-         * 다큐먼트 일 경우의 인스턴스 만들기
-         *
-         * **/
-        WebDocumentInstance webReportInstance = serverSession.getFactory().getDocumentSource().getNewInstance(reportId);
+        WebResultSetInstance webReportInstance = null;
 
+        if("D".equals(reportInfo.getDocumentType())){
+            webReportInstance = (WebDocumentInstance) serverSession.getFactory().getDocumentSource().getNewInstance(reportId);
+        }
+        else{
+            webReportInstance = (WebReportInstance) serverSession.getFactory().getReportSource().getNewInstance(reportId);
+        }
 
         //프롬프트가 있는지 없는지 확인 없으면 return
         if(webReportInstance.pollStatus() != EnumDSSXMLStatus.DssXmlStatusPromptXML){

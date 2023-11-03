@@ -107,7 +107,13 @@ public class UrlUtils {
          * 이벤트 타입에 따른 옵션 설정
          *
          * **/
-        int evtType = 4001; // 단순 조회
+        int evtType = 4001; // 리포트 단순 조회
+        String idType = "reportID";
+        if("D".equals(reportInfo.getDocumentType())){
+            evtType = 2048001; // 다큐먼트 단순 조회
+            idType = "documentID";
+        }
+
         if("P".equals(reportInfo.getExportType())){
             evtType = 3062; // PDF 내보내기
         }else if("E".equals(reportInfo.getExportType())){
@@ -122,7 +128,7 @@ public class UrlUtils {
         // urlSB.append("&port=0");
         urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
         urlSB.append("&evt=").append(evtType);
-        urlSB.append("&reportID=").append(reportInfo.getReportId()); //Report ID
+        urlSB.append("&"+idType+"=").append(reportInfo.getReportId()); //Report ID
         urlSB.append("&currentViewMedia=").append(1);
         urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append(evtType);
         urlSB.append("&usrSmgr=").append(usrSmgr);

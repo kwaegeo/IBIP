@@ -30,4 +30,6 @@ public class ReportVO {
 
     private String exportType; // 내보내기 타입
 
+    private String documentType; // 문서 타입
+
 }

@@ -16,11 +16,11 @@ public class ReportService {
     @Autowired
     private MstrObject mstrObject;
 
-    public ReportVO getPromptData(String mstrSessionId, String reportId) throws WebObjectsException {
+    public ReportVO getPromptData(String mstrSessionId, String reportId, String documentType) throws WebObjectsException {
 
         mstrObject.setSession(mstrSessionId);
 
-        ReportVO reportInfo = mstrObject.getReportInfo(reportId);
+        ReportVO reportInfo = mstrObject.getReportInfo(reportId, documentType);
         reportInfo = mstrObject.getReportDataInfo(reportId, reportInfo);
 
         return reportInfo;

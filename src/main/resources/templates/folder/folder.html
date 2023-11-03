@@ -355,7 +355,7 @@
             var node = data.node;
 
             if (node.type === 3){
-                var requestData = {'reportId': node.id}
+                var requestData = {'reportId': node.id, 'documentType' : 'R'}
 
                 $.ajax({
                     // url: '/folder/report',
@@ -388,7 +388,7 @@
                 })
 
             } else if (node.type === 55){
-                var requestData = {'reportId': node.id}
+                var requestData = {'reportId': node.id, 'documentType' : 'D'}
 
                 $.ajax({
                     // url: '/folder/report',
@@ -452,14 +452,14 @@
             <div class="container-fluid" name="reportDiv">
                 <h3 class="h5 text-gray-800 md-18">${reportInfo.reportPath}</h3>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N')"> 조회</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y')"> 편집</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N')"> 새창으로 열기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N', '', '${reportInfo.documentType}')"> 조회</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y','', '${reportInfo.documentType}')"> 편집</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 저장</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 불러오기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'P')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'P', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
                             </div>
                             <div id="reportDiv">
                                 <div class="rows">
@@ -583,13 +583,15 @@
 
 
     // 리포트 호출 URL 생성
-    function getReportURL(reportId, editYn, exportType){
+    function getReportURL(reportId, editYn, exportType, documentType){
         //reportId, promptId, attrId, promptType
         var reportInfo = {};
         //리포트 필요한 것
         reportInfo.reportId = reportId;
         reportInfo.prompts = [];
         reportInfo.editYn = editYn;
+        reportInfo.documentType = documentType;
+        console.log(documentType);
 
         var breakLoop = false;
 

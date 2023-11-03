@@ -36,7 +36,7 @@ public class ReportController {
 
     @GetMapping("/getReport")
     @ResponseBody
-    public ReportVO getReport(@RequestParam(name = "reportId")String reportId, HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+    public ReportVO getReport(@RequestParam(name = "reportId")String reportId, @RequestParam(name = "documentType")String documentType, HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
@@ -48,8 +48,10 @@ public class ReportController {
             throw ex;
         }
 
+        System.out.println(documentType);
+
         //2. Prompt가 있는지 확인하면서 걍 return 때려버려
-        ReportVO reportInfo = reportService.getPromptData(mstrSessionId, reportId);
+        ReportVO reportInfo = reportService.getPromptData(mstrSessionId, reportId, documentType);
 
         System.out.println(reportInfo);
        return reportInfo;
