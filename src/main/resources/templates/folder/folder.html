@@ -462,7 +462,7 @@
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'P', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
                             </div>
                             <div id="reportDiv">
-                                <div class="rows">
+                                <div class="rows" style="overflow:scroll; height: 700px;">
                                     <div class="popup-window black-border" id="reportDataDiv">
                                         <div class="popup__head id="${reportInfo.reportId}">
                                             <h3>${reportInfo.reportNm}</h3>
@@ -492,26 +492,6 @@
                 objectPromptSetting(reportDetail, reportInfo.prompts[i]) // 개체 프롬프트 세팅 함수 호출
             }
         }
-    }
-
-    function getReportURLMulti(reportId, promptId, promptType){
-        // ID만 가지고 태그를 파싱한다. 단 태그 타입이 무엇인지 확인
-        var tagType = $('')
-        if(promptType === 'element'){
-
-        }
-        else if(promptType === 'value'){
-
-        }
-        else if(promptType === 'object'){
-
-        }
-
-
-        // 특정 div 하위 모든 정보를 파싱
-        // div의 name은 prompt이며, type이 존재 각 type별로 다른 파싱방법으로 데이터를 모두 긁어온다.
-        // 모은 정보를 통해 URL 요청 (리포트 promptAnswerXML)
-        // 모든 프롬프트에 대하여 Valid를 실행 (유효성 검사 모두 통과 시 정상 호출)
     }
 
     function promptDataParsing(prompt, index){

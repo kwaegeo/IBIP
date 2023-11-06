@@ -23,6 +23,9 @@ public class ComUtils {
             throw new CustomException(ResultCode.MSTR_NO_SESSION, request, response);
         }
     }
+    public String getUsrSmgr(){
+        return mstrObject.getUsrSmgr();
+    }
 
     public void closeSession(){
         try {

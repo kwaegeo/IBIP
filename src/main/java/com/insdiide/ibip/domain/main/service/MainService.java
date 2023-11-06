@@ -5,6 +5,7 @@ import com.insdiide.ibip.domain.main.vo.SideBarItemVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.global.mstr.MstrObject;
 import com.insdiide.ibip.global.mstr.MstrSession;
+import com.insdiide.ibip.global.utils.UrlUtils;
 import com.insdiide.ibip.global.vo.EnumFolderNamesKR;
 import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.webapi.EnumDSSXMLFolderNames;
@@ -60,6 +61,18 @@ public class MainService {
         mstrObject.setSession(mstrSessionId);
         UserInfoVO userInfo = mstrObject.getUserInfo();
         return userInfo;
+    }
+
+    public String getHistoryURL(String usrSmgr){
+        String historyListURL = UrlUtils.getHistoryURL(usrSmgr);
+
+        return historyListURL;
+    }
+
+    public String getSubscriptionURL(String usrSmgr){
+        String subscriptionURL = UrlUtils.getSubscriptionURL(usrSmgr);
+
+        return subscriptionURL;
     }
 
 

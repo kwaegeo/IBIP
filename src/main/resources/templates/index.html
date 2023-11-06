@@ -108,7 +108,7 @@
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+                <a class="nav-link" href="#" onclick="getSubscriptionURL()">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>내 구독물</span></a>
             </li>
@@ -116,7 +116,7 @@
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+                <a class="nav-link" href="#" onclick="getHistoryListURL()">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>사용내역목록</span></a>
             </li>
@@ -239,9 +239,17 @@
                 </nav>
                 <!-- End of Topbar -->
 
-                <!-- Begin Page Content -->
-                <div class="container-fluid"></div>
-                <!-- /.container-fluid -->
+                <div id="main-content">
+                    <div class="container-fluid" name="">
+                        <h3 class="h5 text-gray-800 md-18">사용내역목록</h3>
+                        <div class="rows">
+                            <div id="contentDiv">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
 
             </div>
             <!-- End of Main Content -->
@@ -307,7 +315,9 @@
     <!--custom js, css-->
     <script src="/js/leedo_custom.js"></script>
 
-    <script type="text/javascript">
+    <script th:inline="javascript">
+        var userId = [[${userInfo.userId}]]
+        console.log(userId);
         // function getFolderInfo(folderId){
         //
         //     const folderRoot = $('#root'+folderId)
@@ -457,6 +467,63 @@
                     } else {
                         alert(responseData.msg)
                     }
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+
+        }
+
+        // 사용내역목록 URL 생성
+        function getHistoryListURL(){
+
+            $.ajax({
+                url: '/getHistoryListURL',
+                data: JSON.stringify({userId: userId}),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "text",
+                success: function (responseData) {
+                    console.log(responseData)
+                    var iframe = $("<iframe>", {
+                        "src": responseData,
+                        "width": "100%",
+                        "height": "720px" // 조절해야 할 크기
+                    });
+
+                    // iframe을 한번 비운 뒤에
+                    $("#contentDiv").empty().addClass("black-border");
+                    // iframe을 특정 컨테이너에 추가
+                    $("#contentDiv").append(iframe);
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+
+        }
+
+        function getSubscriptionURL(){
+
+            $.ajax({
+                url: '/getSubscriptionURL',
+                data: JSON.stringify({userId: userId}),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "text",
+                success: function (responseData) {
+                    console.log(responseData)
+                    var iframe = $("<iframe>", {
+                        "src": responseData,
+                        "width": "100%",
+                        "height": "720px" // 조절해야 할 크기
+                    });
+
+                    // iframe을 한번 비운 뒤에
+                    $("#contentDiv").empty().addClass("black-border");
+                    // iframe을 특정 컨테이너에 추가
+                    $("#contentDiv").append(iframe);
                 },
                 error: function () {
                     alert("서버에 접속할 수 없습니다.")

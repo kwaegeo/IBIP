@@ -125,7 +125,7 @@ public class UrlUtils {
         urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
         urlSB.append("/MicroStrategy/servlet/mstrWeb");
         urlSB.append("?server=").append("192.168.70.245"); //I Server name
-        // urlSB.append("&port=0");
+         urlSB.append("&port=0");
         urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
         urlSB.append("&evt=").append(evtType);
         urlSB.append("&"+idType+"=").append(reportInfo.getReportId()); //Report ID
@@ -138,6 +138,56 @@ public class UrlUtils {
             //조회 모드일 경우에 해당 옵션 추가
             urlSB.append(",dockTop,dockLeft");
         }
+
+        System.out.println(urlSB.toString());
+
+        return urlSB.toString();
+    }
+
+    public static String getHistoryURL(String usrSmgr){
+
+        /**
+         *
+         * 사용내역목록 불러오기
+         *
+         * **/
+
+        // Return session
+        StringBuilder urlSB = new StringBuilder();
+        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("/MicroStrategy/servlet/mstrWeb");
+        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        urlSB.append("&port=0");
+        urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
+        urlSB.append("&evt=").append("3018");
+        urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append("3018");
+        urlSB.append("&usrSmgr=").append(usrSmgr);
+        urlSB.append("&hiddensections=path,dockTop,dockLeft");
+
+        System.out.println(urlSB.toString());
+
+        return urlSB.toString();
+    }
+
+    public static String getSubscriptionURL(String usrSmgr){
+
+        /**
+         *
+         * 구독물 목록 가져오기
+         *
+         * **/
+
+        // Return session
+        StringBuilder urlSB = new StringBuilder();
+        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("/MicroStrategy/servlet/mstrWeb");
+        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        urlSB.append("&port=0");
+        urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
+        urlSB.append("&evt=").append("3031");
+        urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append("3031");
+        urlSB.append("&usrSmgr=").append(usrSmgr);
+        urlSB.append("&hiddensections=path,dockTop,dockLeft");
 
         System.out.println(urlSB.toString());
 
