@@ -108,4 +108,28 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
 
         return subscriptionURL;
     }
+
+    @GetMapping("/searchReport")
+    @ResponseBody
+    public String searchReport(HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
+
+        //1. 사용자 세션 (MSTR) 유효성 검사
+        //2. 나의 구독물 URL 생성 반환
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        mainService.searchReport();
+        return "zz";
+    }
+
+
+
 }

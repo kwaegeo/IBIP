@@ -8,6 +8,7 @@ import com.insdiide.ibip.global.mstr.MstrSession;
 import com.insdiide.ibip.global.utils.UrlUtils;
 import com.insdiide.ibip.global.vo.EnumFolderNamesKR;
 import com.microstrategy.web.objects.WebObjectsException;
+import com.microstrategy.web.objects.WebSearch;
 import com.microstrategy.webapi.EnumDSSXMLFolderNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,6 +74,12 @@ public class MainService {
         String subscriptionURL = UrlUtils.getSubscriptionURL(usrSmgr);
 
         return subscriptionURL;
+    }
+
+    public void searchReport() throws WebObjectsException {
+        String keyword = "이도";
+        mstrObject.searchReport();
+
     }
 
 

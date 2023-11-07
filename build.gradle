@@ -47,6 +47,9 @@ dependencies {
             exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
         }
     }
+
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+    implementation 'org.postgresql:postgresql:42.2.22'
 }
 
 tasks.named('test') {

@@ -13,6 +13,7 @@ import com.microstrategy.web.objects.*;
 import com.microstrategy.web.objects.admin.users.WebUser;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
 import com.microstrategy.webapi.EnumDSSXMLPrivilegeTypes;
+import com.microstrategy.webapi.EnumDSSXMLSearchFlags;
 import com.microstrategy.webapi.EnumDSSXMLStatus;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -118,6 +119,27 @@ public class MstrObject extends MstrSession{
     public String getUsrSmgr(){
         String usrSmgr = serverSession.saveState(0);
         return usrSmgr;
+    }
+
+
+    public void searchReport() throws WebObjectsException {
+        String keyword = "";
+        WebSearch webSearch = factory.getObjectSource().getNewSearchObject();
+        webSearch.setNamePattern("*" + keyword + "*");
+        webSearch.setSearchFlags(webSearch.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+        webSearch.setAsync(false);
+        webSearch.submit();
+        WebFolder objectResult = webSearch.getResults();
+        System.out.println(objectResult);
+        System.out.println("What>?");
+
+        for(int i=0; i< objectResult.size(); i++){
+            System.out.println(objectResult.get(i).getID());
+            System.out.println(objectResult.get(i).getName());
+            System.out.println(objectResult.get(i).getDisplayName());
+            System.out.println(objectResult.get(i).getType());
+            System.out.println(objectResult.get(i).getCreationTime());
+        }
     }
 
     //리포트 정보 가져오기 (리포트 정보만)
