@@ -9,10 +9,7 @@ import com.microstrategy.web.objects.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -111,7 +108,7 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
 
     @GetMapping("/searchReport")
     @ResponseBody
-    public String searchReport(HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
+    public String searchReport(@RequestParam String searchKeyword, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
 
         //1. 사용자 세션 (MSTR) 유효성 검사
         //2. 나의 구독물 URL 생성 반환
@@ -125,6 +122,8 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
         }catch(CustomException ex){
             throw ex;
         }
+
+        System.out.println(searchKeyword);
 
         mainService.searchReport();
         return "zz";

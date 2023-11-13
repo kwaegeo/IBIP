@@ -123,7 +123,7 @@ public class MstrObject extends MstrSession{
 
 
     public void searchReport() throws WebObjectsException {
-        String keyword = "";
+        String keyword = "이도";
         WebSearch webSearch = factory.getObjectSource().getNewSearchObject();
         webSearch.setNamePattern("*" + keyword + "*");
         webSearch.setSearchFlags(webSearch.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
@@ -134,11 +134,26 @@ public class MstrObject extends MstrSession{
         System.out.println("What>?");
 
         for(int i=0; i< objectResult.size(); i++){
-            System.out.println(objectResult.get(i).getID());
-            System.out.println(objectResult.get(i).getName());
-            System.out.println(objectResult.get(i).getDisplayName());
-            System.out.println(objectResult.get(i).getType());
-            System.out.println(objectResult.get(i).getCreationTime());
+            System.out.println(objectResult.get(i).getID()); //아이디
+            System.out.println(objectResult.get(i).getName()); //이름
+            System.out.println(objectResult.get(i).getType()); //타입
+            System.out.println(objectResult.get(i).getOwner().getName()); //소유자
+
+            SimpleList lst = objectResult.get(i).getAncestors(); //Path 경로 넣는 것 
+            String reportPath = "";
+            String reportName = objectResult.get(i).getName();
+            for(int j=0; j< lst.size()-2; j++){
+                WebObjectInfo obj = (WebObjectInfo)lst.item(j+2);
+                System.out.println(obj.getName());
+                if ("".equals(reportPath)){
+                    reportPath += obj.getName();
+                }
+                else {
+                    reportPath += " > " + obj.getName();
+                }
+            }
+            reportPath += " > " + reportName;
+            System.out.println(reportPath);
         }
     }
 
@@ -178,7 +193,6 @@ public class MstrObject extends MstrSession{
         reportPath += " > " + reportName;
         reportInfo.setReportPath(reportPath);
 
-        System.out.println("아오 졸려");
         System.out.println(reportPath);
 
         return reportInfo;
