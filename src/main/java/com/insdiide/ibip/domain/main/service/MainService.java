@@ -1,6 +1,7 @@
 package com.insdiide.ibip.domain.main.service;
 
 import com.insdiide.ibip.domain.login.vo.FolderVO;
+import com.insdiide.ibip.domain.main.vo.SearchVO;
 import com.insdiide.ibip.domain.main.vo.SideBarItemVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.global.mstr.MstrObject;
@@ -76,10 +77,11 @@ public class MainService {
         return subscriptionURL;
     }
 
-    public void searchReport() throws WebObjectsException {
-        String keyword = "이도";
-        mstrObject.searchReport();
+    public SearchVO searchReport(String searchKeyword) throws WebObjectsException {
 
+        SearchVO search = mstrObject.searchReport(searchKeyword);
+
+        return search;
     }
 
 

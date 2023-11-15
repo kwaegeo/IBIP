@@ -1,6 +1,7 @@
 package com.insdiide.ibip.domain.main.controller;
 
 import com.insdiide.ibip.domain.main.service.MainService;
+import com.insdiide.ibip.domain.main.vo.SearchVO;
 import com.insdiide.ibip.domain.main.vo.SideBarItemVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.global.exception.CustomException;
@@ -108,7 +109,7 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
 
     @GetMapping("/searchReport")
     @ResponseBody
-    public String searchReport(@RequestParam String searchKeyword, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
+    public SearchVO searchReport(@RequestParam String searchKeyword, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
 
         //1. 사용자 세션 (MSTR) 유효성 검사
         //2. 나의 구독물 URL 생성 반환
@@ -125,8 +126,8 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
 
         System.out.println(searchKeyword);
 
-        mainService.searchReport();
-        return "zz";
+        SearchVO search = mainService.searchReport(searchKeyword);
+        return search;
     }
 
 

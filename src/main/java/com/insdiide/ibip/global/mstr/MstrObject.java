@@ -2,6 +2,8 @@ package com.insdiide.ibip.global.mstr;
 
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.login.vo.FolderVO;
+import com.insdiide.ibip.domain.main.vo.SearchResultVO;
+import com.insdiide.ibip.domain.main.vo.SearchVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.domain.prompt.vo.PromptVO;
 import com.insdiide.ibip.domain.prompt.vo2.PromptDataVO;
@@ -122,16 +124,17 @@ public class MstrObject extends MstrSession{
     }
 
 
-    public void searchReport() throws WebObjectsException {
-        String keyword = "이도";
+    public SearchVO searchReport(String searchKeyword) throws WebObjectsException {
         WebSearch webSearch = factory.getObjectSource().getNewSearchObject();
-        webSearch.setNamePattern("*" + keyword + "*");
+        webSearch.setNamePattern("*" + searchKeyword + "*");
         webSearch.setSearchFlags(webSearch.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
         webSearch.setAsync(false);
         webSearch.submit();
         WebFolder objectResult = webSearch.getResults();
         System.out.println(objectResult);
-        System.out.println("What>?");
+
+        SearchVO search = new SearchVO();
+        List<SearchResultVO> searchList = new ArrayList<>();
 
         for(int i=0; i< objectResult.size(); i++){
             System.out.println(objectResult.get(i).getID()); //아이디
@@ -142,8 +145,8 @@ public class MstrObject extends MstrSession{
             SimpleList lst = objectResult.get(i).getAncestors(); //Path 경로 넣는 것 
             String reportPath = "";
             String reportName = objectResult.get(i).getName();
-            for(int j=0; j< lst.size()-2; j++){
-                WebObjectInfo obj = (WebObjectInfo)lst.item(j+2);
+            for(int j=0; j< lst.size(); j++){
+                WebObjectInfo obj = (WebObjectInfo)lst.item(j);
                 System.out.println(obj.getName());
                 if ("".equals(reportPath)){
                     reportPath += obj.getName();
@@ -154,8 +157,20 @@ public class MstrObject extends MstrSession{
             }
             reportPath += " > " + reportName;
             System.out.println(reportPath);
+            SearchResultVO searchResult = new SearchResultVO(
+                    objectResult.get(i).getID(),
+                    objectResult.get(i).getName(),
+                    objectResult.get(i).getType(),
+                    objectResult.get(i).getOwner().getName(),
+                    reportPath
+                    );
+            searchList.add(searchResult);
         }
+        search.setSearchList(searchList);
+        return search;
+
     }
+
 
     //리포트 정보 가져오기 (리포트 정보만)
     public ReportVO getReportInfo(String reportId, String documentType) throws WebObjectsException {
@@ -242,7 +257,7 @@ public class MstrObject extends MstrSession{
              * prompt 타입에 따라 분기 처리
              * TYPE = 1 날짜 프롬프트
              * TYPE = 2 구성요소 프롬프트 (화면 꾸려야 하니까 먼저 처리)
-             * TYPE = 3 계층 프롬프트
+             * TYPE = 3 계층 프롬프트 (잠시 보류) 계층의 경우 파악 먼저
              * TYPE = 4 개체 프롬프트
              * **/
             if (webPrompt.getPromptType() == EnumWebPromptType.WebPromptTypeConstant) { //값 프롬프트

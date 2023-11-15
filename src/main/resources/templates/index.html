@@ -148,7 +148,7 @@
                 <!-- Topbar Search -->
                 <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                     <div class="input-group">
-                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                        <input id="searchKeyword" type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
                                aria-label="Search" aria-describedby="basic-addon2">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="button" onclick="searchReport()">
@@ -254,57 +254,7 @@
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-6">
-                                                    <div class="dataTables_length" id="dataTable_length">
-                                                        <label>Show
-                                                            <select name="dataTable_length" aria-controls="dataTable"
-                                                                    class="custom-select custom-select-sm form-control form-control-sm">
-                                                                <option value="10">10</option>
-                                                                <option value="25">25</option>
-                                                                <option value="50">50</option>
-                                                                <option value="100">100</option>
-                                                            </select>
-                                                            entries
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-12">
-                                                <table class="table table-bordered dataTable" id="dataTable"
-                                                       width="100%" cellspacing="0" role="grid"
-                                                       aria-describedby="dataTable_info" style="width: 100%;">
-                                                    <thead>
-                                                    <tr role="row">
-                                                        <th class="" tabindex="0"
-                                                            aria-controls="dataTable" rowspan="1" colspan="1"
-                                                            style="width: 190.775px;" aria-sort="ascending">Name
-                                                        </th>
-                                                        <th class="" tabindex="0" aria-controls="dataTable"
-                                                            rowspan="1" colspan="1"
-                                                            style="width: 309.712px;">Position
-                                                        </th>
-                                                        <th class="" tabindex="0" aria-controls="dataTable"
-                                                            rowspan="1" colspan="1"
-                                                            style="width: 137.288px;">Office
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tfoot>
-                                                    <tr>
-                                                        <th rowspan="1" colspan="1">탐색명</th>
-                                                        <th rowspan="1" colspan="1">소유자</th>
-                                                        <th rowspan="1" colspan="1">경로</th>
-                                                    </tr>
-                                                    </tfoot>
-                                                    <tbody>
-                                                    <tr class="odd">
-                                                        <td class="sorting_1">Airi Satou</td>
-                                                        <td>Accountant</td>
-                                                        <td>Tokyo</td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
+                                            <div class="row" id="searchDiv">
                                             </div>
                                         </div>
                                     </div>
@@ -600,18 +550,52 @@
 
     function searchReport() {
 
+        var searchKeyword = $('#searchKeyword').val();
+
         $.ajax({
-            url: '/searchReport' + "?searchKeyword=이도",
+            url: '/searchReport' + "?searchKeyword="+searchKeyword,
             method: 'GET',
-            dataType: "text",
+            dataType: "json",
             success: function (responseData) {
                 console.log(responseData)
-                var iframe = $("<iframe>", {
-                    "src": responseData,
-                    "width": "100%",
-                    "height": "500px" // 조절해야 할 크기
-                });
+                console.log("힝구")
+                var inputTable = `<div class="col-sm-12">
+                                                <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+                                                    <thead>
+                                                    <tr role="row">
+                                                        <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 137.288px;" aria-sort="ascending">Type
+                                                        </th>
+                                                        <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 190.775px;" aria-sort="ascending">Name
+                                                        </th>
+                                                        <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 137.288px;">Owner
+                                                        </th>
+                                                        <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 309.712px;">Path
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    `;
+                for(var i=0; i<responseData.searchList.length; i++){
+                    inputTable +=
+                        `
+                            <tr class="odd">
+                                <td>폴더명이다임마</td>
+                                <td>${responseData.searchList[i].resultName}</td>
+                                <td>${responseData.searchList[i].resultOwner}</td>
+                                <td>${responseData.searchList[i].resultPath}</td>
+                            </tr>
+                        `
+                }
+            inputTable +=
+                `
+                            </tbody>
+                        </table>
+                    </div>`
+            ;
+            console.log(inputTable);
 
+            $("#searchDiv").empty();
+            $("#searchDiv").append(inputTable);
 
             },
             error: function () {
