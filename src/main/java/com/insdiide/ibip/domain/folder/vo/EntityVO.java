@@ -19,4 +19,13 @@ public class EntityVO {
 
     private int type;
 
+    private boolean children;
+
+    public EntityVO (String id, String text, String parent, int type){
+        this.id = id;
+        this.text = text;
+        this.parent = parent;
+        this.type = type;
+    }
 }
+

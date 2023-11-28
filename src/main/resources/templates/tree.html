@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- Include jsTree CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.11/themes/default/style.min.css" />
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Include jsTree library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.11/jstree.min.js"></script>
+</head>
+<body>
+<div id="tree"></div>
+
+<script>
+    $(document).ready(function () {
+        $('#tree').jstree({
+            'core': {
+                'data': {
+                    'url': function (node) {
+                        console.log("?")
+                        console.log(node.id)
+                        return node.id === '#' ? '/root_data' : '/getSubFolder?folderId='+node.id;
+                        // Adjust the URLs based on your server-side implementation
+                    },
+                    'data': function (node) {
+                        console.log(node);
+                        return { 'id': node.id };
+                        // Send any additional data along with the request
+                    }
+                },
+                "check_callback":true,
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

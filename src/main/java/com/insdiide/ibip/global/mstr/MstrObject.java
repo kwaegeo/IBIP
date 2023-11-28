@@ -55,6 +55,21 @@ public class MstrObject extends MstrSession{
         return subFolderList;
     }
 
+    //하위 폴더 요소 가져오기
+    public List<EntityVO> getRootFolderList(String folderId) throws WebObjectsException {
+        List<EntityVO> rootFolderList = new ArrayList<>();
+        WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+        folder.populate();
+        for(int i=0; i<folder.getChildCount(); i++){
+            if(folder.get(i).getType() == EnumDSSXMLObjectTypes.DssXmlTypeFolder) {
+                rootFolderList.add(new EntityVO(folder.get(i).getID(), folder.get(i).getName(), "#", folder.get(i).getType(), true));
+                System.out.println(folder.get(i));
+            }
+        }
+        System.out.println(rootFolderList + "zz");
+        return rootFolderList;
+    }
+
     //폴더 ID 불러오기
     public String getFolderId(int folderNum) throws WebObjectsException {
         String folderId = factory.getObjectSource().getFolderID(folderNum);
@@ -70,7 +85,7 @@ public class MstrObject extends MstrSession{
     }
 
     //폴더 정보 불러오기
-    public FolderVO getfolderInfo(String folderId) throws WebObjectsException {
+    public FolderVO getFolderInfo(String folderId) throws WebObjectsException {
         FolderVO folderInfo = new FolderVO();
         WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
         System.out.println(folder);
@@ -94,29 +109,50 @@ public class MstrObject extends MstrSession{
     }
 
     //하위 전체 요소 조회 (TreeVO로 저장)
-    public List<EntityVO> getSubList(String folderId, String parentId) throws WebObjectsException {
-        List<EntityVO> subList = new ArrayList<>();
+//    public List<EntityVO> getSubList(String folderId, String parentId) throws WebObjectsException {
+//        List<EntityVO> subList = new ArrayList<>();
+//        WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+//        String currentParentId = parentId.equals("") ? "#" : parentId;
+//        folder.populate();
+//        if(currentParentId == "#"){
+//            subList.add(new EntityVO(folder.getID(), folder.getName(), currentParentId, folder.getType(), false));
+//        }
+//
+//        for(int i=0; i<folder.getChildCount(); i++){
+//                subList.add(new EntityVO(folder.get(i).getID(), folder.get(i).getName(), folder.get(i).getParent().getID(), folder.get(i).getType(), false));
+//
+//                if(folder.get(i).getType() == 8){
+//                    folder.get(i).populate();
+//                    if(folder.get(i).getChildUnits().size() > 0){
+//                        List<EntityVO> childSubList = getSubList(folder.get(i).getID(), folder.get(i).getParent().getID());
+//                        subList.addAll(childSubList);
+//                    }
+//                }
+//        }
+//        System.out.println(subList);
+//        return subList;
+//    }
+
+    public List<EntityVO> getSubList(String folderId, String parentId, List<EntityVO> subList) throws WebObjectsException {
+
         WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
-        String currentParentId = parentId.equals("") ? "#" : parentId;
         folder.populate();
-        if(currentParentId == "#"){
-            subList.add(new EntityVO(folder.getID(), folder.getName(), currentParentId, folder.getType()));
-        }
 
-        for(int i=0; i<folder.getChildCount(); i++){
-                subList.add(new EntityVO(folder.get(i).getID(), folder.get(i).getName(), folder.get(i).getParent().getID(), folder.get(i).getType()));
-
-                if(folder.get(i).getType() == 8){
-                    folder.get(i).populate();
-                    if(folder.get(i).getChildUnits().size() > 0){
-                        List<EntityVO> childSubList = getSubList(folder.get(i).getID(), folder.get(i).getParent().getID());
-                        subList.addAll(childSubList);
-                    }
+        for(int i =0; i<folder.getChildCount(); i++){
+            if(folder.get(i).getType() == 8){
+                folder.get(i).populate();
+                System.out.println(folder.get(i).getChildUnits().size());
+                if(folder.get(i).getChildUnits().size()>0){
+                    getSubList(folder.get(i).getID(), folder.get(i).getParent().getID(), subList);
                 }
+            }
+            subList.add(new EntityVO(folder.get(i).getID(), folder.get(i).getName(), folder.get(i).getParent().getID(), folder.get(i).getType(), false));
         }
         System.out.println(subList);
         return subList;
     }
+
+
 
     public String getUsrSmgr(){
         String usrSmgr = serverSession.saveState(0);
@@ -141,8 +177,12 @@ public class MstrObject extends MstrSession{
             System.out.println(objectResult.get(i).getName()); //이름
             System.out.println(objectResult.get(i).getType()); //타입
             System.out.println(objectResult.get(i).getOwner().getName()); //소유자
+            System.out.println(objectResult.get(i).getCreationTimeStamp());
+            System.out.println(objectResult.get(i).getCreationTime());
+            WebObjectInfo woi = objectResult.get(i);
+            woi.populate();
 
-            SimpleList lst = objectResult.get(i).getAncestors(); //Path 경로 넣는 것 
+            SimpleList lst = objectResult.get(i).getAncestors(); //Path 경로 넣는 것
             String reportPath = "";
             String reportName = objectResult.get(i).getName();
             for(int j=0; j< lst.size(); j++){
@@ -166,6 +206,7 @@ public class MstrObject extends MstrSession{
                     );
             searchList.add(searchResult);
         }
+
         search.setSearchList(searchList);
         return search;
 

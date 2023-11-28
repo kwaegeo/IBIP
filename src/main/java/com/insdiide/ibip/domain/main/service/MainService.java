@@ -39,14 +39,15 @@ public class MainService {
 
         //1. 먼저 공유 폴더의 아이디를 가져오는 함수를 부른다.
         String shareFolderId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNamePublicReports);
+        System.out.println(shareFolderId);
         //2. 받은 폴더 ID가지고 목록을 가져오는 함수를 부른다
         shareFolderItems = mstrObject.getSubfolderList(shareFolderId);
 
         //3. 내 리포트, 즐겨찾기 가져오기 (사용내역 목록, 구독 목록은 안된다 iframe으로 직접 띄워야 함.)
         String myReportId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileReports);
         String myFavoriteId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileFavorites);
-        myReport = mstrObject.getfolderInfo(myReportId);
-        myFavorite = mstrObject.getfolderInfo(myFavoriteId);
+        myReport = mstrObject.getFolderInfo(myReportId);
+        myFavorite = mstrObject.getFolderInfo(myFavoriteId);
         myReport.setName(EnumFolderNamesKR.myReport);
         myFavorite.setName(EnumFolderNamesKR.myFavorite);
 

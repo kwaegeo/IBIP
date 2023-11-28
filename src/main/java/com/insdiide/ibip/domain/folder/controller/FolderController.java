@@ -322,4 +322,44 @@ public class FolderController {
         return subList;
     }
 
+    @GetMapping("/getRootFolder")
+    @ResponseBody
+    public List<EntityVO> getRootFolder(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try {
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        } catch (CustomException ex) {
+            throw ex;
+        }
+
+        //전달 받은 폴더의 하위 목록 조회
+        List<EntityVO> subList = folderService.getRootFolderList(mstrSessionId);
+        return subList;
+    }
+
+    @GetMapping("/getUserFolder")
+    @ResponseBody
+    public List<EntityVO> getUserFolder(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try {
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        } catch (CustomException ex) {
+            throw ex;
+        }
+
+        //전달 받은 폴더의 하위 목록 조회
+        List<EntityVO> subList = folderService.getUserFolderList(mstrSessionId);
+        return subList;
+
+    }
+
 }

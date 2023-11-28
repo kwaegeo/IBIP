@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@ResponseBody
 public class Test2Controller {
 
     @Autowired
@@ -18,7 +17,7 @@ public class Test2Controller {
 
        testService.testGet();
 
-       return"zz";
+       return"/folder/zzz";
 
     }
 }

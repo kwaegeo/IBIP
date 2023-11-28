@@ -70,16 +70,19 @@
             공유 리포트
         </div>
 
-        <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item" th:each="shareFolderItem : ${sideBarItem.shareFolderItems}">
-            <a class="nav-link collapsed" href="#"
-               th:attr="folderItemId=${shareFolderItem.id}"
-               aria-expanded="true" aria-controls="collapseTwo" th:id="${folderItemId}"
-               onclick="openFolder(this.getAttribute('folderItemId'))">
-                <i class="fas fa-fw fa-folder"></i>
-                <span th:text="${{shareFolderItem.name}}"></span>
-            </a>
-        </li>
+        <div id="jstree">
+
+        </div>
+<!--        &lt;!&ndash; Nav Item - Pages Collapse Menu &ndash;&gt;-->
+<!--        <li class="nav-item" th:each="shareFolderItem : ${sideBarItem.shareFolderItems}">-->
+<!--            <a class="nav-link collapsed" href="#"-->
+<!--               th:attr="folderItemId=${shareFolderItem.id}"-->
+<!--               aria-expanded="true" aria-controls="collapseTwo" th:id="${folderItemId}"-->
+<!--               onclick="openFolder(this.getAttribute('folderItemId'))">-->
+<!--                <i class="fas fa-fw fa-folder"></i>-->
+<!--                <span th:text="${{shareFolderItem.name}}"></span>-->
+<!--            </a>-->
+<!--        </li>-->
 
 
         <!-- Divider -->
@@ -91,21 +94,28 @@
         </div>
 
 
-        <!-- Nav Item - Charts -->
-        <li class="nav-item">
-            <a class="nav-link" href="#" th:attr="myReportId=${sideBarItem.myReport.id}"
-               onclick="openFolder(this.getAttribute('myReportId'))">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span th:id="${sideBarItem.myReport.id}" th:text="${sideBarItem.myReport.name}"></span></a>
-        </li>
+<!--        &lt;!&ndash; Nav Item - Charts &ndash;&gt;-->
+<!--        <li class="nav-item">-->
+<!--            <a class="nav-link" href="#" th:attr="myReportId=${sideBarItem.myReport.id}"-->
+<!--               onclick="openFolder(this.getAttribute('myReportId'))">-->
+<!--                <i class="fas fa-fw fa-chart-area"></i>-->
+<!--                <span th:id="${sideBarItem.myReport.id}" th:text="${sideBarItem.myReport.name}"></span></a>-->
+<!--        </li>-->
 
-        <!-- Nav Item - Charts -->
-        <li class="nav-item">
-            <a class="nav-link" href="#" th:attr="myFavoriteId=${sideBarItem.myFavorite.id}"
-               onclick="openFolder(this.getAttribute('myFavoriteId'))">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span th:id="${sideBarItem.myFavorite.id}" th:text="${sideBarItem.myFavorite.name}"></span></a>
-        </li>
+<!--        &lt;!&ndash; Nav Item - Charts &ndash;&gt;-->
+<!--        <li class="nav-item">-->
+<!--            <a class="nav-link" href="#" th:attr="myFavoriteId=${sideBarItem.myFavorite.id}"-->
+<!--               onclick="openFolder(this.getAttribute('myFavoriteId'))">-->
+<!--                <i class="fas fa-fw fa-chart-area"></i>-->
+<!--                <span th:id="${sideBarItem.myFavorite.id}" th:text="${sideBarItem.myFavorite.name}"></span></a>-->
+<!--        </li>-->
+
+        <div id="jstree2">
+
+        </div>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
 
         <!-- Nav Item - Charts -->
         <li class="nav-item">
@@ -121,12 +131,6 @@
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>사용내역목록</span></a>
         </li>
-
-        <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
-            <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
-
 
     </ul>
     <!-- End of Sidebar -->
@@ -246,24 +250,6 @@
             <!-- End of Topbar -->
 
             <div id="main-content">
-                <div class="container-fluid" name="">
-                    <h3 class="h5 text-gray-800 md-18">사용내역목록</h3>
-                    <div class="rows">
-                        <div id="contentDiv">
-                            <div class="card shadow mb-4">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
-                                            <div class="row" id="searchDiv">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
             </div>
 
 
@@ -328,147 +314,753 @@
 <script src="/js/demo/chart-area-demo.js"></script>
 <script src="/js/demo/chart-pie-demo.js"></script>
 
+<script src="dist/jstree.min.js"></script>
+
 <!--custom js, css-->
 <script src="/js/leedo_custom.js"></script>
 
 <script th:inline="javascript">
     var userId = [[${userInfo.userId}]]
-    console.log(userId);
-    // function getFolderInfo(folderId){
-    //
-    //     const folderRoot = $('#root'+folderId)
-    //
-    //     const requestData = {'folderId': folderId}
-    //
-    //     $.ajax({
-    //         url: '/folder/subList',
-    //         data: requestData,
-    //         method: 'GET',
-    //         dataType: "json",
-    //         success: function (responseData) {
-    //                 console.log(responseData)
-    //                 folderRoot.children().remove();
-    //                 responseData.forEach(function (item, index){
-    //
-    //                     var newHtml = $("<span>", {
-    //                         "class": "collapse-item",
-    //                         "text": item.name,
-    //                     });
-    //                     newHtml.attr("folderId", item.id);
-    //                     newHtml.attr("type", item.tp);
-    //
-    //
-    //                     if (item.tp == "3") { //3은 report
-    //                         newHtml.click(function () {
-    //                             openReport($(this).attr("folderId"));
-    //                         });
-    //                     }
-    //                     else if(item.tp=="55"){
-    //                         newHtml.click(function(){
-    //                             openDocument($(this).attr("folderId"));
-    //                         })
-    //                     }
-    //
-    //                 folderRoot.append(newHtml);
-    //                 })
-    //         },
-    //         error: function () {
-    //             alert("서버에 접속할 수 없습니다.")
-    //         }
-    //     })
-    // }
+    console.log("현재 접속한 사용자의 userId : " + userId);
 
-    function getReportInfo(folderId) {
-        alert("아직 만드는중이야")
+    $(document).ready(function () {
+        $('#jstree').jstree({
+            'core': {
+                'data': {
+                    'url': function (node) {
+                        return node.id === '#' ? '/getRootFolder' : '/getSubFolder?folderId='+node.id;
+                        // Adjust the URLs based on your server-side implementation
+                    },
+                    'data': function (node) {
+                        console.log(node);
+                        return { 'id': node.id };
+                        // Send any additional data along with the request
+                    }
+                },
+                "check_callback":true,
+            },
+            'plugins' : ["types", "contextmenu"], // plugin 목록에 추가
+            'types': {
+                8: { // tp 8= 폴더
+                    "icon": "jstree-folder",
+                },
+                3:{ // tp 3= 리포트
+                    "icon": "/dist/themes/default/report.png", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                55:{ // tp 55= 다큐먼트
+                    "icon":"/dist/themes/default/document.png", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                10:{ // tp 10= 프롬프트
+                    "icon":"/dist/themes/default/prompt.png", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                "default":{
+                    "icon": "jstree-icon jstree-folder"
+                }
+            },
+            'contextmenu': {
+                "items": function($node){
+                    console.log($node)
+                    var tree = $("#tree").jstree(true);
+                    if($node.type == 8){
+                        return {
+                            "Menu1": {
+                                "separator_before": false,
+                                "separator_after": true,
+                                "label": "폴더 상세정보 보기", //메뉴 표기 (제목)
+                                "icon": 'jstree-folder', //menu icon
+                                action: function(obj){
+                                    console.log(obj);
+                                    alert("이 폴더의 ID는 : "+ $node.id);
+                                }
+                            }
+                        }
+                    } else if($node.type == 3) {
+                        return {
+                            "Menu1": {
+                                "separator_before": false,
+                                "separator_after": true,
+                                "label": "조회", //메뉴 표기 (제목)
+                                "icon": 'jstree-file', //menu icon
+                                action: function(obj){
+                                    console.log(obj)
+                                    var requestData = {'reportId': $node.id}
+
+                                    $.ajax({
+                                        // url: '/folder/report',
+                                        url: '/getReport',
+                                        data: requestData,
+                                        method: 'GET',
+                                        dataType: "json",
+                                        success: function (responseData) {
+                                            console.log(responseData)
+                                            if(responseData.promptExist == "N"){
+                                                console.log("이 리포트는 프롬프트가 없습니다.");
+                                                var iframe = $("<iframe>", {
+                                                    "src": responseData,
+                                                    "width": "100%",
+                                                    "height": "720px", // 조절해야 할 크기
+                                                    "class": "black-border"
+                                                });
+                                                // iframe을 한번 비운 뒤에
+                                                $("#promptDiv").empty();
+                                                // iframe을 특정 컨테이너에 추가
+                                                $("#promptDiv").append(iframe);
+                                            }
+                                            else{
+                                                promptSetting(responseData);
+                                            }
+                                        },
+                                        error: function () {
+                                            alert("서버에 접속할 수 없습니다.")
+                                        }
+                                    })
+                                }
+                            },
+                            "Menu2": {
+                                "separator_before": false,
+                                "separator_after": true,
+                                "label": "수정", //메뉴 표기 (제목)
+                                "icon": 'jstree-file', //menu icon
+                                action: function(obj){
+                                    console.log(obj);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        });
+
+        $('#jstree2').jstree({
+            'core': {
+                'data': {
+                    'url': function (node) {
+                        return node.id === '#' ? '/getUserFolder' : '/getSubFolder?folderId='+node.id;
+                        // Adjust the URLs based on your server-side implementation
+                    },
+                    'data': function (node) {
+                        console.log(node);
+                        return { 'id': node.id };
+                        // Send any additional data along with the request
+                    }
+                },
+                "check_callback":true,
+            },
+            'plugins' : ["types", "contextmenu"], // plugin 목록에 추가
+            'types': {
+                8: { // tp 8= 폴더
+                    "icon": "jstree-folder",
+                },
+                3:{ // tp 3= 리포트
+                    "icon": "/dist/themes/default/report.png", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                55:{ // tp 55= 다큐먼트
+                    "icon":"/dist/themes/default/document.png", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                10:{ // tp 10= 프롬프트
+                    "icon":"/dist/themes/default/prompt.png", //file 아이콘
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                "default":{
+                    "icon": "jstree-icon jstree-folder"
+                }
+            },
+            'contextmenu': {
+            "items": function($node){
+                console.log($node)
+                var tree = $("#tree").jstree(true);
+                if($node.type == 8){
+                    return {
+                        "Menu1": {
+                            "separator_before": false,
+                            "separator_after": true,
+                            "label": "폴더 상세정보 보기", //메뉴 표기 (제목)
+                            "icon": 'jstree-folder', //menu icon
+                            action: function(obj){
+                                console.log(obj);
+                                alert("이 폴더의 ID는 : "+ $node.id);
+                            }
+                        }
+                    }
+                } else if($node.type == 3) {
+                    return {
+                        "Menu1": {
+                            "separator_before": false,
+                            "separator_after": true,
+                            "label": "조회", //메뉴 표기 (제목)
+                            "icon": 'jstree-file', //menu icon
+                            action: function(obj){
+                                console.log(obj)
+                                var requestData = {'reportId': $node.id}
+
+                                $.ajax({
+                                    // url: '/folder/report',
+                                    url: '/getReport',
+                                    data: requestData,
+                                    method: 'GET',
+                                    dataType: "json",
+                                    success: function (responseData) {
+                                        console.log(responseData)
+                                        if(responseData.promptExist == "N"){
+                                            console.log("이 리포트는 프롬프트가 없습니다.");
+                                            var iframe = $("<iframe>", {
+                                                "src": responseData,
+                                                "width": "100%",
+                                                "height": "720px", // 조절해야 할 크기
+                                                "class": "black-border"
+                                            });
+                                            // iframe을 한번 비운 뒤에
+                                            $("#promptDiv").empty();
+                                            // iframe을 특정 컨테이너에 추가
+                                            $("#promptDiv").append(iframe);
+                                        }
+                                        else{
+                                            promptSetting(responseData);
+                                        }
+                                    },
+                                    error: function () {
+                                        alert("서버에 접속할 수 없습니다.")
+                                    }
+                                })
+                            }
+                        },
+                        "Menu2": {
+                            "separator_before": false,
+                            "separator_after": true,
+                            "label": "수정", //메뉴 표기 (제목)
+                            "icon": 'jstree-file', //menu icon
+                            action: function(obj){
+                                console.log(obj);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        });
+
+
+        // 클릭 된 노드 확인 bind to events triggered on the tree
+        $('#jstree').on("changed.jstree", function (e, data) {
+            console.log(data.selected);
+        });
+
+        $('#jstree').on("select_node.jstree", function(e, data){
+            var node = data.node;
+
+            if (node.type === 3){
+                var requestData = {'reportId': node.id, 'documentType' : 'R'}
+
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/getReport',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        console.log(responseData)
+                        if(responseData.promptsExists == "N"){
+                            console.log("이 리포트는 프롬프트가 없습니다.");
+                            var iframe = $("<iframe>", {
+                                "src": responseData,
+                                "width": "100%",
+                                "height": "720px", // 조절해야 할 크기
+                                "class": "black-border"
+                            });
+                            // iframe을 한번 비운 뒤에
+                            $("#promptDiv").empty();
+                            // iframe을 특정 컨테이너에 추가
+                            $("#promptDiv").append(iframe);
+                        }
+                        else{
+                            promptSetting(responseData);
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
+
+            } else if (node.type === 55){
+                var requestData = {'reportId': node.id, 'documentType' : 'D'}
+
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/getReport',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        console.log(responseData)
+                        if(responseData.promptsExists == "N"){
+                            console.log("이 리포트는 프롬프트가 없습니다.");
+                            var iframe = $("<iframe>", {
+                                "src": responseData,
+                                "width": "100%",
+                                "height": "720px", // 조절해야 할 크기
+                                "class": "black-border"
+                            });
+                            // iframe을 한번 비운 뒤에
+                            $("#promptDiv").empty();
+                            // iframe을 특정 컨테이너에 추가
+                            $("#promptDiv").append(iframe);
+                        }
+                        else{
+                            promptSetting(responseData);
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
+
+
+            }else if (node.type === 10){
+                alert("프롬프트입니다.")
+            }
+        })
+    });
+
+    var tagTypeMap = {
+        "radio": "radio",
+        "checkbox": "checkbox",
+        "selectbox": "select"
+    };
+
+    // 프롬프트 세팅
+    function promptSetting(reportInfo){
+
+        console.log(reportInfo);
+
+        $("#main-content").empty();
+
+        //리포트의 기본정보를 화면에 표시
+        // 1. 템플릿 유무에 따른 버튼? (아니면 일단 버튼은 다 나타낼 것)
+        var makeReportInfoHtml = `
+            <div class="container-fluid" name="reportDiv">
+                <h3 class="h5 text-gray-800 md-18">${reportInfo.reportPath}</h3>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N', '', '${reportInfo.documentType}')"> 조회</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y','', '${reportInfo.documentType}')"> 편집</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
+                                <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 저장</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 불러오기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'P', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
+                            </div>
+                            <div id="reportDiv">
+                                <div class="rows" style="overflow:scroll; height: 700px;">
+                                    <div class="popup-window black-border" id="reportDataDiv">
+                                        <div class="popup__head id="${reportInfo.reportId}">
+                                            <h3>${reportInfo.reportNm}</h3>
+                                        </div>
+                                        <div id="promptDiv">
+                                        </div>
+                                    </div>
+                                    <div id="contentDiv">
+                                    </div>
+                                </div>
+                            </div>
+        `
+        //main부분에 리포트 정보 삽입
+        $("#main-content").prepend(makeReportInfoHtml);
+
+        //프롬프트 개수만큼 반복함.
+        for(var i=0; i<reportInfo.prompts.length; i++){
+            var reportDetail = {'reportId': reportInfo.reportId, 'reportNm': reportInfo.reportNm}
+
+            if(reportInfo.prompts[i].promptType === "element"){
+                elementPromptSetting(reportDetail, reportInfo.prompts[i]) //구성요소 프롬프트 세팅 함수 호출  (프롬프트 보내기)
+            }
+            else if(reportInfo.prompts[i].promptType === "value"){
+                valuePromptSetting(reportDetail, reportInfo.prompts[i]) // 값 프롬프트 세팅 함수 호출
+            }
+            else if(reportInfo.prompts[i].promptType === "object"){
+                objectPromptSetting(reportDetail, reportInfo.prompts[i]) // 개체 프롬프트 세팅 함수 호출
+            }
+        }
     }
 
+    function promptDataParsing(prompt, index){
+        var promptInfo = {};
+        promptInfo.promptId = prompt.attr('id');
+        promptInfo.pt = prompt.attr('pt');
 
-    // function onNavLinkClicked(link) {
-    //     // 클래스를 확인하고 분기를 수행합니다.
-    //     if (link.hasClass('collapsed')) {
-    //         // collapsed 클래스를 가지고 있을 때
-    //         link.removeClass('collapsed');
-    //         // 여기에서 원하는 작업을 수행하세요.
-    //         console.log("Nav link expanded:", link.attr('id'));
-    //         getFolderInfo(link.attr('id'));
-    //     } else {
-    //         // collapsed 클래스를 가지고 있지 않을 때
-    //         // 여기에서 다른 작업을 수행하거나 아무 작업도 하지 않을 수 있습니다.
-    //     }
-    // }
-    //
-    // $(document).ready(function () {
-    //     $('.nav-link').on('click', function (event) {
-    //         event.preventDefault();
-    //         onNavLinkClicked($(this));
-    //     });
-    // });
+        if(prompt.attr('promptType') === 'element'){
+            var attrInfo = {};
+            promptInfo.promptType = 'element';
+            console.log(promptInfo);
 
+            var attrParser = $("[name='attr']").eq(index);
 
-    function openReport(reportId) {
+            attrInfo.attrId = attrParser.attr('id');
+            attrInfo.attrType = attrParser.attr('attrType');
+            console.log(attrInfo);
 
-        const requestData = {'reportId': reportId}
+            var elements = [];
+            var elementParser = $("[name='" + promptInfo.promptId + "']");
+
+            elementParser.each(function(){
+                var elementType = $(this).attr('type');
+
+                if((elementType === 'checkbox' || elementType === 'radio') && $(this).is(':checked')){
+                    elements.push({elementId : $(this).attr('id'), elementNm: $(this).next("label").text()})
+                }
+                else if(elementType === 'selectbox' && $(this).is(':selected')){
+                    elements.push({elementId: $(this).attr('id'), elementNm: $(this).attr('text')})
+                }
+            })
+
+            console.log(elementParser);
+            console.log(elements);
+
+            attrInfo.elements = elements;
+            promptInfo.attr = attrInfo;
+
+            return promptInfo;
+        }
+        else if(prompt.attr('promptType') === 'value'){
+            promptInfo.promptType = 'value';
+
+            var valueParser = $("[name='" + promptInfo.promptId + "']");
+            promptInfo.val = valueParser.val();
+            return promptInfo;
+        }
+        else if(prompt.attr('promptType') === 'object'){
+            promptInfo.promptType = 'object';
+
+            var entities = [];
+            var entityParser = $("[name='" + promptInfo.promptId + "']");
+
+            entityParser.each(function(){
+                var entityType = $(this).attr('type');
+
+                if((entityType === 'checkbox' || entityType === 'radio') && $(this).is(':checked')){
+                    entities.push({entityId: $(this).attr('id'), entityNm: $(this).next("label").text(), entityType: $(this).attr('entityType')})
+                }
+                else if(entityType === 'selectbox' && $(this).is(':selected')){
+                    entities.push({entityId: $(this).attr('id'), entityNm: $(this).attr('text'), entityType: $(this).attr('entityType')})
+                }
+            })
+            promptInfo.entity = entities;
+            return promptInfo;
+        }
+
+    }
+
+    // 리포트 호출 URL 생성
+    function getReportURL(reportId, editYn, exportType, documentType){
+        //reportId, promptId, attrId, promptType
+        var reportInfo = {};
+        //리포트 필요한 것
+        reportInfo.reportId = reportId;
+        reportInfo.prompts = [];
+        reportInfo.editYn = editYn;
+        reportInfo.documentType = documentType;
+        console.log(documentType);
+
+        var breakLoop = false;
+
+        var promptInfo = $("[name='prompt']");
+
+        promptInfo.each(function(index, prompt){
+
+            if(validMinMax($(prompt))==='min'){
+                $(prompt).focus();
+                $(prompt).css("color", "red");
+                setTimeout(function(){
+                    $(prompt).css("color","");
+                }, 5000);
+                alert($(prompt).attr("title") + "의 최솟값에 부합하지 않습니다." + "\n최솟값 : " + $(prompt).attr("minValue"));
+                breakLoop = true;
+                return false;
+            }
+            else if(validMinMax($(prompt))==='max'){
+                $(prompt).focus();
+                $(prompt).css("color", "red");
+                setTimeout(function(){
+                    $(prompt).css("color","");
+                }, 5000);
+                alert($(prompt).attr("title") + "의 최댓값에 부합하지 않습니다." + "\n최댓값 : " + $(prompt).attr("maxValue"));
+                breakLoop = true;
+                return false;
+            }
+            reportInfo.prompts.push(promptDataParsing($(prompt), index));
+            console.log("Element :" + $(prompt).attr("promptType"));
+        })
+
+        if(breakLoop){
+            return false;
+        }
+
+        console.log(reportInfo);
+        var popupYn = $(event.target).attr('popupYn');
+        console.log(popupYn);
+
+        reportInfo.exportType = exportType;
+
         $.ajax({
-            url: '/folder/report',
-            data: requestData,
-            method: 'GET',
+            url: '/getReportURL',
+            data: JSON.stringify(reportInfo),
+            contentType: "application/json",
+            method: 'POST',
             dataType: "text",
             success: function (responseData) {
                 console.log(responseData)
                 var iframe = $("<iframe>", {
                     "src": responseData,
                     "width": "100%",
-                    "height": "500px" // 조절해야 할 크기
+                    "height": "720px" // 조절해야 할 크기
                 });
-
-                //모든 항목 삭제 후 추가
-                $("#iframeDiv").empty();
-                // iframe을 특정 컨테이너에 추가
-                $("#iframeDiv").append(iframe);
-
+                if(popupYn === 'Y'){
+                    window.open(responseData, '', 'width=1400,height=600');
+                }
+                else{
+                    var $reportDataDiv = $('#reportDataDiv');
+                    if ($reportDataDiv.css('display') != 'none' ) {
+                        $('#foldAndOpen').text('프롬프트 펼치기');
+                        $reportDataDiv.toggle();
+                    }
+                    // promptToggle();
+                    // // iframe을 한번 비운 뒤에
+                    $("#contentDiv").empty().addClass("black-border");
+                    // iframe을 특정 컨테이너에 추가
+                    $("#contentDiv").append(iframe);
+                }
             },
             error: function () {
                 alert("서버에 접속할 수 없습니다.")
             }
         })
+    }
+
+    function promptToggle(){
+        var $reportDataDiv = $('#reportDataDiv');
+        $reportDataDiv.toggle();
+        if ($reportDataDiv.css('display') == 'none' ) {
+            $('#foldAndOpen').text('프롬프트 펼치기');
+        }
+        else{
+            $('#foldAndOpen').text('프롬프트 접기');
+        }
+    }
+
+    //최소, 최대 값 유효성 검사
+    function validMinMax(prompt){
+        if(prompt.attr("promptType") === 'value'){
+            var parseMin = new Date(prompt.attr("minValue"));
+            var parseMax = new Date(prompt.attr("maxValue"));
+        }
+        else{
+            var parseMin = parseInt(prompt.attr("minValue"));
+            var parseMax = parseInt(prompt.attr("maxValue"));
+        }
+
+        // 각 태그에 맞게 선택 된 갯수로 검증한다.
+        var childSize = 0;
+        var inputType = prompt.find("input").attr("type");
+
+        if(inputType === "checkbox"){
+            childSize = prompt.find("input[type='checkbox']:checked").length;
+        }
+        else if(inputType === "radio"){
+            childSize = prompt.find("input[type='radio']:checked").length;
+        }
+        else if(inputType === "date"){
+            childSize = new Date(prompt.find("input[type='date']").val());
+        }
+        else{
+            childSize = prompt.find("select option:selected").length;
+        }
+
+
+        console.log("잘들어가고 있는지?")
+        console.log(inputType);
+
+        console.log(parseMin)
+        console.log(parseMax)
+        console.log(childSize)
+        return childSize < parseMin ? "min" : childSize > parseMax ? "max" : true;
+    }
+
+
+    // 개체 프롬프트 세팅
+    function objectPromptSetting(reportInfo, promptInfo){
+
+        // 프롬프트의 타입 설정
+        var tagName = tagTypeMap[promptInfo.tagType] || "checkbox";
+
+        // 구성요소 리스트 선언
+        var entitiesArray = promptInfo.entity;
+
+        //
+        // // radio나 select box는 선택된 목록이 1개 여야함.
+        // if (tagName === "radio" || tagName === "selectbox") {
+        //     // 구성요소 프롬프트에서 defaultAnswerYn 값이 'Y'인 개수를 세기
+        //     var checkedCount = entitiesArray.filter(function(element) {
+        //         return element.defaultAnswerYn === 'Y';
+        //     }).length;
+        //
+        //     var errorMsg = "해당 프롬프트의 설정이 " + tagName + "이지만 기본 값이 2개 이상입니다. 설정 수정 후 재시작하여 주십시오";
+        //     // 만약 checkedCount가 2개 이상인 경우 경고창 표시 후 종료
+        //     if (checkedCount >= 2) {
+        //         alert(errorMsg);
+        //         return;
+        //     }
+        // }
+
+        // 개체 적재 테이블 생성
+
+        var makeHtml = `
+
+                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
+                                <div class="popup__body_custom">
+                                    <h3 class="font-weight-bold">${promptInfo.title}</h3>
+`;
+        if(tagName === "selectbox"){
+            makeHtml +=`<div className=checkbox-container"><select>`
+
+            for(var i=0; i<entitiesArray.length; i++){
+                makeHtml += `
+                        <option type="selectbox" name="${promptInfo.promptId}" id="${entitiesArray[i].entityId}" text="${entitiesArray[i].entityNm}" entityType="${entitiesArray[i].entityType}" ${entitiesArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
+                            ${entitiesArray[i].elementNm}
+                        </option>
+            `
+            };
+            makeHtml += `</select></div>`
+        }
+
+        else{
+            makeHtml += `
+                <div class=checkbox-container">
+                `;
+            for(var i=0; i<entitiesArray.length; i++){
+                if (i % 10 === 0) {
+                    makeHtml += '<div class="row" style="margin: 10px">';
+                }
+                makeHtml +=`
+                        <input type="${tagName}" name="${promptInfo.promptId}" id="${entitiesArray[i].entityId}" text="${entitiesArray[i].entityNm}" entityType="${entitiesArray[i].entityType}" value="${entitiesArray[i].elementId}" ${entitiesArray[i].defaultAnswerYn} === 'Y' ? 'checked' : '';>
+                        <label style="margin: 5px" for="${entitiesArray[i].entityId}">${entitiesArray[i].entityNm}</label>
+            `;
+                if ((i + 1) % 10 === 0 || i === entitiesArray.length - 1) {
+                    makeHtml += '</div>';
+                }
+            }
+        }
+        makeHtml += `           </div>
+                            </div>
+                       </div>
+
+        `;
+
+        $("#promptDiv").prepend(makeHtml);
+    }
+
+    // 값 프롬프트 세팅
+    function valuePromptSetting(reportInfo, promptInfo){
+
+        //1. 값 프롬프트 적재 HTML 생성
+        var makeHtml = `
+
+                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value" pt="${promptInfo.pt}">
+                                <div class="popup__body_custom">
+                                    <h3 class="font-weight-bold">${promptInfo.promptNm}</h3>
+                                    <div class=checkbox-container">
+                                        <input type="date" name="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" value="${promptInfo.val}">
+                                    </div>
+`;
+
+        $("#promptDiv").prepend(makeHtml);
 
     }
 
-    function openDocument(documentId) {
+    // 구성요소 프롬프트 세팅
+    function elementPromptSetting(reportInfo, promptInfo){
+        // 프롬프트의 타입 설정
+        var tagName = tagTypeMap[promptInfo.tagType] || "checkbox";
 
-        const requestData = {'documentId': documentId}
-        $.ajax({
-            url: '/folder/document',
-            data: requestData,
-            method: 'GET',
-            dataType: "text",
-            success: function (responseData) {
-                console.log(responseData)
-                var iframe = $("<iframe>", {
-                    "src": responseData,
-                    "width": "100%",
-                    "height": "500px" // 조절해야 할 크기
-                });
+        tagName = "checkbox";
 
-                //모든 항목 삭제 후 추가
-                $("#iframeDiv").empty();
-                // iframe을 특정 컨테이너에 추가
-                $("#iframeDiv").append(iframe);
+        // 구성요소 리스트 선언
+        var elementsArray = promptInfo.attr.elements;
 
-            },
-            error: function () {
-                alert("서버에 접속할 수 없습니다.")
+
+        // radio나 select box는 선택된 목록이 1개 여야함.
+        if (tagName === "radio" || tagName === "selectbox") {
+            // 구성요소 프롬프트에서 defaultAnswerYn 값이 'Y'인 개수를 세기
+            var checkedCount = elementsArray.filter(function(element) {
+                return element.defaultAnswerYn === 'Y';
+            }).length;
+
+            var errorMsg = "해당 프롬프트의 설정이 " + tagName + "이지만 기본 값이 2개 이상입니다. 설정 수정 후 재시작하여 주십시오";
+            // 만약 checkedCount가 2개 이상인 경우 경고창 표시 후 종료
+            if (checkedCount >= 2) {
+                alert(errorMsg);
+                return;
             }
-        })
+        }
 
+        // 구성요소 적재 테이블 생성
+        var makeHtml = `
+
+                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" childSize="${promptInfo.childSize}" promptType="element" pt="${promptInfo.pt}">
+                                <div class="popup__body_custom">
+                                    <h3 class="font-weight-bold" name="attr", id="${promptInfo.attr.attrId}", attrType="${promptInfo.attr.attrType}">${promptInfo.attr.attrNm}</h3>
+`;
+        if(tagName === "selectbox"){
+            makeHtml +=`<div className=checkbox-container"><select>`
+
+            for(var i=0; i<elementsArray.length; i++){
+                makeHtml += `
+                        <option type="selectbox" name="${promptInfo.promptId}" id="${elementsArray[i].elementId}" text="${elementsArray[i].elementNm}" value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
+                            ${elementsArray[i].elementNm}
+                        </option>
+            `
+            };
+            makeHtml += `</select></div>`
+        }
+        else{
+            makeHtml += `
+                <div class=checkbox-container">
+                `;
+            for(var i=0; i<elementsArray.length; i++){
+                if (i % 10 === 0) {
+                    makeHtml += '<div class="row" style="margin: 10px">';
+                }
+                makeHtml +=`
+                        <input type="${tagName}" name="${promptInfo.promptId}" id="${elementsArray[i].elementId}" text="${elementsArray[i].elementNm}" value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn} === 'Y' ? 'checked' : '';>
+                        <label style="margin: 5px" for="${elementsArray[i].elementId}">${elementsArray[i].elementNm}</label>
+            `;
+                if ((i + 1) % 10 === 0 || i === elementsArray.length - 1) {
+                    makeHtml += '</div>';
+                }
+            }
+        }
+        makeHtml += `           </div>
+                            </div>
+                       </div>
+
+`;
+
+        $("#promptDiv").prepend(makeHtml);
     }
 
     function getMain() {
         window.location.href = "/main";
-    }
-
-    function openFolder(folderId) {
-        window.location.href = "/folder?folderId=" + folderId;
     }
 
     function logout() {
@@ -559,27 +1151,38 @@
             success: function (responseData) {
                 console.log(responseData)
                 console.log("힝구")
-                var inputTable = `<div class="col-sm-12">
-                                                <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
-                                                    <thead>
-                                                    <tr role="row">
-                                                        <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 137.288px;" aria-sort="ascending">Type
-                                                        </th>
-                                                        <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 190.775px;" aria-sort="ascending">Name
-                                                        </th>
-                                                        <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 137.288px;">Owner
-                                                        </th>
-                                                        <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 309.712px;">Path
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    `;
+                var inputTable = `
+
+                <div class="container-fluid" name="">
+                    <h3 class="h5 text-gray-800 md-18">사용내역목록</h3>
+                    <div class="rows">
+                        <div id="contentDiv">
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                                            <div class="row" id="searchDiv">
+                                                <div class="col-sm-12">
+                                                            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+                                                                <thead>
+                                                                <tr role="row">
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 137.288px;" aria-sort="ascending">Type
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 190.775px;" aria-sort="ascending">Name
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 137.288px;">Owner
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 309.712px;">Path
+                                                                    </th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                `;
                 for(var i=0; i<responseData.searchList.length; i++){
                     inputTable +=
                         `
                             <tr class="odd">
-                                <td>폴더명이다임마</td>
+                                <td>Report</td>
                                 <td>${responseData.searchList[i].resultName}</td>
                                 <td>${responseData.searchList[i].resultOwner}</td>
                                 <td>${responseData.searchList[i].resultPath}</td>
@@ -588,14 +1191,24 @@
                 }
             inputTable +=
                 `
-                            </tbody>
-                        </table>
-                    </div>`
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+`
             ;
             console.log(inputTable);
 
-            $("#searchDiv").empty();
-            $("#searchDiv").append(inputTable);
+            $("#main-content").empty();
+            $("#main-content").append(inputTable);
 
             },
             error: function () {

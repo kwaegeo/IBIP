@@ -39,7 +39,7 @@ public class MstrSession {
     public String createSession(String userId, String pwd) throws WebObjectsException {
 
         serverSession = factory.getIServerSession();
-        System.out.println("이건처음이에용" + serverSession.getLogin());
+        System.out.println("처음으로 접속한 계정 : " + serverSession.getLogin());
         if(!(serverSession.getLogin().isEmpty())){
             serverSession.closeSession();
             System.out.println(serverSession);
@@ -51,7 +51,7 @@ public class MstrSession {
         serverSession.setPassword(pwd);
         serverSession.setLocaleID(1042);
         serverSession.setAuthMode(1);
-        System.out.println("이건 둘째에용" + serverSession.getLogin());
+        System.out.println("두번째로 접속한 계정 : " + serverSession.getLogin());
 
         try {
             mstrSessionId = serverSession.getSessionID();
