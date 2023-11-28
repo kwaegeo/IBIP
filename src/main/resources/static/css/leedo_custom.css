@@ -19,3 +19,8 @@
     0% { opacity: 1;}
     100% { opacity: 0;}
 }
+
+
+.sidebar-brand-text-custom-flex {
+    display: flex;
+}

@@ -173,38 +173,36 @@ public class MstrObject extends MstrSession{
         List<SearchResultVO> searchList = new ArrayList<>();
 
         for(int i=0; i< objectResult.size(); i++){
-            System.out.println(objectResult.get(i).getID()); //아이디
-            System.out.println(objectResult.get(i).getName()); //이름
-            System.out.println(objectResult.get(i).getType()); //타입
-            System.out.println(objectResult.get(i).getOwner().getName()); //소유자
-            System.out.println(objectResult.get(i).getCreationTimeStamp());
-            System.out.println(objectResult.get(i).getCreationTime());
             WebObjectInfo woi = objectResult.get(i);
             woi.populate();
 
-            SimpleList lst = objectResult.get(i).getAncestors(); //Path 경로 넣는 것
-            String reportPath = "";
-            String reportName = objectResult.get(i).getName();
-            for(int j=0; j< lst.size(); j++){
-                WebObjectInfo obj = (WebObjectInfo)lst.item(j);
-                System.out.println(obj.getName());
-                if ("".equals(reportPath)){
-                    reportPath += obj.getName();
+            if(woi.getType() == 3 || woi.getType() == 55){
+                SimpleList lst = woi.getAncestors(); //Path 경로 넣는 것
+
+                String reportPath = "";
+                String reportName = woi.getName();
+                for(int j=0; j< lst.size(); j++){
+                    WebObjectInfo obj = (WebObjectInfo)lst.item(j);
+                    System.out.println(obj.getName());
+                    if ("".equals(reportPath)){
+                        reportPath += obj.getName();
+                    }
+                    else {
+                        reportPath += " > " + obj.getName();
+                    }
                 }
-                else {
-                    reportPath += " > " + obj.getName();
-                }
+                reportPath += " > " + reportName;
+                System.out.println(reportPath);
+                SearchResultVO searchResult = new SearchResultVO(
+                        woi.getID(),
+                        woi.getName(),
+                        woi.getType(),
+                        woi.getOwner().getName(),
+                        woi.getCreationTime(),
+                        reportPath
+                );
+                searchList.add(searchResult);
             }
-            reportPath += " > " + reportName;
-            System.out.println(reportPath);
-            SearchResultVO searchResult = new SearchResultVO(
-                    objectResult.get(i).getID(),
-                    objectResult.get(i).getName(),
-                    objectResult.get(i).getType(),
-                    objectResult.get(i).getOwner().getName(),
-                    reportPath
-                    );
-            searchList.add(searchResult);
         }
 
         search.setSearchList(searchList);

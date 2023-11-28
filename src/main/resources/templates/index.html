@@ -49,14 +49,14 @@
 <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" style="overflow:auto;">
 
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/main">
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
-            <div class="sidebar-brand-text mx-3">인사이드정보 <sup>v1</sup></div>
+            <div class="sidebar-brand-text-custom-flex mx-3">인사이드정보 <sup>v1</sup></div>
         </a>
 
         <!-- Divider -->
@@ -348,6 +348,7 @@
                     "icon": "/dist/themes/default/report.png", //file 아이콘
                     "max_children": 0, //leaf이므로 자식을 못갖도록 설정
                     "max_depth":0,
+                    "a_attr":{style: "font-color:black;"}
                 },
                 55:{ // tp 55= 다큐먼트
                     "icon":"/dist/themes/default/document.png", //file 아이콘
@@ -380,7 +381,7 @@
                                 }
                             }
                         }
-                    } else if($node.type == 3) {
+                    } else if($node.type == 3) { //리포트
                         return {
                             "Menu1": {
                                 "separator_before": false,
@@ -399,21 +400,11 @@
                                         dataType: "json",
                                         success: function (responseData) {
                                             console.log(responseData)
-                                            if(responseData.promptExist == "N"){
-                                                console.log("이 리포트는 프롬프트가 없습니다.");
-                                                var iframe = $("<iframe>", {
-                                                    "src": responseData,
-                                                    "width": "100%",
-                                                    "height": "720px", // 조절해야 할 크기
-                                                    "class": "black-border"
-                                                });
-                                                // iframe을 한번 비운 뒤에
-                                                $("#promptDiv").empty();
-                                                // iframe을 특정 컨테이너에 추가
-                                                $("#promptDiv").append(iframe);
+                                            if(responseData.promptExist){
+                                                promptSetting(responseData);
                                             }
                                             else{
-                                                promptSetting(responseData);
+                                                alert("해당 리포트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.")
                                             }
                                         },
                                         error: function () {
@@ -494,60 +485,7 @@
                             }
                         }
                     }
-                } else if($node.type == 3) {
-                    return {
-                        "Menu1": {
-                            "separator_before": false,
-                            "separator_after": true,
-                            "label": "조회", //메뉴 표기 (제목)
-                            "icon": 'jstree-file', //menu icon
-                            action: function(obj){
-                                console.log(obj)
-                                var requestData = {'reportId': $node.id}
-
-                                $.ajax({
-                                    // url: '/folder/report',
-                                    url: '/getReport',
-                                    data: requestData,
-                                    method: 'GET',
-                                    dataType: "json",
-                                    success: function (responseData) {
-                                        console.log(responseData)
-                                        if(responseData.promptExist == "N"){
-                                            console.log("이 리포트는 프롬프트가 없습니다.");
-                                            var iframe = $("<iframe>", {
-                                                "src": responseData,
-                                                "width": "100%",
-                                                "height": "720px", // 조절해야 할 크기
-                                                "class": "black-border"
-                                            });
-                                            // iframe을 한번 비운 뒤에
-                                            $("#promptDiv").empty();
-                                            // iframe을 특정 컨테이너에 추가
-                                            $("#promptDiv").append(iframe);
-                                        }
-                                        else{
-                                            promptSetting(responseData);
-                                        }
-                                    },
-                                    error: function () {
-                                        alert("서버에 접속할 수 없습니다.")
-                                    }
-                                })
-                            }
-                        },
-                        "Menu2": {
-                            "separator_before": false,
-                            "separator_after": true,
-                            "label": "수정", //메뉴 표기 (제목)
-                            "icon": 'jstree-file', //menu icon
-                            action: function(obj){
-                                console.log(obj);
-                            }
-                        }
-                    }
                 }
-
             }
         }
         });
@@ -572,21 +510,11 @@
                     dataType: "json",
                     success: function (responseData) {
                         console.log(responseData)
-                        if(responseData.promptsExists == "N"){
-                            console.log("이 리포트는 프롬프트가 없습니다.");
-                            var iframe = $("<iframe>", {
-                                "src": responseData,
-                                "width": "100%",
-                                "height": "720px", // 조절해야 할 크기
-                                "class": "black-border"
-                            });
-                            // iframe을 한번 비운 뒤에
-                            $("#promptDiv").empty();
-                            // iframe을 특정 컨테이너에 추가
-                            $("#promptDiv").append(iframe);
+                        if(responseData.promptExist){
+                            promptSetting(responseData);
                         }
                         else{
-                            promptSetting(responseData);
+                            alert("해당 리포트에 문제가 발생하였습니다. 확인 후 재실행해주세요.");
                         }
                     },
                     error: function () {
@@ -594,7 +522,7 @@
                     }
                 })
 
-            } else if (node.type === 55){
+            } else if (node.type === 55){ //다큐먼트
                 var requestData = {'reportId': node.id, 'documentType' : 'D'}
 
                 $.ajax({
@@ -604,22 +532,45 @@
                     method: 'GET',
                     dataType: "json",
                     success: function (responseData) {
+                        console.log("이 다큐먼트의 정보는 : ")
+                        console.log(responseData.promptExist)
                         console.log(responseData)
-                        if(responseData.promptsExists == "N"){
-                            console.log("이 리포트는 프롬프트가 없습니다.");
-                            var iframe = $("<iframe>", {
-                                "src": responseData,
-                                "width": "100%",
-                                "height": "720px", // 조절해야 할 크기
-                                "class": "black-border"
-                            });
-                            // iframe을 한번 비운 뒤에
-                            $("#promptDiv").empty();
-                            // iframe을 특정 컨테이너에 추가
-                            $("#promptDiv").append(iframe);
+                        if(responseData.promptExist){
+                            promptSetting(responseData);
                         }
                         else{
+                            alert("해당 다큐먼트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.")
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
+            }else if (node.type === 10){
+                alert("프롬프트입니다.")
+            }
+        })
+
+
+        $('#jstree2').on("select_node.jstree", function(e, data){
+            var node = data.node;
+
+            if (node.type === 3){
+                var requestData = {'reportId': node.id, 'documentType' : 'R'}
+
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/getReport',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        console.log(responseData)
+                        if(responseData.promptExist){
                             promptSetting(responseData);
+                        }
+                        else{
+                            alert("해당 리포트에 문제가 발생하였습니다. 확인 후 재실행해주세요.");
                         }
                     },
                     error: function () {
@@ -627,12 +578,40 @@
                     }
                 })
 
+            } else if (node.type === 55){ //다큐먼트
+                var requestData = {'reportId': node.id, 'documentType' : 'D'}
 
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/getReport',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        console.log("이 다큐먼트의 정보는 : ")
+                        console.log(responseData.promptExist)
+                        console.log(responseData)
+                        if(responseData.promptExist){
+                            promptSetting(responseData);
+                        }
+                        else{
+                            alert("해당 다큐먼트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.")
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
             }else if (node.type === 10){
                 alert("프롬프트입니다.")
             }
         })
+
+
     });
+
+
+
 
     var tagTypeMap = {
         "radio": "radio",
@@ -657,14 +636,14 @@
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y','', '${reportInfo.documentType}')"> 편집</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 저장</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="templateSave()"> 템플릿 저장</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 불러오기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'P', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
                             </div>
                             <div id="reportDiv">
                                 <div class="rows" style="overflow:scroll; height: 700px;">
-                                    <div class="popup-window black-border" id="reportDataDiv">
+                                    <div class="popup-window gray-border" id="reportDataDiv">
                                         <div class="popup__head id="${reportInfo.reportId}">
                                             <h3>${reportInfo.reportNm}</h3>
                                         </div>
@@ -679,18 +658,20 @@
         //main부분에 리포트 정보 삽입
         $("#main-content").prepend(makeReportInfoHtml);
 
-        //프롬프트 개수만큼 반복함.
-        for(var i=0; i<reportInfo.prompts.length; i++){
-            var reportDetail = {'reportId': reportInfo.reportId, 'reportNm': reportInfo.reportNm}
+        //프롬프트 개수만큼 반복함
+        if(reportInfo.prompts){
+            for(var i=0; i<reportInfo.prompts.length; i++){
+                var reportDetail = {'reportId': reportInfo.reportId, 'reportNm': reportInfo.reportNm}
 
-            if(reportInfo.prompts[i].promptType === "element"){
-                elementPromptSetting(reportDetail, reportInfo.prompts[i]) //구성요소 프롬프트 세팅 함수 호출  (프롬프트 보내기)
-            }
-            else if(reportInfo.prompts[i].promptType === "value"){
-                valuePromptSetting(reportDetail, reportInfo.prompts[i]) // 값 프롬프트 세팅 함수 호출
-            }
-            else if(reportInfo.prompts[i].promptType === "object"){
-                objectPromptSetting(reportDetail, reportInfo.prompts[i]) // 개체 프롬프트 세팅 함수 호출
+                if(reportInfo.prompts[i].promptType === "element"){
+                    elementPromptSetting(reportDetail, reportInfo.prompts[i]) //구성요소 프롬프트 세팅 함수 호출  (프롬프트 보내기)
+                }
+                else if(reportInfo.prompts[i].promptType === "value"){
+                    valuePromptSetting(reportDetail, reportInfo.prompts[i]) // 값 프롬프트 세팅 함수 호출
+                }
+                else if(reportInfo.prompts[i].promptType === "object"){
+                    objectPromptSetting(reportDetail, reportInfo.prompts[i]) // 개체 프롬프트 세팅 함수 호출
+                }
             }
         }
     }
@@ -837,7 +818,7 @@
                     }
                     // promptToggle();
                     // // iframe을 한번 비운 뒤에
-                    $("#contentDiv").empty().addClass("black-border");
+                    $("#contentDiv").empty().addClass("gray-border");
                     // iframe을 특정 컨테이너에 추가
                     $("#contentDiv").append(iframe);
                 }
@@ -1094,16 +1075,21 @@
             dataType: "text",
             success: function (responseData) {
                 console.log(responseData)
-                var iframe = $("<iframe>", {
-                    "src": responseData,
-                    "width": "100%",
-                    "height": "720px" // 조절해야 할 크기
-                });
+                var makeHtml = `
 
-                // iframe을 한번 비운 뒤에
-                $("#contentDiv").empty().addClass("black-border");
-                // iframe을 특정 컨테이너에 추가
-                $("#contentDiv").append(iframe);
+                        <div class="container-fluid">
+                            <h3 class="h5 text-gray-800 md-18">내 사용내역목록</h3>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                            </div>
+                            <div class="gray-border">
+                                <iframe src="${responseData}", style="height: 720px; width: 100%;">
+                                </iframe>
+                            </div>
+                        </div>
+
+`;
+                $("#main-content").empty();
+                $("#main-content").append(makeHtml);
             },
             error: function () {
                 alert("서버에 접속할 수 없습니다.")
@@ -1122,16 +1108,21 @@
             dataType: "text",
             success: function (responseData) {
                 console.log(responseData)
-                var iframe = $("<iframe>", {
-                    "src": responseData,
-                    "width": "100%",
-                    "height": "720px" // 조절해야 할 크기
-                });
+                var makeHtml = `
 
-                // iframe을 한번 비운 뒤에
-                $("#contentDiv").empty().addClass("black-border");
-                // iframe을 특정 컨테이너에 추가
-                $("#contentDiv").append(iframe);
+                        <div class="container-fluid">
+                            <h3 class="h5 text-gray-800 md-18">내 구독물</h3>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                            </div>
+                            <div class="gray-border">
+                                <iframe src="${responseData}", style="height: 720px; width: 100%;">
+                                </iframe>
+                            </div>
+                        </div>
+
+`;
+                $("#main-content").empty();
+                $("#main-content").append(makeHtml);
             },
             error: function () {
                 alert("서버에 접속할 수 없습니다.")
@@ -1150,11 +1141,12 @@
             dataType: "json",
             success: function (responseData) {
                 console.log(responseData)
-                console.log("힝구")
-                var inputTable = `
+                var inputTable;
+                if(responseData.searchList) {
+                    inputTable = `
 
                 <div class="container-fluid" name="">
-                    <h3 class="h5 text-gray-800 md-18">사용내역목록</h3>
+                    <h3 class="h5 text-gray-800 md-18">검색결과 총 ${responseData.searchList.length}건</h3>
                     <div class="rows">
                         <div id="contentDiv">
                             <div class="card shadow mb-4">
@@ -1166,31 +1158,47 @@
                                                             <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
                                                                 <thead>
                                                                 <tr role="row">
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 137.288px;" aria-sort="ascending">Type
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 1%;" aria-sort="ascending">타입
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 190.775px;" aria-sort="ascending">Name
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 24%;" aria-sort="ascending">문서명
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 137.288px;">Owner
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">소유자
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 309.712px;">Path
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">생성일자
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 50%;">경로
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;">조회
                                                                     </th>
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                 `;
-                for(var i=0; i<responseData.searchList.length; i++){
-                    inputTable +=
-                        `
+                    for (var i = 0; i < responseData.searchList.length; i++) {
+                        var imgSrc="";
+                        var docType="";
+                        if(responseData.searchList[i].resultType === 3){
+                            imgSrc= "/dist/themes/default/report.png";
+                            docType = "R";
+                        }
+                        else if(responseData.searchList[i].resultType === 55){
+                            imgSrc= "/dist/themes/default/document.png";
+                            docType = "D";
+                        }
+                        inputTable +=
+                            `
                             <tr class="odd">
-                                <td>Report</td>
+                                <td><img src=${imgSrc} style="margin-right: 4px"></img></td>
                                 <td>${responseData.searchList[i].resultName}</td>
                                 <td>${responseData.searchList[i].resultOwner}</td>
+                                <td>${responseData.searchList[i].creationTime}</td>
                                 <td>${responseData.searchList[i].resultPath}</td>
+                                <td style="text-align: center;"><button style="margin: 0 auto;" onclick="getReportData('${responseData.searchList[i].resultId}', '${docType}')"><img src="/img/submit.png" style="width: 20px;"></img></button></td>
                             </tr>
                         `
-                }
-            inputTable +=
-                `
+                    }
+                    inputTable +=
+                        `
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1203,8 +1211,15 @@
 
                     </div>
                 </div>
-`
-            ;
+`;
+                }
+            else{
+                inputTable = `
+                            <div class="container-fluid" name="">
+                                <h3 class="h5 text-gray-800 md-18">검색결과가 없습니다.</h3>
+                            </div>
+                            `
+            }
             console.log(inputTable);
 
             $("#main-content").empty();
@@ -1217,6 +1232,34 @@
         })
     }
 
+    function templateSave(){
+        if(confirm("현재 선택된 프롬프트 값을 저장하시겠습니까?")){
+
+        }
+    }
+
+    function getReportData(reportId, docType){
+        var requestData = {'reportId': reportId, 'documentType' : docType}
+
+        $.ajax({
+            url: '/getReport',
+            data: requestData,
+            method: 'GET',
+            dataType: "json",
+            success: function (responseData) {
+                console.log(responseData)
+                if(responseData.promptExist){
+                    promptSetting(responseData);
+                }
+                else{
+                    alert("해당 리포트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.")
+                }
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        })
+    }
 </script>
 </body>
 

@@ -2939,6 +2939,7 @@ fieldset:disabled a.btn {
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: 0.2rem;
+  margin: 2px;
 }
 
 .btn-block {
@@ -9577,7 +9578,8 @@ button.bg-dark:focus {
 }
 
 .font-weight-bold {
-  font-weight: 700 !important;
+  font-weight: 600 !important;
+  font-size: medium;
 }
 
 .font-weight-bolder {
@@ -10566,6 +10568,7 @@ a:focus {
   .sidebar .sidebar-brand .sidebar-brand-text {
     display: inline;
   }
+
   .sidebar .sidebar-heading {
     text-align: left;
   }

@@ -19,6 +19,8 @@ public class SearchResultVO {
 
     private String resultOwner;
 
+    private String creationTime;
+
     private String resultPath;
 
 }
