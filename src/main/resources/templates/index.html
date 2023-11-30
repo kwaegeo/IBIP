@@ -636,7 +636,7 @@
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y','', '${reportInfo.documentType}')"> 편집</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="templateSave()"> 템플릿 저장</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="templateSave('${reportInfo.reportId}', '${reportInfo.documentType}')"> 템플릿 저장</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 불러오기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'P', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
@@ -645,6 +645,7 @@
                                 <div class="rows" style="overflow:scroll; height: 700px;">
                                     <div class="popup-window gray-border" id="reportDataDiv">
                                         <div class="popup__head id="${reportInfo.reportId}">
+                                            <input type="hidden" id="reportNm" value="${reportInfo.reportNm}" />
                                             <h3>${reportInfo.reportNm}</h3>
                                         </div>
                                         <div id="promptDiv">
@@ -679,6 +680,7 @@
     function promptDataParsing(prompt, index){
         var promptInfo = {};
         promptInfo.promptId = prompt.attr('id');
+        promptInfo.promptNm = prompt.attr('title')
         promptInfo.pt = prompt.attr('pt');
 
         if(prompt.attr('promptType') === 'element'){
@@ -868,10 +870,7 @@
             childSize = prompt.find("select option:selected").length;
         }
 
-
-        console.log("잘들어가고 있는지?")
         console.log(inputType);
-
         console.log(parseMin)
         console.log(parseMax)
         console.log(childSize)
@@ -1162,9 +1161,9 @@
                                                                     </th>
                                                                     <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 24%;" aria-sort="ascending">문서명
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">소유자
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 8%;">소유자
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">생성일자
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 12%;">생성일자
                                                                     </th>
                                                                     <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 50%;">경로
                                                                     </th>
@@ -1175,20 +1174,20 @@
                                                                 <tbody>
                                                                 `;
                     for (var i = 0; i < responseData.searchList.length; i++) {
-                        var imgSrc="";
+                        var docName="";
                         var docType="";
                         if(responseData.searchList[i].resultType === 3){
-                            imgSrc= "/dist/themes/default/report.png";
+                            docName= "리포트";
                             docType = "R";
                         }
                         else if(responseData.searchList[i].resultType === 55){
-                            imgSrc= "/dist/themes/default/document.png";
+                            docName= "다큐먼트(도씨에)";
                             docType = "D";
                         }
                         inputTable +=
                             `
                             <tr class="odd">
-                                <td><img src=${imgSrc} style="margin-right: 4px"></img></td>
+                                <td>${docName}</td>
                                 <td>${responseData.searchList[i].resultName}</td>
                                 <td>${responseData.searchList[i].resultOwner}</td>
                                 <td>${responseData.searchList[i].creationTime}</td>
@@ -1232,9 +1231,73 @@
         })
     }
 
-    function templateSave(){
+    function templateSave(reportId, documentType){
         if(confirm("현재 선택된 프롬프트 값을 저장하시겠습니까?")){
 
+            //reportId, promptId, attrId, promptType
+            var reportInfo = {};
+            //리포트 필요한 것
+            reportInfo.reportId = reportId;
+            reportInfo.reportNm = $("#reportNm").val();
+            reportInfo.prompts = [];
+            reportInfo.documentType = documentType;
+
+            var breakLoop = false;
+            var promptInfo = $("[name='prompt']");
+
+            promptInfo.each(function(index, prompt){
+
+                if(validMinMax($(prompt))==='min'){
+                    $(prompt).focus();
+                    $(prompt).css("color", "red");
+                    setTimeout(function(){
+                        $(prompt).css("color","");
+                    }, 5000);
+                    alert($(prompt).attr("title") + "의 최솟값에 부합하지 않습니다." + "\n최솟값 : " + $(prompt).attr("minValue"));
+                    breakLoop = true;
+                    return false;
+                }
+                else if(validMinMax($(prompt))==='max'){
+                    $(prompt).focus();
+                    $(prompt).css("color", "red");
+                    setTimeout(function(){
+                        $(prompt).css("color","");
+                    }, 5000);
+                    alert($(prompt).attr("title") + "의 최댓값에 부합하지 않습니다." + "\n최댓값 : " + $(prompt).attr("maxValue"));
+                    breakLoop = true;
+                    return false;
+                }
+                reportInfo.prompts.push(promptDataParsing($(prompt), index));
+                console.log("Element :" + $(prompt).attr("promptType"));
+            })
+
+            if(breakLoop){
+                return false;
+            }
+
+            var openWin = window.open("", "템플릿 저장","width=907 ,height=473");
+            $.ajax({
+                url: '/openTemplateAdd',
+                data: JSON.stringify(reportInfo),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "html",
+                success: function(responseData){
+                    openWin.document.open();
+                    openWin.document.write(responseData);
+                    openWin.document.close();
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+
+            // window.open('/openTemplateAdd?reportInfo='+reportInfo, '템플릿 저장', 'width=907,height=370');
+            // 리포트(다큐먼트) 정보
+            // 프롬프트 정보
+            // 프롬프트 하위의 개체 정보
+            // 프롬프트의 요소 정보
+            // 를 파싱하여 넘긴다. ReportVO가 생성이 되는 것
         }
     }
 

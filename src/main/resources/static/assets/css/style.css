@@ -44,6 +44,10 @@
   align-items: center;
 }
 
+.prompt-list-custom {
+  display: flex;
+}
+
 .checkbox-container{
   display: flex;
   align-items: center;

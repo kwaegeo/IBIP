@@ -18,6 +18,11 @@ public class Test2Controller {
        testService.testGet();
 
        return"/folder/zzz";
-
     }
+
+    @GetMapping("/template")
+    public String getTemplate(){
+        return "/template/templateAdd";
+    }
+
 }

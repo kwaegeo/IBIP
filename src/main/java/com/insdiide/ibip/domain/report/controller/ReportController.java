@@ -1,5 +1,7 @@
 package com.insdiide.ibip.domain.report.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.insdiide.ibip.domain.prompt.vo2.PromptDataVO;
 import com.insdiide.ibip.domain.prompt.vo2.PromptVO;
 import com.insdiide.ibip.domain.prompt.vo2.PromptsVO;
@@ -11,6 +13,7 @@ import com.insdiide.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -85,4 +88,12 @@ public class ReportController {
         return reportURL;
     }
 
+    @PostMapping("/openTemplateAdd")
+    public String openTemplateAdd(@RequestBody ReportVO reportInfo, HttpServletRequest request, HttpServletResponse response, Model model) throws JsonProcessingException {
+
+        System.out.println(reportInfo);
+        model.addAttribute("reportInfo", reportInfo);
+
+        return "/template/templateAdd";
+    }
 }

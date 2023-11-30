@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>템플릿 생성</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+    <!-- JS -->
+    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/common.js" defer></script>
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+      <div class="popup__head">
+        <h1>템플릿 생성</h1>
+        <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+      </div>
+      <div class="popup__body">
+        <form action="" method="" name="popjoin">
+          <ul class="form-input">
+            <li>
+              <label for="reportNm">리포트명</label>
+              <div class="input-area">
+                <input type="text" id="reportNm" class="flex3" th:value="${reportInfo.reportNm}" readonly/>
+              </div>
+            </li>
+            <li>
+              <label>프롬프트명</label>
+              <div class="input-area">
+                  <th:block th:each="prompt : ${reportInfo.prompts}">
+                    <div class="prompt-list-custom">
+                    <div class="" th:text="${prompt.promptNm}" style="font-weight: bold; margin-right: 10px;">
+                      </div>
+                      <div class="checkbox-container">
+                          <div class="row">
+                            <th:block th:each="entity : ${prompt.entity}">
+                              <div th:text="${entity.entityNm}" style="margin-right: 5px;"></div>
+                            </th:block>
+                          </div>
+                      </div>
+                    </div>
+                  </th:block>
+              </div>
+            </li>
+            <li>
+              <label for="templateName" class="star">템플릿 명</label>
+              <div class="input-area">
+                <div class="row">
+                  <input type="text" id="templateName" value="" class="flex3" check_result="fail"/>
+                  <button type="button" class="flex1" id="check_btn" name="check_btn" onclick="checkedTemplate()"><span>중복 확인</span></button>
+                  <button type="button" class="flex1 bg-greenlight" id="check_success" name="check_success" style="display: none"><span>확인 완료</span></button>
+                </div>
+                <p class="input-info">영문자, 한글, 숫자, 특수문자(- _ .)조합의 64자 이하 문자열</p>
+              </div>
+              <!--수정일 경우 row 클래스 및 버튼 삭제
+              <div class="input-area">
+                <input type="text" id="userId" value="" />
+              </div>-->
+            </li>
+            <li>
+              <label for="etc">설명</label>
+              <div class="input-area">
+                <div class="row">
+                  <textarea id="etc"></textarea>
+                </div>
+                <p class="input-info">200자 이하 문자열</p>
+              </div>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <div class="popup__footer">
+        <button type="button" class="pop-close bg-gray" onclick="confirmExit()"><span>취소</span></button>
+        <button type="button" onclick="addTemplate()"><span>생성</span></button>
+      </div>
+    </div>
+  </body>
+  <script th:inline="javascript">
+
+    var reportInfo = [[${reportInfo}]]
+    console.log("현재 접속한 사용자의 리포트정보:" + reportInfo);
+    console.log(reportInfo);
+    var repo = [[${reportInfo.prompts}]]
+    console.log(repo)
+
+
+    // 템플릿 명 실시간 유효성 검사
+    $('#templateName').on('keyup', function () {
+      const getReg = RegExp(/^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9._-]*$/);
+      const templateNameVal = $(this).val();
+      $('#check_success').hide();
+      $('#check_btn').show();
+      $('#templateName').attr("check_result", "fail");
+
+      if (!getReg.test(templateNameVal) || templateNameVal.length > 64) {
+        $(this).css({'outline': '1px solid red', 'border': '1px solid red'});
+        $('#check_btn').attr('disabled', true);
+      } else if (getReg.test(templateNameVal) && templateNameVal.length > 0) {
+        $(this).css({'outline': '1px solid green', 'border': '1px solid green'});
+        $('#check_btn').attr('disabled', false);
+      } else if ($(this).val().length == 0) {
+        $(this).css({'outline': '', 'border': ''});
+        $('#check_btn').attr('disabled', true);
+      }
+    })
+
+    function checkedTemplate(){
+        $("templateName").on('keyup',function(){
+          $('#check_success').hide();
+          $('#check_btn').show();
+          $('#templateName').attr("check_result", "fail");
+        })
+      const getReg = RegExp(/^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9._-]*$/);
+      const templateNameVal = $('#templateName').val();
+
+      //1. 아이디 유효성 체크
+      if (validData(templateNameVal)) {
+        alert("템플릿명을 입력해주세요.");
+        $('#templateName').focus();
+        return false;
+      }
+      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
+      else if (!getReg.test(templateNameVal) || templateNameVal.length > 64) {
+        alert("템플릿명을 형식에 맞게 입력해주세요.\n(한글, 영어,숫자._-만 포함)\n길이 64자")
+        $('#templateName').focus();
+        return false;
+      }
+
+      //2. 중복확인 요청
+      const data = {"templateName": templateNameVal};
+
+      $.ajax({
+        url: "/checkTemplate",
+        data: JSON.stringify(data),
+        method: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        success: function (data) {
+          console.log(data)
+          if (data.code == "S00") {
+            alert("사용 가능한 템플릿 명 입니다.")
+            $('#templateName').attr("check_result", "success");
+            $('#templateName').css({'outline': '', 'border': ''});
+            $('#check_success').show();
+            $('#check_btn').hide();
+            return;
+          } else {
+            alert(data.msg);
+            return;
+          }
+        },
+        error: function () {
+          alert("통신 에러 발생");
+        }
+      });
+    }
+
+    function addTemplate(){
+      // 부모 요소 파싱 어떻게 할거야~~~~~~
+      //
+
+    }
+
+    function validData(data){
+      if(data == "" || data.length == 0)
+        return true;
+      else
+        return false;
+    }
+
+    function confirmExit() {
+      if (confirm("작성중인 내용이 초기화 됩니다.\n취소하시겠습니까?")) {
+        window.close();
+      } else{
+
+      }
+    }
+  </script>
+</html>
