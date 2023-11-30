@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.insdiide.ibip.domain.template.mapper.TemplateMapper">
 
+
     <select id="checkTemplate" parameterType="string" resultType="integer">
         SELECT
             count(*)
@@ -10,4 +11,36 @@
         WHERE
             tmp_nm = #{templateName};
     </select>
+
+    <insert id="insertTemplate" parameterType="com.insdiide.ibip.domain.template.TemplateVO">
+        INSERT INTO
+            tb_template
+            (
+             tmp_id,
+             report_id,
+             doc_type,
+             user_id,
+             user_nm,
+             reg_ts,
+             use_yn,
+             tmp_nm,
+             remark
+             )
+        VALUES
+            (
+            'TE' || TO_CHAR(CURRENT_TIMESTAMP, 'YYMMDDHH24MISS') || LPAD(nextval('seq_tb_template')::text, 6, '0'),
+             #{reportId},
+             #{docType},
+             #{userId},
+             #{userNm},
+             CURRENT_TIMESTAMP,
+             'Y',
+             #{tmpNm},
+             #{remark}
+             )
+    </insert>
+    <insert id="insertPrompts" parameterType="com.insdiide.ibip.domain.prompt.vo.PromptVO">
+
+    </insert>
 </mapper>
+

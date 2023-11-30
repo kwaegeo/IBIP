@@ -13,6 +13,7 @@
     <typeAliases>
         <!-- 공통 -->
         <typeAlias alias="testvo" type="com.insdiide.ibip.domain.test.vo.TestVO"/>
+        <typeAlias alias="TemplateVO" type="com.insdiide.ibip.domain.template.TemplateVO"/>
 
     </typeAliases>
 

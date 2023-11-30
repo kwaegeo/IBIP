@@ -7,6 +7,7 @@ import com.insdiide.ibip.domain.prompt.vo2.PromptVO;
 import com.insdiide.ibip.domain.prompt.vo2.PromptsVO;
 import com.insdiide.ibip.domain.report.service.ReportService;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
+import com.insdiide.ibip.domain.template.ReqTemplateVO;
 import com.insdiide.ibip.global.exception.CustomException;
 import com.insdiide.ibip.global.exception.code.ResultCode;
 import com.insdiide.ibip.global.utils.ComUtils;
@@ -88,12 +89,4 @@ public class ReportController {
         return reportURL;
     }
 
-    @PostMapping("/openTemplateAdd")
-    public String openTemplateAdd(@RequestBody ReportVO reportInfo, HttpServletRequest request, HttpServletResponse response, Model model) throws JsonProcessingException {
-
-        System.out.println(reportInfo);
-        model.addAttribute("reportInfo", reportInfo);
-
-        return "/template/templateAdd";
-    }
 }

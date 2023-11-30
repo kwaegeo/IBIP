@@ -31,15 +31,22 @@
             </li>
             <li>
               <label>프롬프트명</label>
-              <div class="input-area">
+              <div class="input-area" style="overflow: auto;">
                   <th:block th:each="prompt : ${reportInfo.prompts}">
                     <div class="prompt-list-custom">
-                    <div class="" th:text="${prompt.promptNm}" style="font-weight: bold; margin-right: 10px;">
+                    <div class="" th:text="${prompt.promptNm}" style="font-weight: bold; margin-right: 10px; border-color: grey;">
                       </div>
                       <div class="checkbox-container">
                           <div class="row">
-                            <th:block th:each="entity : ${prompt.entity}">
-                              <div th:text="${entity.entityNm}" style="margin-right: 5px;"></div>
+                            <th:block th:if="${prompt.promptType == 'element'}">
+                              <th:block th:each="element : ${prompt.attr.elements}">
+                                <div th:text="${element.elementNm}" style="margin-right: 5px;"></div>
+                              </th:block>
+                            </th:block>
+                            <th:block th:unless="${prompt.promptType == 'element'}">
+                              <th:block th:each="entity : ${prompt.entity}">
+                                <div th:text="${entity.entityNm}" style="margin-right: 5px;"></div>
+                              </th:block>
                             </th:block>
                           </div>
                       </div>
@@ -63,10 +70,10 @@
               </div>-->
             </li>
             <li>
-              <label for="etc">설명</label>
+              <label for="remark">설명</label>
               <div class="input-area">
                 <div class="row">
-                  <textarea id="etc"></textarea>
+                  <textarea id="remark"></textarea>
                 </div>
                 <p class="input-info">200자 이하 문자열</p>
               </div>
@@ -83,11 +90,10 @@
   <script th:inline="javascript">
 
     var reportInfo = [[${reportInfo}]]
-    console.log("현재 접속한 사용자의 리포트정보:" + reportInfo);
-    console.log(reportInfo);
-    var repo = [[${reportInfo.prompts}]]
-    console.log(repo)
+    var userInfo = [[${userInfo}]]
 
+    console.log("현재 접속한 사용자의 리포트 정보:" + reportInfo);
+    console.log("현재 접속한 사용자의 사용자 정보:" + userInfo);
 
     // 템플릿 명 실시간 유효성 검사
     $('#templateName').on('keyup', function () {
@@ -160,10 +166,62 @@
       });
     }
 
-    function addTemplate(){
-      // 부모 요소 파싱 어떻게 할거야~~~~~~
-      //
+    function addTemplate() {
+      //1. 템플릿명 유효성 검사.
+      //2. 설명 유효성 검사.
+      //3. 요청
+      const getReg = RegExp(/^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9._-]*$/);
+      const templateNameVal = $('#templateName').val();
+      const remark = $('#remark').val();
 
+      if ($('#templateName').attr("check_result") == "fail") {
+        alert("템플릿 명 중복체크를 해주세요.");
+        $('#templateName').focus();
+        return false;
+      }
+      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
+      else if (!getReg.test(templateNameVal) || templateNameVal.length > 64) {
+        alert("템플릿명을 형식에 맞게 입력해주세요.\n(한글, 영어,숫자._-만 포함)\n길이 64자")
+        $('#templateName').focus();
+        return false;
+      } else if (remark.length > 200) {
+        alert("설명은 200자 이하로 작성해주세요.");
+        $('#remark').focus();
+        return false;
+      }
+
+      const templateInfo = {
+        "reportInfo": reportInfo,
+        "userInfo" : userInfo,
+        "templateName": templateNameVal,
+        "remark": remark,
+      };
+
+      $.ajax({
+        url: "/createTemplate",
+        data: JSON.stringify(templateInfo),
+        method: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        success: function (data) {
+          console.log(data.code)
+          console.log(data.msg)
+
+          if (data.code == "E24") {
+            alert("입력하지 않은 항목이 있습니다.");
+            return;
+          }
+          // 나올수 없는 오류 (방어목적)
+          else if (data.code == "E23") {
+            alert("이미 존재하는 부서입니다.");
+            return;
+          }
+
+        },
+        error: function () {
+          alert("통신 에러 발생");
+        }
+      });
     }
 
     function validData(data){
@@ -177,7 +235,6 @@
       if (confirm("작성중인 내용이 초기화 됩니다.\n취소하시겠습니까?")) {
         window.close();
       } else{
-
       }
     }
   </script>
