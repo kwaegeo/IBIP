@@ -1,6 +1,7 @@
 package com.insdiide.ibip.domain.template.controller;
 
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
+import com.insdiide.ibip.domain.prompt.vo.ObjectVO;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
 import com.insdiide.ibip.domain.template.ReqTemplateVO;
 import com.insdiide.ibip.domain.template.TemplateVO;
@@ -98,10 +99,11 @@ public class TemplateController {
 
     @PostMapping("/getTemplate")
     @ResponseBody
-    public String getTemplate(@RequestBody String templateId,  HttpServletRequest request, HttpServletResponse response){
+    public List<ObjectVO> getTemplate(@RequestBody Map<String, String> template,  HttpServletRequest request, HttpServletResponse response){
+        String templateId = template.get("templateId");
         System.out.println(templateId);
-        ReportVO reportTemplateInfo = templateService.getTemplate(templateId);
-        return "zz";
+        List<ObjectVO> entities = templateService.getTemplate(templateId);
+        return entities;
     }
 }
 

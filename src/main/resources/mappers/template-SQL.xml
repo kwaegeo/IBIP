@@ -82,7 +82,8 @@
         prpt_id,
         entn_type,
         entn_nm,
-        default_yn
+        default_yn,
+        tmp_id
         )
         VALUES
         <foreach collection="list" item="item" separator=",">
@@ -92,19 +93,11 @@
             #{item.promptId},
             #{item.entityType},
             #{item.entityNm},
-            #{item.defaultAnswerYn}
+            #{item.defaultAnswerYn},
+            #{item.tmpId}
             )
         </foreach>
     </insert>
-
-    <select id="getTemplate" resultType="com.insdiide.ibip.domain.prompt.vo.ObjectVO">
-        SELECT
-            *
-        FROM
-            tb_entity
-        WHERE
-            tmp_id=#{templateId}
-    </select>
 
     <select id="selectTemplate" resultType="com.insdiide.ibip.domain.template.TemplateVO">
         SELECT
@@ -117,6 +110,17 @@
             user_id=#{userId}
     </select>
 
+    <select id="getTemplate" resultType="com.insdiide.ibip.domain.prompt.vo.ObjectVO">
+        SELECT
+            entn_mstr_id as entityId,
+            prpt_id as promptId,
+            entn_nm as entityNm,
+            entn_type as entityType
+        FROM
+            tb_entity
+        WHERE
+            tmp_id=#{templateId}
+    </select>
 
 
 </mapper>

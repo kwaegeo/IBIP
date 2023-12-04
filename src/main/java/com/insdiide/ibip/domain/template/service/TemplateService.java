@@ -70,6 +70,9 @@ public class TemplateService {
                     if(promptCount == templateInfo.getReportInfo().getPrompts().size()){
                         int entityCount =0;
                         for(int j=0; j<templateInfo.getReportInfo().getPrompts().size(); j++){
+                            for(int k=0; k<templateInfo.getReportInfo().getPrompts().get(j).getEntity().size(); k++){
+                                templateInfo.getReportInfo().getPrompts().get(j).getEntity().get(k).setTmpId(template.getTmpId());
+                            }
                             entityCount += templateMapper.insertEntity(templateInfo.getReportInfo().getPrompts().get(j).getEntity());
                         }
                         System.out.println(entityCount);
@@ -87,9 +90,11 @@ public class TemplateService {
         return templates;
     }
 
-    public ReportVO getTemplate(String templateId){
+    public List<ObjectVO> getTemplate(String templateId){
+        System.out.println(templateId);
+        System.out.println("왔?");
         List<ObjectVO> entities = templateMapper.getTemplate(templateId);
         System.out.println(entities);
-        return new ReportVO();
+        return entities;
     }
 }

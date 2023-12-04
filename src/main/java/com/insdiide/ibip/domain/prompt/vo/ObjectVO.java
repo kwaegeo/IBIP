@@ -23,4 +23,5 @@ public class ObjectVO {
 
     private String promptId;
 
+    private String tmpId;
 }

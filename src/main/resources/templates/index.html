@@ -1327,6 +1327,32 @@
     function getTemplateList(reportId){
         window.open('/openTemplateList?reportId='+reportId+'&userId='+userId, '', 'width=1000,height=400,location=no,status=no,scrollbars=yes');
     }
+
+    function setTemplateInfo(templateInfo){
+        console.log("확인중");
+        console.log(templateInfo);
+        // 모든 체크박스 선택 후 체크 해제
+        $('input[type="checkbox"]').prop('checked', false);
+
+        // 모든 라디오 박스 선택 후 체크 해제
+        $('input[type="radio"]').prop('checked', false);
+
+        for(var i=0; i<templateInfo.length; i++){
+
+            var $target = $('#' + templateInfo[i].entityId);
+
+            if($target.length === 0){
+                alert("해당 프롬프트에 하위 요소가 존재하지 않습니다. 해당 템플릿을 삭제하거나 다시 생성해주세요.");
+            }
+
+            // checkbox 또는 radio 여부에 상관없이 checked 설정
+            if ($target.is(':checkbox, :radio')) {
+                $target.prop('checked', true);
+            }
+        }
+
+    }
+
 </script>
 </body>
 
