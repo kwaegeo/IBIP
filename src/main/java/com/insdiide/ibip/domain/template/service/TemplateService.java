@@ -1,5 +1,7 @@
 package com.insdiide.ibip.domain.template.service;
 
+import com.insdiide.ibip.domain.prompt.vo.ObjectVO;
+import com.insdiide.ibip.domain.report.vo.ReportVO;
 import com.insdiide.ibip.domain.template.ReqTemplateVO;
 import com.insdiide.ibip.domain.template.TemplateVO;
 import com.insdiide.ibip.domain.template.mapper.TemplateMapper;
@@ -10,6 +12,9 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.catalina.util.CustomObjectInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.insdiide.ibip.global.utils.ComUtils.isNullOrEmpty;
 
@@ -36,6 +41,7 @@ public class TemplateService {
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    @Transactional
     public void createTemplate(ReqTemplateVO templateInfo){
         ResVO response = this.checkTemplate(templateInfo.getTemplateName());
         if("S00".equals(response.getCode())){
@@ -53,10 +59,37 @@ public class TemplateService {
                         .remark(templateInfo.getRemark())
                         .build();
 
-                int resultCount = templateMapper.insertTemplate(template);
-                System.out.println(resultCount);
+                int templateCount = templateMapper.insertTemplate(template);
+                System.out.println(templateCount);
+                if(templateCount > 0){
+                    for(int i =0; i<templateInfo.getReportInfo().getPrompts().size(); i++){
+                        templateInfo.getReportInfo().getPrompts().get(i).setTmpId(template.getTmpId());
+                    }
+                    int promptCount = templateMapper.insertPrompts(templateInfo.getReportInfo().getPrompts());
+                    System.out.println(promptCount);
+                    if(promptCount == templateInfo.getReportInfo().getPrompts().size()){
+                        int entityCount =0;
+                        for(int j=0; j<templateInfo.getReportInfo().getPrompts().size(); j++){
+                            entityCount += templateMapper.insertEntity(templateInfo.getReportInfo().getPrompts().get(j).getEntity());
+                        }
+                        System.out.println(entityCount);
+                    }
+                }
             }
         }
     }
 
+    public List<TemplateVO> selectTemplate(String reportId, String userId){
+        System.out.println(reportId);
+        System.out.println(userId);
+        List<TemplateVO> templates = templateMapper.selectTemplate(reportId, userId);
+        System.out.println(templates);
+        return templates;
+    }
+
+    public ReportVO getTemplate(String templateId){
+        List<ObjectVO> entities = templateMapper.getTemplate(templateId);
+        System.out.println(entities);
+        return new ReportVO();
+    }
 }

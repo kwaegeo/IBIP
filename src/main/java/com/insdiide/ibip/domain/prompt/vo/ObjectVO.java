@@ -21,4 +21,6 @@ public class ObjectVO {
 
     private String defaultAnswerYn = "N"; //기본값 yn
 
+    private String promptId;
+
 }

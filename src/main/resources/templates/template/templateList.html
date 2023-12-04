@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/js/jqueryui/jquery-ui.min.css" type="text/css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+    <!-- JS -->
+    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/jqueryui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="assets/js/common.js" defer></script>
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+      <div class="popup__head">
+        <h1>리포트 명</h1>
+      </div>
+      <div class="popup__body">
+        <section>
+          <div class="tbl-top">
+            <div class="left"><h2>템플릿 목록</h2></div>
+          </div>
+          <div class="tbl-list scroll">
+            <table summary="no, 부서명(Kor), 부서명(Eng), AWS 계정, 신청기간, 수정, 삭제 항목으로 구성된 IAM 목록 입니다.">
+              <caption>
+                IAM 목록
+              </caption>
+              <colgroup>
+                <col style="width: 7%" />
+                <col style="width: 27%" />
+                <col style="width: 26%" />
+                <col style="width: 26%" />
+                <col style="width: 7%" />
+                <col style="width: 7%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col">No.</th>
+                  <th scope="col">템플릿 명</th>
+                  <th scope="col">설명</th>
+                  <th scope="col">생성시간</th>
+                  <th scope="col">선택</th>
+                  <th scope="col">삭제</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="template, templateStat : ${templates}">
+                  <td th:text="${templateStat.count}"></td>
+                  <td th:text="${template.tmpNm}"></td>
+                  <td th:text="${template.remark}"></td>
+                  <td th:text="${template.regTs}"></td>
+                  <td>
+                    <button type="button" class="btn-ok" th:attr="templateId=${template.tmpId}" onclick="selectTemplate(this.getAttribute('templateId'))" ><span class="hide">선택</span></button>
+                  </td>
+                  <td>
+                    <button type="button" class="btn-delete"><span class="hide">삭제</span></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+  <script>
+    function selectTemplate(templateId){
+      console.log(templateId)
+      var requestData = {
+        templateId : templateId
+      }
+
+      $.ajax({
+        url: '/getTemplate',
+        data: requestData,
+        method: 'POST',
+        dataType: "json",
+        success: function (responseData) {
+          console.log(reseponseData)
+        },
+        error: function () {
+          alert("서버에 접속할 수 없습니다.")
+        }
+      })
+    }
+
+  </script>
+</html>

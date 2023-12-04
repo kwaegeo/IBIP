@@ -13,13 +13,12 @@ import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -76,13 +75,34 @@ public class TemplateController {
 
     @PostMapping("/createTemplate")
     @ResponseBody
-    public String createTemplate(@RequestBody ReqTemplateVO templateInfo, HttpServletRequest request){
+    public ResVO createTemplate(@RequestBody ReqTemplateVO templateInfo, HttpServletRequest request){
         System.out.println(templateInfo);
 
         templateService.createTemplate(templateInfo);
 
-        return "zz";
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
+    @GetMapping("/openTemplateList")
+    public String openTemplateList(@RequestParam String reportId, String userId, HttpServletRequest request, HttpServletResponse response, Model model) throws WebObjectsException {
+
+        System.out.println(reportId);
+        System.out.println(userId);
+
+        List<TemplateVO> templates = templateService.selectTemplate(reportId, userId);
+        model.addAttribute("templates", templates);
+
+        return "/template/templateList";
     }
 
 
+    @PostMapping("/getTemplate")
+    @ResponseBody
+    public String getTemplate(@RequestBody String templateId,  HttpServletRequest request, HttpServletResponse response){
+        System.out.println(templateId);
+        ReportVO reportTemplateInfo = templateService.getTemplate(templateId);
+        return "zz";
+    }
 }
+
+

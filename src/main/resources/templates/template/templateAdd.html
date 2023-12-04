@@ -207,13 +207,13 @@
           console.log(data.code)
           console.log(data.msg)
 
-          if (data.code == "E24") {
-            alert("입력하지 않은 항목이 있습니다.");
-            return;
+          if (data.code == "S00") {
+            alert("성공적으로 템플릿이 저장되었습니다.");
+            window.close();
           }
           // 나올수 없는 오류 (방어목적)
-          else if (data.code == "E23") {
-            alert("이미 존재하는 부서입니다.");
+          else{
+            alert(data.msg);
             return;
           }
 

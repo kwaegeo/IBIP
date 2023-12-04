@@ -637,7 +637,7 @@
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="templateSave('${reportInfo.reportId}', '${reportInfo.documentType}')"> 템플릿 저장</button>
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4"> 템플릿 불러오기</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="getTemplateList('${reportInfo.reportId}')"> 템플릿 불러오기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'P', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> PDF 내보내기</button>
                             </div>
@@ -701,10 +701,10 @@
                 var elementType = $(this).attr('type');
 
                 if((elementType === 'checkbox' || elementType === 'radio') && $(this).is(':checked')){
-                    elements.push({elementId : $(this).attr('id'), elementNm: $(this).next("label").text()})
+                    elements.push({elementId : $(this).attr('id'), elementNm: $(this).next("label").text(), promptId: promptInfo.promptId})
                 }
                 else if(elementType === 'selectbox' && $(this).is(':selected')){
-                    elements.push({elementId: $(this).attr('id'), elementNm: $(this).attr('text')})
+                    elements.push({elementId: $(this).attr('id'), elementNm: $(this).attr('text'), promptId: promptInfo.promptId})
                 }
             })
 
@@ -733,10 +733,10 @@
                 var entityType = $(this).attr('type');
 
                 if((entityType === 'checkbox' || entityType === 'radio') && $(this).is(':checked')){
-                    entities.push({entityId: $(this).attr('id'), entityNm: $(this).next("label").text(), entityType: $(this).attr('entityType')})
+                    entities.push({entityId: $(this).attr('id'), entityNm: $(this).next("label").text(), entityType: $(this).attr('entityType'), promptId: promptInfo.promptId})
                 }
                 else if(entityType === 'selectbox' && $(this).is(':selected')){
-                    entities.push({entityId: $(this).attr('id'), entityNm: $(this).attr('text'), entityType: $(this).attr('entityType')})
+                    entities.push({entityId: $(this).attr('id'), entityNm: $(this).attr('text'), entityType: $(this).attr('entityType'), promptId: promptInfo.promptId})
                 }
             })
             promptInfo.entity = entities;
@@ -1322,6 +1322,10 @@
                 alert("서버에 접속할 수 없습니다.")
             }
         })
+    }
+
+    function getTemplateList(reportId){
+        window.open('/openTemplateList?reportId='+reportId+'&userId='+userId, '', 'width=1000,height=400,location=no,status=no,scrollbars=yes');
     }
 </script>
 </body>

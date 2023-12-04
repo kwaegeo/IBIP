@@ -38,9 +38,86 @@
              #{tmpNm},
              #{remark}
              )
+        <selectKey keyProperty="tmpId" resultType="string" order="AFTER">
+            SELECT
+                tmp_id
+            FROM
+                tb_template
+            WHERE
+                tmp_nm = #{tmpNm}
+        </selectKey>
     </insert>
-    <insert id="insertPrompts" parameterType="com.insdiide.ibip.domain.prompt.vo.PromptVO">
+    <insert id="insertPrompts" parameterType="java.util.List">
+        INSERT INTO
+            tb_prompt
+            (
+             prpt_id,
+             prpt_mstr_id,
+             tmp_id,
+             prpt_type,
+             prpt_nm,
+             prpt_desc,
+             attr_id
+            )
+        VALUES
+            <foreach collection="list" item="item" separator=",">
+            (
+            'PR' || TO_CHAR(CURRENT_TIMESTAMP, 'YYMMDDHH24MISS') || LPAD(nextval('seq_tb_prompt')::text, 6, '0'),
+             #{item.tmpId},
+             #{item.promptId},
+             #{item.promptType},
+             #{item.promptNm},
+             #{item.promptDesc},
+             #{item.attrId}
+            )
+            </foreach>
+    </insert>
 
+    <insert id="insertEntity" parameterType="java.util.List">
+        INSERT INTO
+        tb_entity
+        (
+        entn_id,
+        entn_mstr_id,
+        prpt_id,
+        entn_type,
+        entn_nm,
+        default_yn
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            'EN' || TO_CHAR(CURRENT_TIMESTAMP, 'YYMMDDHH24MISS') || LPAD(nextval('seq_tb_entity')::text, 6, '0'),
+            #{item.entityId},
+            #{item.promptId},
+            #{item.entityType},
+            #{item.entityNm},
+            #{item.defaultAnswerYn}
+            )
+        </foreach>
     </insert>
+
+    <select id="getTemplate" resultType="com.insdiide.ibip.domain.prompt.vo.ObjectVO">
+        SELECT
+            *
+        FROM
+            tb_entity
+        WHERE
+            tmp_id=#{templateId}
+    </select>
+
+    <select id="selectTemplate" resultType="com.insdiide.ibip.domain.template.TemplateVO">
+        SELECT
+            *
+        FROM
+            tb_template
+        WHERE
+            report_id=#{reportId}
+        AND
+            user_id=#{userId}
+    </select>
+
+
+
 </mapper>
 
