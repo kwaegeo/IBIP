@@ -169,4 +169,23 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
         return subList;
     }
 
+    @GetMapping("/adminPage")
+    public String adminPage( HttpServletRequest request, HttpServletResponse response, Model model) throws WebObjectsException {
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        //3. 사용자 정보 가져오기
+        UserInfoVO userInfo = mainService.getUserInfo(mstrSessionId);
+        model.addAttribute("userInfo", userInfo);
+
+        return "/admin/group/admin";
+    }
+
 }

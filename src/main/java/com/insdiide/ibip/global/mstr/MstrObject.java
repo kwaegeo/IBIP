@@ -1,26 +1,26 @@
 package com.insdiide.ibip.global.mstr;
 
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
+import com.insdiide.ibip.domain.admin.group.vo.GroupVO;
 import com.insdiide.ibip.domain.login.vo.FolderVO;
 import com.insdiide.ibip.domain.main.vo.SearchResultVO;
 import com.insdiide.ibip.domain.main.vo.SearchVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.domain.prompt.vo.PromptVO;
-import com.insdiide.ibip.domain.prompt.vo2.PromptDataVO;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
 import com.insdiide.ibip.global.mstr.prompt.ConstantPrompt;
 import com.insdiide.ibip.global.mstr.prompt.ElementPrompt;
 import com.insdiide.ibip.global.mstr.prompt.ObjectPrompt;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.web.objects.admin.users.WebUser;
-import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
-import com.microstrategy.webapi.EnumDSSXMLPrivilegeTypes;
-import com.microstrategy.webapi.EnumDSSXMLSearchFlags;
-import com.microstrategy.webapi.EnumDSSXMLStatus;
+import com.microstrategy.web.objects.admin.users.WebUserGroup;
+import com.microstrategy.web.objects.admin.users.WebUserList;
+import com.microstrategy.webapi.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 @Component
@@ -323,5 +323,99 @@ public class MstrObject extends MstrSession{
             return reportInfo;
         }
 
+    public List<GroupVO> getGroupList() throws WebObjectsException {
 
+//        WebObjectInfo woi = factory.getObjectSource().getObject("73F7482611D3596C60001B8F67019608", EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+//        woi.populate();
+//
+//        woi.
+//        WebUserGroup group = (WebUserGroup) woi;
+//        WebUserList members = group.getMembers();
+//        Enumeration userEnum = members.elements();
+//        WebUser user = null;
+//        int a=1;
+//        while(userEnum.hasMoreElements()){
+//            a++;
+//            user = (WebUser) userEnum.nextElement();
+//            System.out.println("User member = " + user.getName() +
+//                    " enabled: " + user.isEnabled());
+//        }
+//        System.out.println(a);
+
+        WebObjectSource wos = factory.getObjectSource();
+        WebSearch search = wos.getNewSearchObject();
+        search.setDisplayName("*");
+        search.setSearchFlags(search.getSearchFlags() | EnumDSSXMLSearchFlags.DssXmlSearchAbbreviationWildCard);
+        search.setAsync(false);
+
+//        search.types().add(new Integer(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser));
+//        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainRepository);
+//        search.types().add(new Integer(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup));
+
+        //search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+        search.types().add(new Integer(EnumDSSXMLObjectTypes.DssXmlTypeUser));
+
+        search.setSearchRoot("73F7482611D3596C60001B8F67019608");
+//        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchConfigurationAndAllProjects);
+        search.submit();
+
+        WebFolder f = search.getResults();
+//        f.populate();
+        System.out.println("After search: " + f.size());
+
+        WebObjectInfo objectInfo = null;
+
+        if (f.size() > 0) {
+            for (int i = 0; i < f.size(); i++) {
+                objectInfo = f.get(i);
+                System.out.println(objectInfo.getDisplayName());
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    public List<GroupVO> getGrupList() throws WebObjectsException {
+
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+        WebObjectInfo woi = objectSource.getObject("3D0F5EF8978D4AE086012C196BF01EBA" ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+        //채워넣기
+        woi.populate();
+
+        // 사용자 그룹 객체
+        WebUserGroup groups = (WebUserGroup) woi;
+
+        //MicroStrategy Groups하위의 모든 그룹 가져오기위한 UserList 객체 초기화
+        WebUserList members = groups.getMembers();
+
+        //하위 요소들을 Enumeration으로 치환
+        Enumeration  enumeration = members.elements();
+
+        //WebUserGroup 객체 선언
+        WebUserGroup group = null;
+        List<GroupVO> groupList = new ArrayList<>();
+
+        // 객체 수 만큼 반복
+        while(enumeration.hasMoreElements()){
+            //그룹 채워넣기
+            group = (WebUserGroup) enumeration.nextElement();
+            group.populate();
+
+            if(group.isGroup()){
+                groupList.add(GroupVO.builder().
+                        groupId(group.getID()).
+                        groupNm(group.getName()).
+                        childCnt(group.getTotalChildCount()).
+                        description(group.getDescription()).
+                        creationTime(group.getCreationTime()).
+                        owner(group.getOwner().getName()).
+                        build()
+                );
+            }
+        }
+        return groupList;
+    }
 }
