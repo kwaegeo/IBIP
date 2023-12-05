@@ -410,7 +410,7 @@ public class MstrObject extends MstrSession{
                         groupNm(group.getName()).
                         childCnt(group.getTotalChildCount()).
                         description(group.getDescription()).
-                        creationTime(group.getCreationTime()).
+                        creationTime("group.getCreationTime()").
                         owner(group.getOwner().getName()).
                         build()
                 );

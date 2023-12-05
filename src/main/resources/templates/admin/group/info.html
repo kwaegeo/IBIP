@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>그룹 정보</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+    <!-- JS -->
+    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/common.js" defer></script>
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+      <div class="popup__head">
+        <h1>IBIP</h1>
+        <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+      </div>
+      <div class="popup__body">
+        <section>
+          <!--230222, section내용 전체 수정됨-->
+          <h2>그룹 정보</h2>
+          <div class="search">
+            <form action="#" method="" name="userform">
+              <fieldset>
+                <legend>정책 정보</legend>
+                <ul class="form-input">
+                  <li>
+                    <div class="input-area">
+                      <label for="id">부서명</label>
+                      <select id="id">
+                        <option>전체</option>
+                        <option>특수사업팀</option>
+                        <option>전략사업팀</option>
+                      </select>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="input-area">
+                      <label for="name3">사용자명</label>
+                      <input type="text" id="name3" />
+                    </div>
+                    <div class="input-area">
+                      <label for="id">사용자 ID</label>
+                      <input type="text" id="id" />
+                    </div>
+                  </li>
+                  <li>
+                    <div class="input-area">
+                      <label for="rank">직급</label>
+                      <input type="text" id="rank" />
+                    </div>
+                    <div class="input-area">
+                      <label for="eamil">이메일</label>
+                      <input type="text" id="eamil" value="hgd@example.com" />
+                    </div>
+                  </li>
+                </ul>
+              </fieldset>
+            </form>
+          </div>
+        </section>
+        <section>
+          <h3>정책</h3>
+          <div class="box">
+            <div class="tbl-top">
+              <!--230222, search 추가됨 / 기존의 right, left 태그는 전체 삭제-->
+              <div class="search">
+                <form action="#" method="" name="searchform">
+                  <fieldset>
+                    <legend>정책 조회</legend>
+                    <ul class="form-input">
+                      <li>
+                        <div class="input-area">
+                          <label for="s2">구분</label>
+                          <select id="s2">
+                            <option>전체</option>
+                          </select>
+                        </div>
+                        <div class="input-area">
+                          <label for="s3">서비스</label>
+                          <select id="s3">
+                            <option>전체</option>
+                          </select>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="input-area">
+                          <label for="s4">역할</label>
+                          <select id="s4">
+                            <option>전체</option>
+                          </select>
+                        </div>
+                        <div class="input-area">
+                          <label for="rd">할당여부</label>
+                          <div class="radioBox">
+                            <label for="rd1"><input type="radio" id="rd1" name="rd" />전체</label>
+                            <label for="rd2"><input type="radio" id="rd2" name="rd" checked="" />할당</label>
+                            <label for="rd3"><input type="radio" id="rd3" name="rd" />미할당</label>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </fieldset>
+                </form>
+                <div class="btn-wrap">
+                  <button type="button" class="btn-search"><span>조회</span></button>
+                </div>
+              </div>
+            </div>
+            <!--스크롤 테이블에 scroll 클래스 추가-->
+            <!--230222, 테이블 항목 수정-->
+            <div class="tbl-list scroll">
+              <table summary="선택, 할당유무, 사용자id, 사용자명, 생성일시 항목으로 구성된 사용자 관리 리스트 입니다.">
+                <caption>
+                  사용자 정책 관리 리스트
+                </caption>
+                <colgroup>
+                  <col style="width: 10%" />
+                  <col style="width: 12%" />
+                  <col style="width: 12%" />
+                  <col style="width: 22%" />
+                  <col style="width: 22%" />
+                  <col style="width: 22%" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <input type="checkbox" id="c1" name="chk" />
+                    </th>
+                    <th scope="col">할당유무</th>
+                    <th scope="col">구분</th>
+                    <th scope="col">서비스명</th>
+                    <th scope="col">역할(경로)명</th>
+                    <th scope="col">정책명</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="checkbox" id="c2" name="chk" /></td>
+                    <td>N</td>
+                    <td>kv</td>
+                    <td>kv-test-01</td>
+                    <td>csr-01</td>
+                    <td>K/V 관리자용</td>
+                  </tr>
+                  <!--기할당자인 경우 tr에 pick 클래스 추가-->
+                  <tr class="pick">
+                    <td><input type="checkbox" id="c3" name="chk" /></td>
+                    <td>N</td>
+                    <td>kv</td>
+                    <td>kv-test-01</td>
+                    <td>csr-01</td>
+                    <td>K/V 관리자용</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!--230222, tbl-bottom 위치 수정 : <div class="box"> 안으로 이동-->
+            <div class="tbl-bottom">
+              <div class="left">
+                <button type="button"><span>할당</span></button>
+                <button type="button"><span>회수</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!--230222, 버튼 영역 수정-->
+      <div class="popup__footer">
+        <button type="button" class="pop-close bg-gray"><span>취소</span></button>
+        <button type="button"><span>저장</span></button>
+      </div>
+    </div>
+  </body>
+</html>

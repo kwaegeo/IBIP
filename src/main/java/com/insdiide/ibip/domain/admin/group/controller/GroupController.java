@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,4 +49,15 @@ public class GroupController {
         return groupList;
     }
 
+    @GetMapping("/groupInfo")
+    public String groupInfo(@RequestParam String groupId, HttpServletRequest request, HttpServletResponse response, Model model){
+
+        return "/admin/group/info";
+    }
+
+    @GetMapping("/groupAdd")
+    public String groupAdd(HttpServletRequest request, HttpServletResponse response, Model model){
+
+        return "/admin/group/add";
+    }
 }

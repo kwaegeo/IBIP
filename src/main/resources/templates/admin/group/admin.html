@@ -358,7 +358,7 @@
                 <div class="container-fluid" name="">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h3 class="h5 text-gray-800 md-18">그룹 관리 총 ${responseData.length}건</h3>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">그룹 생성</a>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" onclick="window.open('/groupAdd', '', 'width=1000,height=400,location=no,status=no,scrollbars=yes')">그룹 생성</a>
                     </div>
 
                     <div class="rows">
@@ -374,9 +374,9 @@
                                                                 <tr role="row">
                                                                     <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;" aria-sort="ascending">그룹명
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;" aria-sort="ascending">사용자 수
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 8%;" aria-sort="ascending">사용자 수
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 58%;">설명
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 55%;">설명
                                                                     </th>
                                                                     <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 15%;">생성일자
                                                                     </th>
@@ -390,7 +390,7 @@
                         inputTable +=
                             `
                             <tr class="odd">
-                                <td><a href="#" onclick="getGroupInfo('${responseData.groupId}')">${responseData[i].groupNm}</a></td>
+                                <td><a href="#" onclick="getGroupInfo('${responseData[i].groupId}')">${responseData[i].groupNm}</a></td>
                                 <td>${responseData[i].childCnt}</td>
                                 <td>${responseData[i].description}</td>
                                 <td>${responseData[i].creationTime}</td>
@@ -425,6 +425,7 @@
 
     function getGroupInfo(groupId){
         alert(groupId);
+        window.open("/groupInfo?groupId="+groupId,'', 'width=1000,height=400,location=no,status=no,scrollbars=yes');
     }
 </script>
 </html>
