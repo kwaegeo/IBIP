@@ -362,4 +362,13 @@ public class FolderController {
 
     }
 
+//    @GetMapping("/userInfo")
+//    @ResponseBody
+//    public String userInfo() throws WebObjectsException {
+//        folderService.getUserInfo();
+//        return "zz";
+//    }
+
+
+
 }

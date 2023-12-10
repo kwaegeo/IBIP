@@ -1,6 +1,9 @@
 package com.insdiide.ibip.domain.admin.group.vo;
 
+import com.insdiide.ibip.domain.admin.user.vo.UserVO;
 import lombok.*;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,4 +23,8 @@ public class GroupVO {
     private String creationTime;
 
     private String owner;
+
+    private List<UserVO> users;
+
+    private List<GroupVO> childGroups;
 }

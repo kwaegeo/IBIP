@@ -25,4 +25,5 @@ public class Test2Controller {
         return "/template/templateAdd";
     }
 
+
 }

@@ -1,5 +1,6 @@
 package com.insdiide.ibip.global.mstr;
 
+import com.insdiide.ibip.domain.admin.user.vo.UserVO;
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.admin.group.vo.GroupVO;
 import com.insdiide.ibip.domain.login.vo.FolderVO;
@@ -8,13 +9,16 @@ import com.insdiide.ibip.domain.main.vo.SearchVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.domain.prompt.vo.PromptVO;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
+import com.insdiide.ibip.global.exception.code.ResultCode;
 import com.insdiide.ibip.global.mstr.prompt.ConstantPrompt;
 import com.insdiide.ibip.global.mstr.prompt.ElementPrompt;
 import com.insdiide.ibip.global.mstr.prompt.ObjectPrompt;
+import com.insdiide.ibip.global.vo.ResVO;
+import com.microstrategy.web.beans.BeanFactory;
+import com.microstrategy.web.beans.UserGroupBean;
+import com.microstrategy.web.beans.WebBeanException;
 import com.microstrategy.web.objects.*;
-import com.microstrategy.web.objects.admin.users.WebUser;
-import com.microstrategy.web.objects.admin.users.WebUserGroup;
-import com.microstrategy.web.objects.admin.users.WebUserList;
+import com.microstrategy.web.objects.admin.users.*;
 import com.microstrategy.webapi.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -40,6 +44,12 @@ public class MstrObject extends MstrSession{
         serverSession.setSessionID(mstrSessionId);
     }
 
+    public void testUser() throws WebObjectsException {
+        WebObjectInfo user = serverSession.getUserInfo();
+        System.out.println(user.getAbbreviation());
+        System.out.println(user.getComments());
+        System.out.println(user._getObKey());
+    }
 
     //하위 폴더 요소 가져오기
     public List<FolderVO> getSubfolderList(String folderId) throws WebObjectsException {
@@ -323,64 +333,185 @@ public class MstrObject extends MstrSession{
             return reportInfo;
         }
 
-    public List<GroupVO> getGroupList() throws WebObjectsException {
-
-//        WebObjectInfo woi = factory.getObjectSource().getObject("73F7482611D3596C60001B8F67019608", EnumDSSXMLObjectTypes.DssXmlTypeFolder);
-//        woi.populate();
-//
-//        woi.
-//        WebUserGroup group = (WebUserGroup) woi;
-//        WebUserList members = group.getMembers();
-//        Enumeration userEnum = members.elements();
-//        WebUser user = null;
-//        int a=1;
-//        while(userEnum.hasMoreElements()){
-//            a++;
-//            user = (WebUser) userEnum.nextElement();
-//            System.out.println("User member = " + user.getName() +
-//                    " enabled: " + user.isEnabled());
-//        }
-//        System.out.println(a);
+    public List<GroupVO> getGroupTest() throws WebObjectsException {
 
         WebObjectSource wos = factory.getObjectSource();
         WebSearch search = wos.getNewSearchObject();
-        search.setDisplayName("*");
-        search.setSearchFlags(search.getSearchFlags() | EnumDSSXMLSearchFlags.DssXmlSearchAbbreviationWildCard);
+        search.setNamePattern("*" + "" + "*");
+        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+
         search.setAsync(false);
+        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
+        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
 
-//        search.types().add(new Integer(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser));
-//        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainRepository);
-//        search.types().add(new Integer(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup));
-
-        //search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-        search.types().add(new Integer(EnumDSSXMLObjectTypes.DssXmlTypeUser));
-
-        search.setSearchRoot("73F7482611D3596C60001B8F67019608");
-//        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchConfigurationAndAllProjects);
         search.submit();
 
         WebFolder f = search.getResults();
 //        f.populate();
         System.out.println("After search: " + f.size());
 
-        WebObjectInfo objectInfo = null;
-
         if (f.size() > 0) {
             for (int i = 0; i < f.size(); i++) {
-                objectInfo = f.get(i);
-                System.out.println(objectInfo.getDisplayName());
+                WebUserGroup groups= (WebUserGroup) f.get(i);
+                System.out.println(groups.getDisplayName());
             }
         }
         return new ArrayList<>();
     }
 
-    public List<GroupVO> getGrupList() throws WebObjectsException {
+//    public List<GroupVO> getGroupList() throws WebObjectsException {
+//
+//        //ObjectSourcec 객체 생성
+//        WebObjectSource objectSource = factory.getObjectSource();
+//
+//        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+//        WebObjectInfo woi = objectSource.getObject("3D0F5EF8978D4AE086012C196BF01EBA" ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+//
+//        //채워넣기
+//        woi.populate();
+//
+//        // 사용자 그룹 객체
+//        WebUserGroup groups = (WebUserGroup) woi;
+//
+//        //MicroStrategy Groups하위의 모든 그룹 가져오기위한 UserList 객체 초기화
+//        WebUserList members = groups.getMembers();
+//
+//        //하위 요소들을 Enumeration으로 치환
+//        Enumeration  enumeration = members.elements();
+//
+//        //WebUserGroup 객체 선언
+//        WebUserGroup group = null;
+//        List<GroupVO> groupList = new ArrayList<>();
+//
+//        // 객체 수 만큼 반복
+//        while(enumeration.hasMoreElements()){
+//            //그룹 채워넣기
+//            group = (WebUserGroup) enumeration.nextElement();
+//            group.populate();
+//
+//            if(group.isGroup()){
+//                groupList.add(GroupVO.builder().
+//                        groupId(group.getID()).
+//                        groupNm(group.getName()).
+//                        childCnt(group.getTotalChildCount()).
+//                        description(group.getDescription()).
+//                        creationTime(group.getCreationTime()).
+//                        owner(group.getOwner().getName()).
+//                        build()
+//                );
+//            }
+//        }
+//        return groupList;
+//    }
+
+    public List<GroupVO> getGroupList() throws WebObjectsException {
+
+        WebObjectSource wos = factory.getObjectSource();
+
+        WebSearch search = wos.getNewSearchObject();
+
+        search.setNamePattern("*" + "" + "*");
+        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+        search.setAsync(false);
+        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
+        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+        search.submit();
+        WebFolder f = search.getResults();
+
+        System.out.println("그룹 총 갯수: " + f.size());
+
+        List<GroupVO> groupList = new ArrayList<>();
+
+        if (f.size() > 0) {
+            for (int i = 0; i < f.size(); i++) {
+                WebUserGroup group= (WebUserGroup) f.get(i);
+                group.populate();
+                if(group.isGroup()){
+                    groupList.add(GroupVO.builder().
+                            groupId(group.getID()).
+                            groupNm(group.getName()).
+                            childCnt(group.getTotalChildCount()).
+                            description(group.getDescription()).
+                            creationTime(group.getCreationTime()).
+                            owner(group.getOwner().getName()).
+                            build()
+                    );
+                }
+            }
+        }
+        return groupList;
+    }
+
+
+    public ResVO addGroup(){
+
+        WebObjectSource wos = factory.getObjectSource();
+        WebUserServicesSource wuss = wos.getUserServicesSource();
+        UserGroupBean group = null;
+
+        try {
+            group = (UserGroupBean) BeanFactory.getInstance().newBean("UserGroupBean");
+            group.setSessionInfo(serverSession);
+            group.InitAsNew();
+            group.getUserEntityObject().setFullName("testGroup");
+            group.save();
+
+        } catch (WebBeanException ex) {
+            System.out.println("Error creating  group: " + ex.getMessage());
+        }
+
+
+        return new ResVO();
+    }
+
+    public ResVO delGroup() throws WebObjectsException {
+
+        WebObjectSource wos = factory.getObjectSource();
+
+        // Getting the User Group Object
+        WebUserEntity userEntity = (WebUserEntity)wos.getObject("934800724391EF4AFB42E289C3F3F397", EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+        // Deleting the User Group Object
+        wos.deleteObject(userEntity);
+        System.out.println("Done");
+
+        return new ResVO();
+    }
+
+    //그룹 정보
+    public GroupVO getGroupInfo(String groupId) throws WebObjectsException {
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+        WebObjectInfo woi = objectSource.getObject(groupId ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+        //채워넣기
+        woi.populate();
+
+        // 사용자 그룹 객체
+        WebUserGroup group = (WebUserGroup) woi;
+        group.populate();
+        GroupVO groupInfo = GroupVO.builder().
+                groupId(group.getID()).
+                groupNm(group.getDisplayName()).
+                childCnt(group.getTotalChildCount()).
+                creationTime(group.getCreationTime()).
+                description(group.getDescription()).
+                owner(group.getOwner().getDisplayName()).
+                build();
+        return groupInfo;
+    }
+
+    //그룹에 포함된 사용자 정보
+    public GroupVO getGroupUserList(GroupVO groupInfo) throws WebObjectsException {
 
         //ObjectSourcec 객체 생성
         WebObjectSource objectSource = factory.getObjectSource();
 
         //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
-        WebObjectInfo woi = objectSource.getObject("3D0F5EF8978D4AE086012C196BF01EBA" ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+        WebObjectInfo woi = objectSource.getObject(groupInfo.getGroupId() ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
         //채워넣기
         woi.populate();
@@ -391,31 +522,148 @@ public class MstrObject extends MstrSession{
         //MicroStrategy Groups하위의 모든 그룹 가져오기위한 UserList 객체 초기화
         WebUserList members = groups.getMembers();
 
+        System.out.println(members.size());
+
         //하위 요소들을 Enumeration으로 치환
         Enumeration  enumeration = members.elements();
 
-        //WebUserGroup 객체 선언
-        WebUserGroup group = null;
-        List<GroupVO> groupList = new ArrayList<>();
+        List<UserVO> users = new ArrayList<>();
+        List<GroupVO> childGroups = new ArrayList<>();
+        WebObjectInfo enumWoi = null;
+        List<String> assignIds = new ArrayList<>();
 
         // 객체 수 만큼 반복
         while(enumeration.hasMoreElements()){
-            //그룹 채워넣기
-            group = (WebUserGroup) enumeration.nextElement();
-            group.populate();
 
-            if(group.isGroup()){
-                groupList.add(GroupVO.builder().
-                        groupId(group.getID()).
-                        groupNm(group.getName()).
-                        childCnt(group.getTotalChildCount()).
-                        description(group.getDescription()).
-                        creationTime("group.getCreationTime()").
-                        owner(group.getOwner().getName()).
-                        build()
-                );
+            //그룹 채워넣기
+            enumWoi = (WebObjectInfo) enumeration.nextElement();
+
+            //WEBUSER로 캐스팅 불가능 한 것은 try catch로 묶던가 하자
+            enumWoi.populate();
+            System.out.println(enumWoi.getSubType());
+            if(enumWoi.getSubType() == 8704) {
+                WebUser user = (WebUser) enumWoi;
+                    assignIds.add(enumWoi.getID());
+            }
+            /**
+             * 그룹할당의 경우를 생각
+             * **/
+//            else if(enumWoi.getSubType() == 8705){
+//                WebUserGroup group = (WebUserGroup) enumWoi;
+//                childGroups.add(GroupVO.builder().
+//                        groupId(group.getID()).
+//                        groupNm(group.getDisplayName()).
+//                        childCnt(group.getTotalChildCount()).
+//                        creationTime(group.getCreationTime()).
+//                        description(group.getDescription()).
+//                        owner(group.getOwner().getDisplayName()).
+//                        build()
+//                );
+//            }
+        }
+        groupInfo.setUsers(users);
+        groupInfo.setChildGroups(childGroups);
+
+        WebSearch search = objectSource.getNewSearchObject();
+
+        search.setNamePattern("*" + "" + "*");
+        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+        search.setAsync(false);
+        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser);
+        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+        search.submit();
+        WebFolder f = search.getResults();
+
+        System.out.println("사용자 총 갯수: " + f.size());
+        System.out.println(assignIds);
+
+        if (f.size() > 0) {
+            for (int i = 0; i < f.size(); i++) {
+                WebUser user= (WebUser) f.get(i);
+                user.populate();
+                if(!user.isGroup()){
+                    String assignYn = "N";
+
+                    // Check if the user ID is in assignIds
+                    if (assignIds.contains(user.getID())) {
+                        assignYn = "Y";
+                    }
+
+                    users.add(UserVO.builder().
+                            userId(user.getID()).
+                            loginID(user.getLoginName()).
+                            userNm(user.getDisplayName()).
+                            owner(user.getOwner().getDisplayName()).
+                            modification(user.getModificationTime()).
+                            description(user.getDescription()).
+                            assignYn(assignYn).
+                            enableYn(user.isEnabled()).
+                            build()
+                    );
+                }
             }
         }
-        return groupList;
+        return groupInfo;
+    }
+
+    public ResVO assign(GroupVO groupInfo){
+
+        //검색말고 webObjectSource로 그냥 가져와서 넣는 걸로 ㅇㅋㅇㅋ
+        
+        
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        WebSearch groupSearch = objectSource.getNewSearchObject();
+        groupSearch.setNamePattern(groupInfo.getGroupId());
+        groupSearch.setAsync(false);
+        groupSearch.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
+        groupSearch.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+        try {
+            WebUserGroup group = (WebUserGroup)performSearch(groupSearch);
+            if(group!=null){
+                for(int i=0; i<groupInfo.getUsers().size(); i++){
+                    WebSearch userSearch = objectSource.getNewSearchObject();
+                    userSearch.setAbbreviationPattern(groupInfo.getUsers().get(i).getUserId());
+                    userSearch.setAsync(false);
+                    userSearch.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser);
+                    userSearch.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+                    WebUser user = (WebUser) performSearch(userSearch);
+                    System.out.println("뭐여");
+                    System.out.println(user.getAbbreviation());
+
+                    //Add user to group
+                    if(user!=null){
+                        group.getMembers().add(user);
+                    }
+                }
+            }
+            //Save the group object
+            objectSource.save(group);
+        } catch (WebObjectsException e) {
+            e.printStackTrace();
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
+    public static Object performSearch(WebSearch search){
+        try {
+            search.submit();
+            WebFolder folder = search.getResults();
+            if(folder.size()>0){
+                if(folder.size()==1){
+                    return folder.get(0);
+                } else {
+                    System.out.println("Search returns more than 1 object, returning first object");
+                    return folder.get(0);
+                }
+            }
+        } catch (WebObjectsException ex) {
+            System.out.println("Error performing search: "+ex.getMessage());
+        }
+        return null;
     }
 }

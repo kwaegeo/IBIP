@@ -62,13 +62,6 @@
         <!-- Divider -->
         <hr class="sidebar-divider my-0">
 
-        <!-- Nav Item - Dashboard -->
-        <li class="nav-item active">
-            <a class="nav-link" href="index.html">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span></a>
-        </li>
-
         <!-- Divider -->
         <hr class="sidebar-divider">
 
@@ -79,16 +72,10 @@
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" onclick="getGroupList()" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+            <a class="nav-link collapsed" onclick="getGroupList()" href="#" >
                 <i class="fas fa-fw fa-cog"></i>
                 <span>그룹 관리</span>
             </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="#">Buttons</a>
-                    <a class="collapse-item" href="#">Cards</a>
-                </div>
-            </div>
         </li>
 
         <!-- Nav Item - Utilities Collapse Menu -->
@@ -204,9 +191,11 @@
                     </div>
                 </div>
 
+                <a href="/main" class="btn btn-icon-split btn-sm"><span
+                        class="text btn-text-responsive">사용자</span></a>
 
                 <!-- Topbar Navbar -->
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav">
 
                     <!-- Nav Item - Search Dropdown (Visible Only XS) -->
                     <li class="nav-item dropdown no-arrow d-sm-none">
@@ -374,7 +363,7 @@
                                                                 <tr role="row">
                                                                     <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;" aria-sort="ascending">그룹명
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 8%;" aria-sort="ascending">사용자 수
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 8%;" aria-sort="ascending">하위 개체 수
                                                                     </th>
                                                                     <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 55%;">설명
                                                                     </th>
@@ -425,7 +414,7 @@
 
     function getGroupInfo(groupId){
         alert(groupId);
-        window.open("/groupInfo?groupId="+groupId,'', 'width=1000,height=400,location=no,status=no,scrollbars=yes');
+        window.open("/groupInfo?groupId="+groupId,'', 'width=995,height=813,location=no,status=no,scrollbars=yes');
     }
 </script>
 </html>
