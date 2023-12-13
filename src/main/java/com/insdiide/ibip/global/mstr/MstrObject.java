@@ -607,37 +607,26 @@ public class MstrObject extends MstrSession{
         return groupInfo;
     }
 
-    public ResVO assign(GroupVO groupInfo){
+    public ResVO assign(GroupVO groupInfo) {
 
-        //검색말고 webObjectSource로 그냥 가져와서 넣는 걸로 ㅇㅋㅇㅋ
-        
-        
         //ObjectSourcec 객체 생성
         WebObjectSource objectSource = factory.getObjectSource();
 
-        WebSearch groupSearch = objectSource.getNewSearchObject();
-        groupSearch.setNamePattern(groupInfo.getGroupId());
-        groupSearch.setAsync(false);
-        groupSearch.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
-        groupSearch.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-
         try {
-            WebUserGroup group = (WebUserGroup)performSearch(groupSearch);
+            WebObjectInfo woi = objectSource.getObject(groupInfo.getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+            WebUserGroup group = (WebUserGroup) woi;
             if(group!=null){
                 for(int i=0; i<groupInfo.getUsers().size(); i++){
-                    WebSearch userSearch = objectSource.getNewSearchObject();
-                    userSearch.setAbbreviationPattern(groupInfo.getUsers().get(i).getUserId());
-                    userSearch.setAsync(false);
-                    userSearch.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser);
-                    userSearch.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-
-                    WebUser user = (WebUser) performSearch(userSearch);
-                    System.out.println("뭐여");
-                    System.out.println(user.getAbbreviation());
-
+                    WebUser webUser = (WebUser) objectSource.getObject(groupInfo.getUsers().get(i).getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
                     //Add user to group
-                    if(user!=null){
-                        group.getMembers().add(user);
+                    if(webUser!=null){
+                        if("assign".equals(groupInfo.getAssignmentType())){
+                            group.getMembers().add(webUser);
+                        }
+                        else{
+                            group.getMembers().remove(webUser);
+                        }
                     }
                 }
             }

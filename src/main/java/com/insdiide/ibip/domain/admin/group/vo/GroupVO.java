@@ -27,4 +27,6 @@ public class GroupVO {
     private List<UserVO> users;
 
     private List<GroupVO> childGroups;
+
+    private String assignmentType;
 }

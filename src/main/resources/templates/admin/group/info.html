@@ -114,8 +114,8 @@
             <!--230222, tbl-bottom 위치 수정 : <div class="box"> 안으로 이동-->
             <div class="tbl-bottom">
               <div class="left">
-                <button type="button" onclick="assign()"><span>할당</span></button>
-                <button type="button" onclick="unassign()"><span>회수</span></button>
+                <button type="button" onclick="assignment('assign')"><span>할당</span></button>
+                <button type="button" onclick="assignment('unassign')"><span>회수</span></button>
               </div>
             </div>
           </div>
@@ -195,8 +195,8 @@
     }
 
 
-    function assign() {
-      if (validCheck('assign')) {
+    function assignment(assignmentType) {
+      if (validCheck(assignmentType)) {
 
         // 1. 부서명 추출
         var groupId = $('#groupId').val();
@@ -216,11 +216,12 @@
         const data = {
           "groupId": groupId,
           "users": users,
+          "assignmentType": assignmentType
         };
 
         //2.1 사용자 할당 요청
         $.ajax({
-          url: "/groupAssign",
+          url: "/groupManageAssignment",
           data: JSON.stringify(data),
           contentType: "application/json",
           method: "POST",
@@ -233,11 +234,6 @@
           }
         });
       }
-    }
-
-
-    function unassign(){
-
     }
 
 

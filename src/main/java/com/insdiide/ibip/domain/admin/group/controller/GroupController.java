@@ -99,7 +99,7 @@ public class GroupController {
         return "일단 확인";
     }
 
-    @PostMapping("/groupAssign")
+    @PostMapping("/groupManageAssignment")
     @ResponseBody
     public ResVO groupAssign(@RequestBody GroupVO groupInfo, HttpServletRequest request, HttpServletResponse response){
         //1. 사용자 세션 (MSTR) 유효성 검사
