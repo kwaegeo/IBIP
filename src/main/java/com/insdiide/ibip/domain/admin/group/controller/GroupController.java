@@ -116,6 +116,6 @@ public class GroupController {
 
         System.out.println(groupInfo);
         ResVO result = groupService.assign(groupInfo);
-        return new ResVO(ResultCode.SUCCESS);
+        return result;
     }
 }

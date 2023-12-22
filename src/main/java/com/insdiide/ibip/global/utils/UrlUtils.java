@@ -122,9 +122,9 @@ public class UrlUtils {
 
         // Return session
         StringBuilder urlSB = new StringBuilder();
-        urlSB.append("http").append("://").append("localhost:8090"); //Web Server name and port
+        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
         urlSB.append("/MicroStrategy/servlet/mstrWeb");
-        urlSB.append("?server=").append("DESKTOP-2S8JQOO"); //I Server name
+        urlSB.append("?server=").append("192.168.70.245"); //I Server name
          urlSB.append("&port=0");
         urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
         urlSB.append("&evt=").append(evtType);

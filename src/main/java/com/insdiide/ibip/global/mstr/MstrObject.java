@@ -633,7 +633,7 @@ public class MstrObject extends MstrSession{
             //Save the group object
             objectSource.save(group);
         } catch (WebObjectsException e) {
-            e.printStackTrace();
+            return new ResVO(ResultCode.ERROR_ADD_USER);
         }
         return new ResVO(ResultCode.SUCCESS);
     }

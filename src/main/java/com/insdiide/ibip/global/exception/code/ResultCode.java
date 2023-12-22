@@ -20,6 +20,8 @@ public enum ResultCode {
 
     INVALID_REMARK("E05", "설명 유효길이를 초과 하였습니다. [200자]"),
 
+    ERROR_ADD_USER("E06", "사용자 추가 중 에러가 발생하였습니다."),
+
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다.");
 
     private final String code;

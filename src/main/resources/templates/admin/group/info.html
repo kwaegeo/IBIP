@@ -33,32 +33,41 @@
                     <div class="input-area">
                       <label for="id">그룹명</label>
                       <input type="hidden" th:value="${groupInfo.groupId}" id="groupId">
-                      <input type="text" th:value="${groupInfo.groupNm}" id="groupNm">
+                      <input type="text" name="groupInfo" th:value="${groupInfo.groupNm}" id="groupNm" disabled>
                     </div>
                   </li>
                   <li>
                     <div class="input-area">
                       <label for="name3">설명</label>
-                      <input type="text" id="name3" th:value="${groupInfo.description}"/>
+                      <input type="text" name="groupInfo" id="name3" th:value="${groupInfo.description}" disabled/>
                     </div>
                     <div class="input-area">
                       <label for="id">하위 개체 수</label>
-                      <input type="text" id="id" th:value="${groupInfo.childCnt}"/>
+                      <input type="text" name="groupInfo" id="id" th:value="${groupInfo.childCnt}"/>
                     </div>
                   </li>
                   <li>
                     <div class="input-area">
                       <label for="rank">생성일자</label>
-                      <input type="text" id="rank" th:value="${groupInfo.creationTime}"/>
+                      <input type="text" name="groupInfo" id="rank" th:value="${groupInfo.creationTime}"/>
                     </div>
                     <div class="input-area">
                       <label for="eamil">소유자</label>
-                      <input type="text" id="eamil" value="" th:value="${groupInfo.owner}"/>
+                      <input type="text" name="groupInfo" id="eamil" value="" th:value="${groupInfo.owner}"/>
                     </div>
                   </li>
                 </ul>
               </fieldset>
             </form>
+          </div>
+        </section>
+        <section>
+          <div class="tbl-top">
+            <div class="left"></div>
+            <div class="right">
+              <button type="button" id="btn-modify" class="btn-" onclick="modify(this)"><span>수정</span></button>
+              <button type="button" id="btn-delete" class="btn- bg-danger"><span>삭제</span></button>
+            </div>
           </div>
         </section>
         <section>
@@ -123,8 +132,7 @@
       </div>
       <!--230222, 버튼 영역 수정-->
       <div class="popup__footer">
-        <button type="button" class="pop-close bg-gray"><span>취소</span></button>
-        <button type="button"><span>저장</span></button>
+        <button type="button" class="pop-close bg-gray"><span>닫기</span></button>
       </div>
     </div>
   </body>
@@ -227,7 +235,18 @@
           method: "POST",
           dataType: "json",
           success: function (responseData) {
-            console.log(responseData)
+            var msg = "";
+            if(responseData.code === "S00"){
+              if(assignmentType == 'assign'){
+                msg="사용자가 정상적으로 할당되었습니다.";
+              }
+              else{
+                msg="사용자가 정상적으로 회수되었습니다.";
+              }
+              alert(msg);
+              location.reload();
+            }
+
           },
           error: function () {
             alert("서버에 접속할 수 없습니다.")
@@ -236,7 +255,11 @@
       }
     }
 
-
+  function modify(button){
+      button.classList.add("bg-green");
+      button.innerHTML = "저장";
+      $('input[name="groupInfo"]').prop('disabled', false);
+  }
 
   </script>
 </html>
