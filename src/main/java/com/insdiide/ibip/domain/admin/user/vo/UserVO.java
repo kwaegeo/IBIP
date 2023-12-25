@@ -8,16 +8,15 @@ import lombok.*;
 @ToString
 @Builder
 public class UserVO {
-
-    private String userId;
-
     private boolean enableYn;
 
-    private String assignYn;
+    private String userId;
 
     private String loginID;
 
     private String userNm;
+
+    private String assignYn;
 
     private String owner;
 

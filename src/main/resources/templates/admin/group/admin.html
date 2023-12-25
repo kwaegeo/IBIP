@@ -87,7 +87,7 @@
         </li>
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
+            <a class="nav-link collapsed" href="#" onclick="getRoleList()">
                 <i class="fas fa-fw fa-folder"></i>
                 <span>보안역할 관리</span>
             </a>
@@ -407,12 +407,100 @@
         window.open("/groupInfo?groupId="+groupId,'', 'width=995,height=813,location=no,status=no,scrollbars=yes');
     }
 
-    function getUserList(){
+    function getRoleList(){
+        $.ajax({
+            url: '/getRoleList',
+            method: 'POST',
+            dataType: "json",
+            success: function (responseData) {
+                console.log(responseData)
+            },
+        });
 
     }
 
-    function getUserInfo(userId){
+    function getUserList(){
+        $.ajax({
+            url: '/getUserList',
+            method: 'POST',
+            dataType: "json",
+            success: function (responseData) {
+                console.log(responseData)
+                var inputTable =`
 
+                <div class="container-fluid" name="">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h3 class="h5 text-gray-800 md-18">사용자 관리 총 ${responseData.length}건</h3>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" onclick="window.open('/groupAdd', '', 'width=1000,height=400,location=no,status=no,scrollbars=yes')">그룹 생성</a>
+                    </div>
+
+                    <div class="rows">
+                        <div id="contentDiv">
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                                            <div class="row" id="searchDiv">
+                                                <div class="col-sm-12">
+                                                            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+                                                                <thead>
+                                                                <tr role="row">
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 15%;" aria-sort="ascending">로그인 ID
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 15%;" aria-sort="ascending">사용자명
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;">계정상태
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">소유자
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 15%;">변경시간
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 40%;">설명
+                                                                    </th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                `;
+                for (var i = 0; i < responseData.length; i++) {
+                    inputTable +=
+                        `
+                            <tr class="odd">
+                                <td><a href="#" onclick="getUserInfo('${responseData[i].userId}')">${responseData[i].loginID}</a></td>
+                                <td>${responseData[i].userNm}</td>
+                                <td>${responseData[i].enableYn}</td>
+                                <td>${responseData[i].owner}</td>
+                                <td>${responseData[i].modification}</td>
+                                <td>${responseData[i].description}</td>
+                            </tr>
+                        `
+                }
+                inputTable +=
+                    `
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                `;
+
+                $("#main-content").empty();
+                $("#main-content").append(inputTable);
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        })
+    }
+
+    function getUserInfo(userId){
+        window.open("/userInfo?userId="+userId,'', 'width=995,height=813,location=no,status=no,scrollbars=yes');
     }
 </script>
 </html>

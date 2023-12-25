@@ -1,5 +1,6 @@
 package com.insdiide.ibip.global.mstr;
 
+import com.insdiide.ibip.domain.admin.role.vo.RoleVO;
 import com.insdiide.ibip.domain.admin.user.vo.UserVO;
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.admin.group.vo.GroupVO;
@@ -443,6 +444,79 @@ public class MstrObject extends MstrSession{
         return groupList;
     }
 
+    public List<UserVO> getUserList() throws WebObjectsException {
+
+        WebObjectSource wos = factory.getObjectSource();
+
+        WebSearch search = wos.getNewSearchObject();
+
+        search.setNamePattern("*" + "" + "*");
+        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+        search.setAsync(false);
+        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser);
+        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+        search.submit();
+        WebFolder f = search.getResults();
+
+        System.out.println("사용자 총 갯수: " + f.size());
+
+        List<UserVO> userList = new ArrayList<>();
+
+        if (f.size() > 0) {
+            for (int i = 0; i < f.size(); i++) {
+                WebUser user= (WebUser) f.get(i);
+                user.populate();
+
+                if(!user.isGroup()){
+                    userList.add(UserVO.builder().
+                            enableYn(user.isEnabled()).
+                            userId(user.getID()).
+                            loginID(user.getLoginName()).
+                            userNm(user.getDisplayName()).
+                            owner(user.getOwner().getDisplayName()).
+                            modification(user.getModificationTime()).
+                            description(user.getDescription()).
+                            build()
+                    );
+                }
+            }
+        }
+        return userList;
+    }
+
+    public List<RoleVO> getRoleList() throws WebObjectsException {
+
+        WebObjectSource wos = factory.getObjectSource();
+
+        WebSearch search = wos.getNewSearchObject();
+
+        search.setNamePattern("*" + "" + "*");
+        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+        search.setAsync(false);
+        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeSecurityRole);
+        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+        search.submit();
+        WebFolder f = search.getResults();
+
+        System.out.println("보안역할 총 갯수: " + f.size());
+
+        List<GroupVO> groupList = new ArrayList<>();
+
+        if (f.size() > 0) {
+            for (int i = 0; i < f.size(); i++) {
+                WebSecurityRole role= (WebSecurityRole) f.get(i);
+                role.populate();
+                System.out.println(role.getPrivileges());
+                System.out.println(role.getID());
+                System.out.println(role.getDisplayName());
+                System.out.println(role.getDescription());
+            }
+        }
+        return new ArrayList<>();
+    }
+
 
     public ResVO addGroup(){
 
@@ -502,6 +576,30 @@ public class MstrObject extends MstrSession{
                 owner(group.getOwner().getDisplayName()).
                 build();
         return groupInfo;
+    }
+
+    public UserVO getUserInfoById(String userId) throws WebObjectsException {
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+        WebObjectInfo woi = objectSource.getObject(userId ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+        //채워넣기
+        woi.populate();
+
+        // 사용자 그룹 객체
+        WebUser user = (WebUser) woi;
+        user.populate();
+        UserVO userInfo = UserVO.builder().
+                loginID(user.getLoginName()).
+                userNm(user.getDisplayName()).
+                owner(user.getOwner().getDisplayName()).
+                modification(user.getModificationTime()).
+                description(user.getDescription()).
+                enableYn(user.isEnabled()).
+                build();
+        return userInfo;
     }
 
     //그룹에 포함된 사용자 정보
