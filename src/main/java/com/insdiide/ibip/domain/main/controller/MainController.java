@@ -185,7 +185,7 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
         UserInfoVO userInfo = mainService.getUserInfo(mstrSessionId);
         model.addAttribute("userInfo", userInfo);
 
-        return "/admin/group/admin";
+        return "/admin/admin";
     }
 
 }

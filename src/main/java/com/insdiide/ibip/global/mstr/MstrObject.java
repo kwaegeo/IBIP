@@ -10,6 +10,7 @@ import com.insdiide.ibip.domain.main.vo.SearchVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
 import com.insdiide.ibip.domain.prompt.vo.PromptVO;
 import com.insdiide.ibip.domain.report.vo.ReportVO;
+import com.insdiide.ibip.global.exception.CustomException;
 import com.insdiide.ibip.global.exception.code.ResultCode;
 import com.insdiide.ibip.global.mstr.prompt.ConstantPrompt;
 import com.insdiide.ibip.global.mstr.prompt.ElementPrompt;
@@ -19,6 +20,7 @@ import com.microstrategy.web.beans.BeanFactory;
 import com.microstrategy.web.beans.UserGroupBean;
 import com.microstrategy.web.beans.WebBeanException;
 import com.microstrategy.web.objects.*;
+import com.microstrategy.web.objects.admin.licensing.*;
 import com.microstrategy.web.objects.admin.users.*;
 import com.microstrategy.webapi.*;
 import lombok.extern.log4j.Log4j2;
@@ -27,6 +29,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+
+import static com.microstrategy.webapi.EnumDSSXMLLicenseComplianceCategory.DssXmlLicenseComplianceCategoryActivation;
 
 @Component
 @Log4j2
@@ -107,14 +111,18 @@ public class MstrObject extends MstrSession{
     }
 
     //사용자 정보 불러오기
-    public UserInfoVO getUserInfo() throws WebObjectsException {
+    public UserInfoVO getUserInfo() {
         UserInfoVO userInfo = new UserInfoVO();
-        WebUser webUser = (WebUser)serverSession.getUserInfo();
-        userInfo.setUserId(webUser.getID());
-        userInfo.setUserName(webUser.getName());
+        try {
+            WebUser webUser = (WebUser) serverSession.getUserInfo();
+            userInfo.setUserId(webUser.getID());
+            userInfo.setUserName(webUser.getName());
 
-        if(serverSession.checkUserPrivilege(EnumDSSXMLPrivilegeTypes.DssXmlPrivilegesUseServerAdmin)&& serverSession.checkUserPrivilege(EnumDSSXMLPrivilegeTypes.DssXmlPrivilegesWebAdministrator)){
-            userInfo.setAdminYn("Y");
+            if (serverSession.checkUserPrivilege(EnumDSSXMLPrivilegeTypes.DssXmlPrivilegesUseServerAdmin) && serverSession.checkUserPrivilege(EnumDSSXMLPrivilegeTypes.DssXmlPrivilegesWebAdministrator)) {
+                userInfo.setAdminYn("Y");
+            }
+        }catch (WebObjectsException e){
+            throw new CustomException(ResultCode.MSTR_NO_SESSION);
         }
         return userInfo;
     }
@@ -502,19 +510,23 @@ public class MstrObject extends MstrSession{
 
         System.out.println("보안역할 총 갯수: " + f.size());
 
-        List<GroupVO> groupList = new ArrayList<>();
+        List<RoleVO> roleList = new ArrayList<>();
 
         if (f.size() > 0) {
             for (int i = 0; i < f.size(); i++) {
                 WebSecurityRole role= (WebSecurityRole) f.get(i);
                 role.populate();
-                System.out.println(role.getPrivileges());
-                System.out.println(role.getID());
-                System.out.println(role.getDisplayName());
-                System.out.println(role.getDescription());
+                roleList.add(RoleVO.builder().
+                        roleId(role.getID()).
+                        roleNm(role.getDisplayName()).
+                        owner(role.getOwner().getDisplayName()).
+                        modification(role.getModificationTime()).
+                        description(role.getDescription()).
+                        build()
+                );
             }
         }
-        return new ArrayList<>();
+        return roleList;
     }
 
 
@@ -592,6 +604,7 @@ public class MstrObject extends MstrSession{
         WebUser user = (WebUser) woi;
         user.populate();
         UserVO userInfo = UserVO.builder().
+                userId(user.getID()).
                 loginID(user.getLoginName()).
                 userNm(user.getDisplayName()).
                 owner(user.getOwner().getDisplayName()).
@@ -599,6 +612,24 @@ public class MstrObject extends MstrSession{
                 description(user.getDescription()).
                 enableYn(user.isEnabled()).
                 build();
+        WebUserList wul = user.getParents();
+
+        System.out.println(wul.size());
+
+        Enumeration  enumeration = wul.elements();
+        WebObjectInfo enumWoi = null;
+        // 객체 수 만큼 반복
+        while(enumeration.hasMoreElements()) {
+
+            //그룹 채워넣기
+            enumWoi = (WebObjectInfo) enumeration.nextElement();
+
+            //WEBUSER로 캐스팅 불가능 한 것은 try catch로 묶던가 하자
+            enumWoi.populate();
+            System.out.println(enumWoi.getDisplayName());
+            System.out.println(enumWoi.getID());
+        }
+
         return userInfo;
     }
 
@@ -705,7 +736,84 @@ public class MstrObject extends MstrSession{
         return groupInfo;
     }
 
-    public ResVO assign(GroupVO groupInfo) {
+    public UserVO getUserGroupList(UserVO userInfo) throws WebObjectsException {
+
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+        WebObjectInfo woi = objectSource.getObject(userInfo.getUserId() ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+        //채워넣기
+        woi.populate();
+
+        // 사용자 그룹 객체
+        WebUser user = (WebUser) woi;
+        user.populate();
+        WebUserList wul = user.getParents();
+        Enumeration  enumeration = wul.elements();
+
+        WebObjectInfo enumWoi = null;
+        List<String> assignIds = new ArrayList<>();
+
+        // 객체 수 만큼 반복
+        while(enumeration.hasMoreElements()) {
+
+            //그룹 채워넣기
+            enumWoi = (WebObjectInfo) enumeration.nextElement();
+
+            //WEBUSER로 캐스팅 불가능 한 것은 try catch로 묶던가 하자
+            enumWoi.populate();
+            assignIds.add(enumWoi.getID());
+        }
+
+        WebSearch search = objectSource.getNewSearchObject();
+
+        search.setNamePattern("*" + "" + "*");
+        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+        search.setAsync(false);
+        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
+        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+        search.submit();
+        WebFolder f = search.getResults();
+        List<GroupVO> groups = new ArrayList<>();
+        System.out.println("그룹 총 갯수: " + f.size());
+        System.out.println(assignIds);
+
+        if (f.size() > 0) {
+            for (int i = 0; i < f.size(); i++) {
+                WebUserGroup group= (WebUserGroup) f.get(i);
+                group.populate();
+                if(group.isGroup()){
+                    String assignYn = "N";
+
+                    // Check if the user ID is in assignIds
+                    if (assignIds.contains(group.getID())) {
+                        assignYn = "Y";
+                    }
+
+                    groups.add(GroupVO.builder().
+                            groupId(group.getID()).
+                            groupNm(group.getName()).
+                            childCnt(group.getTotalChildCount()).
+                            description(group.getDescription()).
+                            creationTime(group.getCreationTime()).
+                            owner(group.getOwner().getName()).
+                            assignYn(assignYn).
+                            build()
+                    );
+                }
+            }
+        }
+        userInfo.setParentsGroups(groups);
+        return userInfo;
+    }
+
+
+
+
+    public ResVO assignGroup(GroupVO groupInfo) {
 
         //ObjectSourcec 객체 생성
         WebObjectSource objectSource = factory.getObjectSource();
@@ -736,6 +844,61 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    public ResVO assignUser(UserVO userInfo) {
+
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        try {
+            WebObjectInfo woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+            WebUser user = (WebUser) woi;
+            if(user!=null){
+                for(int i=0; i<userInfo.getParentsGroups().size(); i++){
+                    WebUserGroup groups = (WebUserGroup) objectSource.getObject(userInfo.getParentsGroups().get(i).getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+                    //Add user to group
+                    if(groups!=null){
+                        if("assign".equals(userInfo.getAssignmentType())){
+                            groups.getMembers().add(user);
+                        }
+                        else{
+                            groups.getMembers().remove(user);
+                        }
+                    }
+                    //Save the group object
+                    objectSource.save(groups);
+                }
+            }
+
+        } catch (WebObjectsException e) {
+            return new ResVO(ResultCode.ERROR_ADD_USER);
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
+    public ResVO enableUser(UserVO userInfo, String assignmentType) {
+
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        boolean assignment = false;
+        if("assign".equals(assignmentType)){
+            assignment = true;
+        }
+        try {
+            WebObjectInfo woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+            WebUser user = (WebUser) woi;
+            user.setEnabled(assignment);
+
+            objectSource.save(user);
+        } catch (WebObjectsException e) {
+            return new ResVO(ResultCode.ERROR_ADD_USER);
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
+
     public static Object performSearch(WebSearch search){
         try {
             search.submit();
@@ -753,4 +916,42 @@ public class MstrObject extends MstrSession{
         }
         return null;
     }
+
+    public void getLicenseInfo() throws WebObjectsException {
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource=factory.getObjectSource();
+
+        LicenseSource ls = factory.getLicenseSource();
+
+        WebUserEntity everyone = (WebUserEntity)objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F",34,true);
+        UserLicenseAudit ula = ls.auditUsers(everyone);
+        LicensedUsers lus = ula.getUnlicensedUsers();
+        String message = "Unlicensed Users:\n" ;
+        for (int i=0;i<lus.size();i++)
+            message += lus.get(i).getDisplayName() + "\n";
+
+//Get user named licenses
+        NamedUserLicense[] sl = ls.getNamedUserCompliance();
+        message += "\n\nLicensed Users:\n";
+
+//loop over the different license types
+        for(int i=1;i<sl.length;i++){
+//Get license name
+            message += "License Name = " + sl[i].getName() + "\t\t";
+
+/*Get number of licensed users
+LicensedUsers collection would allow to display also
+the individual names of the licensed users*/
+
+            message += "Licensed Users: " + ula.getLicensedUsers(sl[i].getLicenseType()).size() + "\t";
+
+//Get license max usage
+            message += " Max = " + sl[i].getMaximumUsage() + "\n";
+        }
+
+        System.out.println( message);
+    }
+
+
+
 }

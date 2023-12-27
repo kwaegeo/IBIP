@@ -23,37 +23,43 @@
       <div class="popup__body">
         <section>
           <!--230222, section내용 전체 수정됨-->
-          <h2>그룹 정보</h2>
+          <h2>사용자 정보</h2>
           <div class="search">
             <form action="#" method="" name="userform">
               <fieldset>
-                <legend>그룹 정보</legend>
+                <legend>사용자 정보</legend>
                 <ul class="form-input">
                   <li>
                     <div class="input-area">
-                      <label for="id">그룹명</label>
-                      <input type="hidden" th:value="${groupInfo.groupId}" id="groupId">
-                      <input type="text" name="groupInfo" th:value="${groupInfo.groupNm}" id="groupNm" disabled>
+                      <label for="loginID">로그인 ID</label>
+                      <input type="hidden" th:value="${userInfo.userId}" id="userId">
+                      <input type="text" name="userInfo" th:value="${userInfo.loginID}" id="loginID" disabled>
                     </div>
                   </li>
                   <li>
                     <div class="input-area">
-                      <label for="name3">설명</label>
-                      <input type="text" name="groupInfo" id="name3" th:value="${groupInfo.description}" disabled/>
+                      <label for="userNm">사용자명</label>
+                      <input type="text" name="userInfo" id="userNm" th:value="${userInfo.userNm}" disabled/>
                     </div>
                     <div class="input-area">
-                      <label for="id">하위 개체 수</label>
-                      <input type="text" name="groupInfo" id="id" th:value="${groupInfo.childCnt}" disabled/>
+                      <label for="owner">소유자</label>
+                      <input type="text"  id="owner" th:value="${userInfo.owner}" disabled/>
                     </div>
                   </li>
                   <li>
                     <div class="input-area">
-                      <label for="rank">생성일자</label>
-                      <input type="text" name="groupInfo" id="rank" th:value="${groupInfo.creationTime}" disabled/>
+                      <label for="enableYn">계정상태</label>
+                      <input type="text" id="enableYn" th:value="${userInfo.enableYn == 'Y' ? '활성화' : '비활성화'}" disabled/>
                     </div>
                     <div class="input-area">
-                      <label for="eamil">소유자</label>
-                      <input type="text" name="groupInfo" id="eamil" value="" th:value="${groupInfo.owner}" disabled/>
+                      <label for="modification">변경시간</label>
+                      <input type="text"  id="modification" value="" th:value="${userInfo.modification}" disabled/>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="input-area">
+                      <label for="description">설명</label>
+                      <input type="text" name="userInfo" id="description" value="" th:value="${userInfo.description}" disabled/>
                     </div>
                   </li>
                 </ul>
@@ -66,12 +72,14 @@
             <div class="left"></div>
             <div class="right">
               <button type="button" id="btn-modify" class="btn-" onclick="modify(this)"><span>수정</span></button>
+              <button type="button" id="" class="btn-" onclick="reset(this)"><span>비밀번호 초기화</span></button>
+              <button type="button" id="d" class="btn-" onclick="enable(this)"><span>계정 활성화</span></button>
               <button type="button" id="btn-delete" class="btn- bg-danger"><span>삭제</span></button>
             </div>
           </div>
         </section>
         <section>
-          <h3>사용자 정보</h3>
+          <h3>그룹 정보</h3>
           <div class="box">
             <div class="tbl-top">
             </div>
@@ -85,12 +93,11 @@
                 <colgroup>
                   <col style="width: 5%" />
                   <col style="width: 5%" />
+                  <col style="width: 25%" />
+                  <col style="width: 5%" />
+                  <col style="width: 30%" />
                   <col style="width: 15%" />
                   <col style="width: 15%" />
-                  <col style="width: 10%" />
-                  <col style="width: 12%" />
-                  <col style="width: 18%" />
-                  <col style="width: 20%" />
                 </colgroup>
                 <thead>
                   <tr>
@@ -98,24 +105,22 @@
                       <input type="checkbox" id="chkAll" onclick="selectAll(this)"/>
                     </th>
                     <th scope="col">할당유무</th>
-                    <th scope="col">로그인ID</th>
-                    <th scope="col">사용자명</th>
-                    <th scope="col">계정상태</th>
-                    <th scope="col">소유자</th>
-                    <th scope="col">변경시간</th>
+                    <th scope="col">그룹명</th>
+                    <th scope="col">하위 개체 수</th>
                     <th scope="col">설명</th>
+                    <th scope="col">생성일자</th>
+                    <th scope="col">소유자</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr th:each="users : ${groupInfo.users}" th:class="${users.assignYn} == 'Y'? 'pick' : '' ">
-                    <td><input type="checkbox" id="c2" name="chk" th:value="${users.userId}"/></td>
-                    <td th:text="${users.assignYn}"></td>
-                    <td th:text="${users.loginID}"></td>
-                    <td th:text="${users.userNm}"></td>
-                    <td th:text="${users.enableYn ? '활성화' : '비활성화'}"></td>
-                    <td th:text="${users.owner}"></td>
-                    <td th:text="${users.modification}"></td>
-                    <td th:text="${users.description}"></td>
+                  <tr th:each="groups : ${userInfo.parentsGroups}" th:class="${groups.assignYn} == 'Y'? 'pick' : '' ">
+                    <td><input type="checkbox" id="c2" name="chk" th:value="${groups.groupId}"/></td>
+                    <td th:text="${groups.assignYn}"></td>
+                    <td th:text="${groups.groupNm}"></td>
+                    <td th:text="${groups.childCnt}"></td>
+                    <td th:text="${groups.description}"></td>
+                    <td th:text="${groups.creationTime}"></td>
+                    <td th:text="${groups.owner}"></td>
                   </tr>
                 </tbody>
               </table>
@@ -136,6 +141,7 @@
       </div>
     </div>
   </body>
+  <script src="/js/leedo_custom.js"></script>
   <script th:inline="javascript">
     // 체크박스 전체 선택
     function selectAll(chkAll){
@@ -179,14 +185,14 @@
 
           if (type === "assign") {
             if (selectedAssign == "Y") {
-              checkmsg = "할당되지 않은 사용자만 할당 가능합니다.";
+              checkmsg = "할당되지 않은 그룹만 할당 가능합니다.";
               checkAssign = false;
               return false;
             }
           } else if (type === "unassign") {
 
             if (selectedAssign == "N") {
-              checkmsg = "할당 된 사용자만 회수 가능합니다.";
+              checkmsg = "할당 된 그룹만 회수 가능합니다.";
               checkAssign = false;
               return false;
             }
@@ -203,33 +209,34 @@
     }
 
 
+
     function assignment(assignmentType) {
       if (validCheck(assignmentType)) {
 
-        // 1. 부서명 추출
-        var groupId = $('#groupId').val();
+        // 1. 사용명 추출
+        var userId = $('#userId').val();
 
-        // 1.1 사용자 ID를 담을 배열 선언
-        var users = []
+        // 1.1 그룹 ID를 담을 배열 선언
+        var groups = []
 
         // 1.2 checkbox에 해당된 ID 배열에 추가
         $("input[name=chk]:checked").each(function (index) {
           var id = $(this).val();
-          user = {userId: id}
-          users.push(user);
+          group = {groupId: id}
+          groups.push(group);
         })
 
 
         //2. 요청값 설정
         const data = {
-          "groupId": groupId,
-          "users": users,
+          "userId": userId,
+          "parentsGroups": groups,
           "assignmentType": assignmentType
         };
 
         //2.1 사용자 할당 요청
         $.ajax({
-          url: "/groupManageAssignment",
+          url: "/userManageAssignment",
           data: JSON.stringify(data),
           contentType: "application/json",
           method: "POST",
@@ -238,12 +245,14 @@
             var msg = "";
             if(responseData.code === "S00"){
               if(assignmentType == 'assign'){
-                msg="사용자가 정상적으로 할당되었습니다.";
+                msg="그룹이 정상적으로 할당되었습니다.";
               }
               else{
-                msg="사용자가 정상적으로 회수되었습니다.";
+                msg="그룹이 정상적으로 회수되었습니다.";
               }
               alert(msg);
+              $(".cm-loading").show();
+
               location.reload();
             }
 
@@ -258,7 +267,7 @@
   function modify(button){
       button.classList.add("bg-green");
       button.innerHTML = "저장";
-      $('input[name="groupInfo"]').prop('disabled', false);
+      $('input[name="userInfo"]').prop('disabled', false);
   }
 
   </script>

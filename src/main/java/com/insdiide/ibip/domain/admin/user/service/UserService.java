@@ -3,6 +3,7 @@ package com.insdiide.ibip.domain.admin.user.service;
 import com.insdiide.ibip.domain.admin.group.vo.GroupVO;
 import com.insdiide.ibip.domain.admin.user.vo.UserVO;
 import com.insdiide.ibip.global.mstr.MstrObject;
+import com.insdiide.ibip.global.vo.ResVO;
 import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,16 @@ public class UserService {
          *
          * **/
         UserVO userInfo = mstrObject.getUserInfoById(userId);
-//        userInfo = mstrObject.getUserGroupList(userInfo);
+        userInfo = mstrObject.getUserGroupList(userInfo);
         return userInfo;
     }
 
+    public ResVO assign(UserVO userInfo){
+        ResVO result = mstrObject.assignUser(userInfo);
+        return result;
+    }
+
+    public String addUser(){
+        return "z";
+    }
 }

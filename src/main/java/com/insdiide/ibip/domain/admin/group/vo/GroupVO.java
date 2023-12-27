@@ -29,4 +29,6 @@ public class GroupVO {
     private List<GroupVO> childGroups;
 
     private String assignmentType;
+
+    private String assignYn;
 }

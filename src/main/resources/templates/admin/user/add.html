@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>사용자 생성</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style2.css" />
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+    <!-- JS -->
+    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/common.js" defer></script>
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+      <div class="popup__head">
+        <h1>사용자 생성</h1>
+        <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+      </div>
+      <div class="popup__body">
+        <form action="" method="" name="popjoin">
+          <ul class="form-input">
+
+            <li>
+              <label for="templateName" class="star">로그인 ID</label>
+              <div class="input-area">
+                <div class="row">
+                  <input type="text" id="templateName" value="" class="flex3" check_result="fail"/>
+                </div>
+                <p class="input-info">영문자, 한글, 숫자, 특수문자(- _ .)조합의 64자 이하 문자열</p>
+              </div>
+              <!--수정일 경우 row 클래스 및 버튼 삭제
+              <div class="input-area">
+                <input type="text" id="userId" value="" />
+              </div>-->
+            </li>
+            <li>
+              <label for="templateName" class="star">사용자명</label>
+              <div class="input-area">
+                <div class="row">
+                  <input type="text" id="templateName" value="" class="flex3" check_result="fail"/>
+                </div>
+                <p class="input-info">영문자, 한글, 숫자, 특수문자(- _ .)조합의 64자 이하 문자열</p>
+              </div>
+            </li>
+            <li>
+              <label for="templateName" class="star">비밀번호</label>
+              <div class="input-area">
+                <div class="row">
+                  <input type="text" id="templateName" value="" class="flex3" check_result="fail"/>
+                </div>
+                <p class="input-info">8자이상, 2자이상의 사용자명, 로그인ID를 포함할 수 없음.</p>
+              </div>
+            </li>
+            <li>
+              <label for="templateName" class="star">비밀번호 확인</label>
+              <div class="input-area">
+                <div class="row">
+                  <input type="text" id="templateName" value="" class="flex3" check_result="fail"/>
+                </div>
+              </div>
+            </li>
+            <li>
+              <label for="remark">설명</label>
+              <div class="input-area">
+                <div class="row">
+                  <textarea id="remark"></textarea>
+                </div>
+                <p class="input-info">200자 이하 문자열</p>
+              </div>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <div class="popup__footer">
+        <button type="button" class="pop-close bg-gray" onclick="confirmExit()"><span>취소</span></button>
+        <button type="button" onclick="addTemplate()"><span>생성</span></button>
+      </div>
+    </div>
+  </body>
+  <script th:inline="javascript">
+  </script>
+</html>

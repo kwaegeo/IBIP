@@ -8,4 +8,12 @@ import lombok.*;
 @Builder
 public class RoleVO {
     private String roleId;
+
+    private String roleNm;
+
+    private String owner;
+
+    private String modification;
+
+    private String description;
 }

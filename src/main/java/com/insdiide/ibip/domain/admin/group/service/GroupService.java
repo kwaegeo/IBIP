@@ -47,7 +47,7 @@ public class GroupService {
     }
 
     public ResVO assign(GroupVO groupInfo){
-        ResVO result = mstrObject.assign(groupInfo);
+        ResVO result = mstrObject.assignGroup(groupInfo);
         return result;
     }
 }

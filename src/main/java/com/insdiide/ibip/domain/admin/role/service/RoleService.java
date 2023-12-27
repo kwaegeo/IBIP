@@ -19,7 +19,7 @@ public class RoleService {
 
         List<RoleVO> roleList = mstrObject.getRoleList();
 
-        return new ArrayList<>();
+        return roleList;
     }
 
 }
