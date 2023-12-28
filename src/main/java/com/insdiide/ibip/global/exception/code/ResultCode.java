@@ -22,7 +22,23 @@ public enum ResultCode {
 
     ERROR_ADD_USER("E06", "사용자 추가 중 에러가 발생하였습니다."),
 
+    DUPLICATE_GROUP("E07", "중복된 사용자 혹은 사용자 그룹명입니다."),
+    INVALID_GROUP_NAME("E08", "그룹명 형식에 맞게 작성해주세요."),
+
+    INVALID_GROUP_ID("E09", "해당 그룹이 이미 삭제되었거나 존재하지 않습니다."),
+
+    INVALID_USER_ID("E10", "해당 유저가 이미 삭제되었거나 존재하지 않습니다."),
+    INVALID_PASSWORD_POLICY("E11", "비밀번호 정책에 부합하지 않습니다."),
+
+    INVALID_USER_NAME("E12", "사용자명 형식에 맞게 작성해주세요."),
+
+    INVALID_LOGIN_ID("E13", "사용자 로그인 ID 형식에 맞게 작성해주세요."),
+
+    INVALID_PASSWORD("E14", "비밀번호와 비밀번호 확인이 같지 않습니다."),
+
+    EXIST_LOGIN_ID("E15", "중복된 로그인 ID 입니다."),
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다.");
+
 
     private final String code;
     private final String msg;

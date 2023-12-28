@@ -572,7 +572,7 @@ footer {
 }
 .popup__body .tbl-top button {
   height: 30px;
-  background: #6c7e9a;
+  /*background: #6c7e9a;*/
   border-color: #607088;
 }
 .popup__body .tbl-top button span {

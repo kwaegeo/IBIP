@@ -24,3 +24,21 @@
 .sidebar-brand-text-custom-flex {
     display: flex;
 }
+
+.btn-yellow {
+.   color: #fff;
+    background-color: #e7b252;
+    border-color: #e7b252;
+}
+
+.btn-brown {
+.   color: #fff;
+    background-color: #9b4c4c;
+    border-color: #9b4c4c;
+}
+
+.btn-skyblue {
+.   color: #fff;
+    background-color: skyblue;
+    border-color: skyblue;
+}

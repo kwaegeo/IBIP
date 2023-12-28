@@ -11,6 +11,8 @@
     <!-- JS -->
     <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="assets/js/common.js" defer></script>
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
   </head>
 
   <body>
@@ -38,22 +40,22 @@
                   </li>
                   <li>
                     <div class="input-area">
-                      <label for="name3">설명</label>
-                      <input type="text" name="groupInfo" id="name3" th:value="${groupInfo.description}" disabled/>
+                      <label for="description">설명</label>
+                      <input type="text" name="groupInfo" id="description" th:value="${groupInfo.description}" disabled/>
                     </div>
                     <div class="input-area">
                       <label for="id">하위 개체 수</label>
-                      <input type="text" name="groupInfo" id="id" th:value="${groupInfo.childCnt}" disabled/>
+                      <input type="text" name="" id="id" th:value="${groupInfo.childCnt}" disabled/>
                     </div>
                   </li>
                   <li>
                     <div class="input-area">
                       <label for="rank">생성일자</label>
-                      <input type="text" name="groupInfo" id="rank" th:value="${groupInfo.creationTime}" disabled/>
+                      <input type="text" name="" id="rank" th:value="${groupInfo.creationTime}" disabled/>
                     </div>
                     <div class="input-area">
                       <label for="eamil">소유자</label>
-                      <input type="text" name="groupInfo" id="eamil" value="" th:value="${groupInfo.owner}" disabled/>
+                      <input type="text" name="" id="eamil" value="" th:value="${groupInfo.owner}" disabled/>
                     </div>
                   </li>
                 </ul>
@@ -65,8 +67,8 @@
           <div class="tbl-top">
             <div class="left"></div>
             <div class="right">
-              <button type="button" id="btn-modify" class="btn-" onclick="modify(this)"><span>수정</span></button>
-              <button type="button" id="btn-delete" class="btn- bg-danger"><span>삭제</span></button>
+              <button type="button" id="btnModify" checkResult="wait" class="btn-edit btn-yellow" onclick="modifyGroup(this)"><span>수정</span></button>
+              <button type="button" id="btn-delete" class="btn-danger btn-delete" onclick="deleteGroup()"><span>삭제</span></button>
             </div>
           </div>
         </section>
@@ -137,6 +139,8 @@
     </div>
   </body>
   <script th:inline="javascript">
+    var groupNm = [[${groupInfo.groupNm}]]
+
     // 체크박스 전체 선택
     function selectAll(chkAll){
 
@@ -186,7 +190,7 @@
           } else if (type === "unassign") {
 
             if (selectedAssign == "N") {
-              checkmsg = "할당 된 사용자만 회수 가능합니다.";
+              checkmsg = "할당된 사용자만 회수 가능합니다.";
               checkAssign = false;
               return false;
             }
@@ -255,11 +259,99 @@
       }
     }
 
-  function modify(button){
-      button.classList.add("bg-green");
-      button.innerHTML = "저장";
-      $('input[name="groupInfo"]').prop('disabled', false);
+  function modifyGroup(button){
+    const groupReg = RegExp(/^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\s-]+$/); //한글, 영어,숫자만 입력 가능
+
+    if($('#btnModify').attr("checkResult") === "wait"){
+        var spanElement = button.querySelector('span');
+        button.classList.remove("btn-yellow")
+        button.classList.add("btn-brown");
+        spanElement.textContent = "저장";
+        $('input[name="groupInfo"]').prop('disabled', false);
+        $('#btnModify').attr("checkResult", "save")
+      }
+      else{
+        var newGroupNm = $('#groupNm').val();
+        var groupId = $('#groupId').val();
+        var description = $('#description').val();
+
+        if (validData(newGroupNm)) {
+          alert("그룹명을 작성해주세요");
+          $('#groupNm').focus();
+          return false;
+        }
+        //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
+        else if (!groupReg.test(newGroupNm) || newGroupNm.length > 64) {
+          alert("그룹명을 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
+          $('#groupNm').focus();
+          return false;
+        }
+        else if(description.length > 200){
+          alert("설명을 형식에 맞게 입력해주세요. \n200자 이내");
+          $('#description').focus();
+          return false;
+        }
+        const data = {"groupId":groupId, "groupNm": newGroupNm, "description": description};
+        $.ajax({
+          url: "/groupModifyProc",
+          data: JSON.stringify(data),
+          method: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          success: function (data) {
+            if (data.code == "S00") {
+              alert("성공적으로 그룹이 수정 되었습니다.")
+              location.reload();
+            } else {
+              alert(data.msg);
+              button.classList.remove("bg-green");
+              button.innerHTML = "수정";
+              return;
+            }
+          },
+          error: function () {
+            alert("통신 에러 발생");
+          }
+        });
+      }
   }
 
+  function deleteGroup(){
+    var groupId = $('#groupId').val();
+    if(confirm("("+groupNm+") 그룹을 정말로 삭제하시겠습니까?")) {
+      //2.1 사용자 할당 요청
+      $.ajax({
+        url: "/groupDelProc",
+        data: JSON.stringify({"groupId": groupId}),
+        contentType: "application/json",
+        method: "POST",
+        dataType: "json",
+        success: function (responseData) {
+          if(responseData.code === "S00"){
+            alert("성공적으로 그룹이 삭제되었습니다.")
+            window.close();
+            opener.getGroupList();
+          }
+          else{
+            alert(responseData.msg);
+            return;
+          }
+        },
+        error: function () {
+          alert("서버에 접속할 수 없습니다.")
+        }
+      });
+    }
+    else{
+      return;
+    }
+  }
+    // 데이터 유효성 검사
+    function validData(data) {
+      if (data == "" || data.length == 0)
+        return true;
+      else
+        return false;
+    }
   </script>
 </html>

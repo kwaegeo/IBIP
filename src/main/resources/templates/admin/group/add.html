@@ -26,12 +26,10 @@
           <ul class="form-input">
 
             <li>
-              <label for="templateName" class="star">그룹 명</label>
+              <label for="groupNm" class="star">그룹 명</label>
               <div class="input-area">
                 <div class="row">
-                  <input type="text" id="templateName" value="" class="flex3" check_result="fail"/>
-                  <button type="button" class="flex1" id="check_btn" name="check_btn" onclick=""><span>중복 확인</span></button>
-                  <button type="button" class="flex1 bg-greenlight" id="check_success" name="check_success" style="display: none"><span>확인 완료</span></button>
+                  <input type="text" id="groupNm" value="" class="flex3" check_result="fail"/>
                 </div>
                 <p class="input-info">영문자, 한글, 숫자, 특수문자(- _ .)조합의 64자 이하 문자열</p>
               </div>
@@ -41,10 +39,10 @@
               </div>-->
             </li>
             <li>
-              <label for="remark">설명</label>
+              <label for="description">설명</label>
               <div class="input-area">
                 <div class="row">
-                  <textarea id="remark"></textarea>
+                  <textarea id="description"></textarea>
                 </div>
                 <p class="input-info">200자 이하 문자열</p>
               </div>
@@ -54,10 +52,63 @@
       </div>
       <div class="popup__footer">
         <button type="button" class="pop-close bg-gray" onclick="confirmExit()"><span>취소</span></button>
-        <button type="button" onclick="addTemplate()"><span>생성</span></button>
+        <button type="button" onclick="createGroup()"><span>생성</span></button>
       </div>
     </div>
   </body>
   <script th:inline="javascript">
+
+    function createGroup(){
+      const groupReg = RegExp(/^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\s-]+$/); //한글, 영어,숫자만 입력 가능
+      const groupNm = $('#groupNm').val();
+      const description = $('#description').val();
+      //1. 아이디 유효성 체크
+      if (validData(groupNm)) {
+        alert("그룹명을 작성해주세요");
+        $('#groupNm').focus();
+        return false;
+      }
+      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
+      else if (!groupReg.test(groupNm) || groupNm.length > 64) {
+        alert("그룹명을 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
+        $('#groupNm').focus();
+        return false;
+      }
+      else if(description.length > 200){
+        alert("설명을 형식에 맞게 입력해주세요. \n200자 이내");
+        $('#description').focus();
+        return false;
+      }
+
+      const data = {"groupNm": groupNm, "description": description};
+      $.ajax({
+        url: "/groupAddProc",
+        data: JSON.stringify(data),
+        method: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+          if (data.code == "S00") {
+            alert("성공적으로 그룹이 생성되었습니다.")
+            window.close();
+            opener.getGroupList();
+          } else {
+            alert(data.msg);
+            return;
+          }
+        },
+        error: function () {
+          alert("통신 에러 발생");
+        }
+      });
+    }
+
+    // 데이터 유효성 검사
+    function validData(data) {
+      if (data == "" || data.length == 0)
+        return true;
+      else
+        return false;
+    }
   </script>
 </html>

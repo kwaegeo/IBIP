@@ -38,7 +38,18 @@ public class UserService {
         return result;
     }
 
-    public String addUser(){
-        return "z";
+    public ResVO resetPassword(String userId){
+        ResVO result = mstrObject.resetPassword(userId);
+        return result;
+    }
+
+    public ResVO enableAccount(UserVO userInfo){
+        ResVO result = mstrObject.enableAccount(userInfo);
+        return result;
+    }
+
+    public ResVO addUser(UserVO userInfo){
+        ResVO result = mstrObject.addUser(userInfo);
+        return result;
     }
 }

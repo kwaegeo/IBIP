@@ -17,6 +17,7 @@ import com.insdiide.ibip.global.mstr.prompt.ElementPrompt;
 import com.insdiide.ibip.global.mstr.prompt.ObjectPrompt;
 import com.insdiide.ibip.global.vo.ResVO;
 import com.microstrategy.web.beans.BeanFactory;
+import com.microstrategy.web.beans.UserBean;
 import com.microstrategy.web.beans.UserGroupBean;
 import com.microstrategy.web.beans.WebBeanException;
 import com.microstrategy.web.objects.*;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import static com.microstrategy.webapi.EnumDSSXMLLicenseComplianceCategory.DssXmlLicenseComplianceCategoryActivation;
+import static com.insdiide.ibip.global.utils.StringUtils.*;
 
 @Component
 @Log4j2
@@ -478,7 +479,7 @@ public class MstrObject extends MstrSession{
 
                 if(!user.isGroup()){
                     userList.add(UserVO.builder().
-                            enableYn(user.isEnabled()).
+                            enableStatus(user.isEnabled()).
                             userId(user.getID()).
                             loginID(user.getLoginName()).
                             userNm(user.getDisplayName()).
@@ -530,39 +531,128 @@ public class MstrObject extends MstrSession{
     }
 
 
-    public ResVO addGroup(){
+    public ResVO addGroup(GroupVO groupInfo){
+
+        if(!isGroupNm(groupInfo.getGroupNm()) || groupInfo.getGroupNm().length() > 64){
+            throw new CustomException(ResultCode.INVALID_GROUP_NAME);
+        }
+        else if(groupInfo.getDescription().length() > 200){
+            throw new CustomException(ResultCode.INVALID_REMARK);
+        }
 
         WebObjectSource wos = factory.getObjectSource();
-        WebUserServicesSource wuss = wos.getUserServicesSource();
         UserGroupBean group = null;
 
         try {
             group = (UserGroupBean) BeanFactory.getInstance().newBean("UserGroupBean");
             group.setSessionInfo(serverSession);
             group.InitAsNew();
-            group.getUserEntityObject().setFullName("testGroup");
+            group.getUserEntityObject().setFullName(groupInfo.getGroupNm());
+            group.getUserEntityObject().setDescription(groupInfo.getDescription());
             group.save();
 
         } catch (WebBeanException ex) {
-            System.out.println("Error creating  group: " + ex.getMessage());
+            System.out.println(ex.getErrorCode());
+            System.out.println(ex.getMessage());
+            if(ex.getErrorCode() == -2147217373){
+                throw new CustomException(ResultCode.DUPLICATE_GROUP);
+            }
+            else if(ex.getErrorCode() == -2147213718){
+                throw new CustomException(ResultCode.INVALID_GROUP_NAME);
+            }
+
         }
-
-
-        return new ResVO();
+        return new ResVO(ResultCode.SUCCESS);
     }
 
-    public ResVO delGroup() throws WebObjectsException {
+    public ResVO addUser(UserVO userInfo){
+        /** 유효성검사 부분 **/
+        if(!isUserNm(userInfo.getLoginID()) ||userInfo.getLoginID().length() > 64){
+            throw new CustomException(ResultCode.INVALID_USER_NAME);
+        }
+        else if(!isUserNm(userInfo.getUserNm()) || userInfo.getUserNm().length() > 64){
+            throw new CustomException(ResultCode.INVALID_LOGIN_ID);
+        }
+        else if(!userInfo.getPassword1().equals(userInfo.getPassword2())){
+            throw new CustomException(ResultCode.INVALID_PASSWORD);
+        }
+        else if(!isPasswordValid(userInfo.getPassword1(),userInfo.getUserNm())){
+            throw new CustomException(ResultCode.INVALID_PASSWORD_POLICY);
+        }
+        else if(userInfo.getDescription().length() > 200){
+            throw new CustomException(ResultCode.INVALID_REMARK);
+        }
+
+        UserBean user = null;
+        try {
+            user = (UserBean)BeanFactory.getInstance().newBean("UserBean");
+            user.setSessionInfo(serverSession);
+            user.InitAsNew();
+
+            WebUser ua = (WebUser) user.getUserEntityObject();
+            WebStandardLoginInfo loginInfo = ua.getStandardLoginInfo();
+
+            ua.setLoginName(userInfo.getLoginID());
+            ua.setFullName(userInfo.getUserNm());
+            user.getObjectInfo().setDescription(userInfo.getDescription());
+            loginInfo.setPassword(userInfo.getPassword1());
+            user.save();
+
+        } catch (WebBeanException ex) {
+            if(ex.getErrorCode() == -2147213795){
+                throw new CustomException(ResultCode.EXIST_LOGIN_ID);
+            }
+            System.out.println(ex.getErrorCode());
+            System.out.println(ex.getMessage());
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
+    public ResVO modifyGroup(GroupVO groupInfo){
+
+        if(!isGroupNm(groupInfo.getGroupNm()) || groupInfo.getGroupNm().length() > 64){
+            throw new CustomException(ResultCode.INVALID_GROUP_NAME);
+        }
+        else if(groupInfo.getDescription().length() > 200){
+            throw new CustomException(ResultCode.INVALID_REMARK);
+        }
 
         WebObjectSource wos = factory.getObjectSource();
 
-        // Getting the User Group Object
-        WebUserEntity userEntity = (WebUserEntity)wos.getObject("934800724391EF4AFB42E289C3F3F397", EnumDSSXMLObjectTypes.DssXmlTypeUser);
+        try {
+            // Getting the User Group Object
+            WebUserGroup group = (WebUserGroup) wos.getObject(groupInfo.getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
-        // Deleting the User Group Object
-        wos.deleteObject(userEntity);
-        System.out.println("Done");
+            group.setFullName(groupInfo.getGroupNm());
+            group.setDescription(groupInfo.getDescription());
 
-        return new ResVO();
+            wos.save(group);
+
+        }catch (WebObjectsException ex){
+            throw new CustomException(ResultCode.DUPLICATE_GROUP);
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.DUPLICATE_GROUP);
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
+
+    public ResVO delGroup(String groupId){
+        System.out.println(groupId);
+        WebObjectSource wos = factory.getObjectSource();
+
+        try {
+            // Getting the User Group Object
+            WebUserGroup group = (WebUserGroup) wos.getObject(groupId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            // Deleting the User Group Object
+            wos.deleteObject(group);
+
+        }catch (WebObjectsException ex){
+            throw new CustomException(ResultCode.INVALID_GROUP_ID);
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.INVALID_GROUP_ID);
+        }
+        return new ResVO(ResultCode.SUCCESS);
     }
 
     //그룹 정보
@@ -610,7 +700,7 @@ public class MstrObject extends MstrSession{
                 owner(user.getOwner().getDisplayName()).
                 modification(user.getModificationTime()).
                 description(user.getDescription()).
-                enableYn(user.isEnabled()).
+                enableStatus(user.isEnabled()).
                 build();
         WebUserList wul = user.getParents();
 
@@ -727,7 +817,7 @@ public class MstrObject extends MstrSession{
                             modification(user.getModificationTime()).
                             description(user.getDescription()).
                             assignYn(assignYn).
-                            enableYn(user.isEnabled()).
+                            enableStatus(user.isEnabled()).
                             build()
                     );
                 }
@@ -876,24 +966,44 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
-    public ResVO enableUser(UserVO userInfo, String assignmentType) {
+    public ResVO enableAccount(UserVO userInfo) {
 
         //ObjectSourcec 객체 생성
         WebObjectSource objectSource = factory.getObjectSource();
-
-        boolean assignment = false;
-        if("assign".equals(assignmentType)){
-            assignment = true;
-        }
+        System.out.println(userInfo.isEnableStatus());
         try {
             WebObjectInfo woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
             WebUser user = (WebUser) woi;
-            user.setEnabled(assignment);
-
+            user.populate();
+            user.setEnabled(userInfo.isEnableStatus());
             objectSource.save(user);
+
         } catch (WebObjectsException e) {
-            return new ResVO(ResultCode.ERROR_ADD_USER);
+            return new ResVO(ResultCode.INVALID_USER_ID);
+        } catch(IllegalArgumentException iax){
+            return new ResVO(ResultCode.INVALID_USER_ID);
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
+    public ResVO resetPassword(String userId){
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        try {
+            WebObjectInfo woi = objectSource.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+            WebUser user = (WebUser) woi;
+            WebStandardLoginInfo loginInfo = user.getStandardLoginInfo();
+            loginInfo.setPassword("12345678");
+            objectSource.save(user);
+        } catch (WebObjectsException ex) {
+            if(ex.getErrorCode() == -2147180957){
+                throw new CustomException(ResultCode.INVALID_PASSWORD_POLICY);
+            }
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.INVALID_USER_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
     }

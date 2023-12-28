@@ -11,7 +11,8 @@ import java.util.List;
 @ToString
 @Builder
 public class UserVO {
-    private boolean enableYn;
+
+    private boolean enableStatus;
 
     private String userId;
 
@@ -30,4 +31,10 @@ public class UserVO {
     private List<GroupVO> parentsGroups;
 
     private String assignmentType;
+
+    private String password1;
+
+    private String password2;
+
+
 }

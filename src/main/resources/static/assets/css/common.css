@@ -1133,7 +1133,7 @@ button:disabled {
   justify-content: center;
   border: 1px solid var(--black);
   border-radius: 2px;
-  background: var(--secondary);
+  /*background: var(--secondary);*/
   width: auto;
   height: 32px;
   padding: 0 8px;

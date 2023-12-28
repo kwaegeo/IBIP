@@ -20,13 +20,18 @@ public class GroupService {
          return groupList;
     }
 
-    public ResVO addGroup(){
-        ResVO result = mstrObject.addGroup();
+    public ResVO addGroup(GroupVO groupInfo){
+        ResVO result = mstrObject.addGroup(groupInfo);
         return result;
     }
 
-    public ResVO delGroup() throws WebObjectsException {
-        ResVO result = mstrObject.delGroup();
+    public ResVO modifyGroup(GroupVO groupInfo){
+        ResVO result = mstrObject.modifyGroup(groupInfo);
+        return result;
+    }
+
+    public ResVO delGroup(String groupId) throws WebObjectsException {
+        ResVO result = mstrObject.delGroup(groupId);
         return result;
     }
 

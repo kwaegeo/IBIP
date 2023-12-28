@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class UserController {
@@ -90,17 +91,71 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/userAdd")
-    public String userAdd(HttpServletRequest request, HttpServletResponse response, Model model){
+    @PostMapping("/resetPassword")
+    @ResponseBody
+    public ResVO resetPassword(@RequestBody Map<String, String> userInfo,HttpServletRequest request, HttpServletResponse response){
+        //1. 사용자 세션 (MSTR) 유효성 검사
+        String userId = userInfo.get("userId");
 
-        return "/admin/user/add";
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        ResVO result = userService.resetPassword(userId);
+
+        return result;
     }
 
-    @GetMapping("/userAddProc")
+    @PostMapping("/enableAccount")
     @ResponseBody
-    public String userAddProc(){
+    public ResVO enableAccount(@RequestBody UserVO userInfo,HttpServletRequest request, HttpServletResponse response){
 
-        userService.addUser();
-        return "일단 확인";
+        System.out.println(userInfo);
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        ResVO result = userService.enableAccount(userInfo);
+
+        return result;
+    }
+
+    @GetMapping("/userAdd")
+    public String userAdd(HttpServletRequest request, HttpServletResponse response){
+        return "/admin/user/add";
+    }
+    @PostMapping("/userAddProc")
+    @ResponseBody
+    public ResVO userAddProc(@RequestBody UserVO userInfo, HttpServletRequest request, HttpServletResponse response){
+
+        System.out.println(userInfo);
+
+        //1. 사용자 세션 (MSTR) 유효성 검사
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        ResVO result = userService.addUser(userInfo);
+        return result;
+
     }
 }

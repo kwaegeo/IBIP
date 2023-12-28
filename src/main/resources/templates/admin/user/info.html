@@ -4,13 +4,15 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>그룹 정보</title>
+    <title>사용자 정보</title>
     <!-- CSS -->
     <link rel="stylesheet" href="assets/css/style2.css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
     <!-- JS -->
     <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="assets/js/common.js" defer></script>
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
   </head>
 
   <body>
@@ -48,8 +50,8 @@
                   </li>
                   <li>
                     <div class="input-area">
-                      <label for="enableYn">계정상태</label>
-                      <input type="text" id="enableYn" th:value="${userInfo.enableYn == 'Y' ? '활성화' : '비활성화'}" disabled/>
+                      <label for="enableStatus">계정상태</label>
+                      <input type="text" id="enableStatus" th:value="${userInfo.enableStatus ? '활성화' : '비활성화'}" disabled/>
                     </div>
                     <div class="input-area">
                       <label for="modification">변경시간</label>
@@ -71,15 +73,15 @@
           <div class="tbl-top">
             <div class="left"></div>
             <div class="right">
-              <button type="button" id="btn-modify" class="btn-" onclick="modify(this)"><span>수정</span></button>
-              <button type="button" id="" class="btn-" onclick="reset(this)"><span>비밀번호 초기화</span></button>
-              <button type="button" id="d" class="btn-" onclick="enable(this)"><span>계정 활성화</span></button>
-              <button type="button" id="btn-delete" class="btn- bg-danger"><span>삭제</span></button>
+              <button type="button" id="btn-modify" class="btn-edit btn-yellow" onclick="modifyUser(this)"><span>수정</span></button>
+              <button type="button" id="" class="btn-primary" onclick="resetPassword()"><span>비밀번호 초기화</span></button>
+              <button type="button" id="enableBtn" class="" th:classappend="${userInfo.enableStatus ?'btn-secondary' : 'btn-skyblue'}"th:attr="enableStatus=${userInfo.enableStatus}" onclick="enable(this.getAttribute('enableStatus'))"><span th:text="${userInfo.enableStatus ? '계정 비활성화' : '계정 활성화'}"></span></button>
+              <button type="button" id="btn-delete" class="btn-danger btn-delete"><span>삭제</span></button>
             </div>
           </div>
         </section>
         <section>
-          <h3>그룹 정보</h3>
+          <h3>사용자 정보</h3>
           <div class="box">
             <div class="tbl-top">
             </div>
@@ -143,6 +145,9 @@
   </body>
   <script src="/js/leedo_custom.js"></script>
   <script th:inline="javascript">
+    var userId = [[${userInfo.userId}]]
+
+
     // 체크박스 전체 선택
     function selectAll(chkAll){
 
@@ -264,11 +269,81 @@
       }
     }
 
-  function modify(button){
-      button.classList.add("bg-green");
-      button.innerHTML = "저장";
+  function modifyUser(button){
+
+      var spanElement = button.querySelector('span');
+      button.classList.remove("btn-yellow")
+      button.classList.add("btn-brown");
+      spanElement.textContent = "저장";
+
       $('input[name="userInfo"]').prop('disabled', false);
   }
 
+  function resetPassword(){
+    if(confirm("해당 사용자의 비밀번호를 정말로 초기화 하시겠습니까? \n초기화 후엔 되돌릴 수 없습니다." )) {
+      //2.1 사용자 할당 요청
+      $.ajax({
+        url: "/resetPassword",
+        data: JSON.stringify({"userId": userId}),
+        contentType: "application/json",
+        method: "POST",
+        dataType: "json",
+        success: function (responseData) {
+          if(responseData.code === "S00"){
+            alert("성공적으로 비밀번호가 초기화 되었습니다. \n초기 비밀번호는 '12345678' 입니다");
+            location.reload();
+          }
+          else{
+            alert(responseData.msg);
+            return;
+          }
+        },
+        error: function () {
+          alert("서버에 접속할 수 없습니다.")
+        }
+      });
+    }
+    else{
+      return;
+    }
+  }
+
+  function enable(enableStatus){
+
+    var enableVal = "활성화";
+    var enable = true
+    if(enableStatus === "true"){
+      enableVal = "비활성화";
+      enable = false
+    }
+
+    if(confirm("해당 사용자를 "+enableVal+"시키시겠습니까?" )) {
+
+      //2.1 사용자 할당 요청
+      $.ajax({
+        url: "/enableAccount",
+        data: JSON.stringify({"userId": userId, "enableStatus": enable}),
+        contentType: "application/json",
+        method: "POST",
+        dataType: "json",
+        success: function (responseData) {
+          if(responseData.code === "S00"){
+            alert("성공적으로 계정이 "+enableVal+"되었습니다.");
+            location.reload();
+          }
+          else{
+            alert(responseData.msg);
+            return;
+          }
+        },
+        error: function () {
+          alert("서버에 접속할 수 없습니다.")
+        }
+      });
+    }
+    else{
+      return;
+    }
+  }
   </script>
 </html>
