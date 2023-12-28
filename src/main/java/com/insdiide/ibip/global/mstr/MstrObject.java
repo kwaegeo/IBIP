@@ -568,10 +568,10 @@ public class MstrObject extends MstrSession{
     public ResVO addUser(UserVO userInfo){
         /** 유효성검사 부분 **/
         if(!isUserNm(userInfo.getLoginID()) ||userInfo.getLoginID().length() > 64){
-            throw new CustomException(ResultCode.INVALID_USER_NAME);
+            throw new CustomException(ResultCode.INVALID_LOGIN_ID);
         }
         else if(!isUserNm(userInfo.getUserNm()) || userInfo.getUserNm().length() > 64){
-            throw new CustomException(ResultCode.INVALID_LOGIN_ID);
+            throw new CustomException(ResultCode.INVALID_USER_NAME);
         }
         else if(!userInfo.getPassword1().equals(userInfo.getPassword2())){
             throw new CustomException(ResultCode.INVALID_PASSWORD);
@@ -636,6 +636,37 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    public ResVO modifyUser(UserVO userInfo){
+
+        if(!isUserNm(userInfo.getLoginID()) ||userInfo.getLoginID().length() > 64){
+            throw new CustomException(ResultCode.INVALID_LOGIN_ID);
+        }
+        else if(!isUserNm(userInfo.getUserNm()) || userInfo.getUserNm().length() > 64){
+            throw new CustomException(ResultCode.INVALID_USER_NAME);
+        }
+        else if(userInfo.getDescription().length() > 200){
+            throw new CustomException(ResultCode.INVALID_REMARK);
+        }
+
+        WebObjectSource wos = factory.getObjectSource();
+
+        try {
+            // Getting the User Group Object
+            WebUser user = (WebUser) wos.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+            user.setFullName(userInfo.getUserNm());
+            user.setDescription(userInfo.getDescription());
+            user.setLoginName(userInfo.getLoginID());
+
+            wos.save(user);
+
+        }catch (WebObjectsException ex){
+            throw new CustomException(ResultCode.EXIST_LOGIN_ID);
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.EXIST_LOGIN_ID);
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
 
     public ResVO delGroup(String groupId){
         System.out.println(groupId);
@@ -655,6 +686,23 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    public ResVO delUser(String userId){
+        System.out.println(userId);
+        WebObjectSource wos = factory.getObjectSource();
+
+        try {
+            // Getting the User Group Object
+            WebUser user = (WebUser) wos.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            // Deleting the User Group Object
+            wos.deleteObject(user);
+
+        }catch (WebObjectsException ex){
+            throw new CustomException(ResultCode.INVALID_USER_ID);
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.INVALID_USER_ID);
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
     //그룹 정보
     public GroupVO getGroupInfo(String groupId) throws WebObjectsException {
         //ObjectSourcec 객체 생성

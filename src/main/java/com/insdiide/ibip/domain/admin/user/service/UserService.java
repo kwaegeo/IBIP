@@ -52,4 +52,14 @@ public class UserService {
         ResVO result = mstrObject.addUser(userInfo);
         return result;
     }
+
+    public ResVO modifyUser(UserVO userInfo){
+        ResVO result = mstrObject.modifyUser(userInfo);
+        return result;
+    }
+
+    public ResVO delUser(String userId) throws WebObjectsException {
+        ResVO result = mstrObject.delUser(userId);
+        return result;
+    }
 }

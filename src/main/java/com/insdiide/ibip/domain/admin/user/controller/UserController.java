@@ -158,4 +158,48 @@ public class UserController {
         return result;
 
     }
+
+    @PostMapping("/userModifyProc")
+    @ResponseBody
+    public ResVO userModifyProc(@RequestBody UserVO userInfo, HttpServletRequest request, HttpServletResponse response){
+
+        System.out.println(userInfo);
+
+        //1. 사용자 세션 (MSTR) 유효성 검사
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        ResVO result = userService.modifyUser(userInfo);
+        return result;
+    }
+
+    @PostMapping("/userDelProc")
+    @ResponseBody
+    public ResVO userDelProc(@RequestBody Map<String,String> userInfo, HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+        //1. 사용자 세션 (MSTR) 유효성 검사
+        String userId = userInfo.get("userId");
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        }catch(CustomException ex){
+            throw ex;
+        }
+
+        ResVO result = userService.delUser(userId);
+        return result;
+    }
+
+
+
 }

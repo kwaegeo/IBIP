@@ -73,10 +73,10 @@
           <div class="tbl-top">
             <div class="left"></div>
             <div class="right">
-              <button type="button" id="btn-modify" class="btn-edit btn-yellow" onclick="modifyUser(this)"><span>수정</span></button>
+              <button type="button" id="btnModify" class="btn-edit btn-yellow" onclick="modifyUser(this)" checkResult="wait"><span>수정</span></button>
               <button type="button" id="" class="btn-primary" onclick="resetPassword()"><span>비밀번호 초기화</span></button>
               <button type="button" id="enableBtn" class="" th:classappend="${userInfo.enableStatus ?'btn-secondary' : 'btn-skyblue'}"th:attr="enableStatus=${userInfo.enableStatus}" onclick="enable(this.getAttribute('enableStatus'))"><span th:text="${userInfo.enableStatus ? '계정 비활성화' : '계정 활성화'}"></span></button>
-              <button type="button" id="btn-delete" class="btn-danger btn-delete"><span>삭제</span></button>
+              <button type="button" id="btn-delete" class="btn-danger btn-delete" onclick="deleteUser()"><span>삭제</span></button>
             </div>
           </div>
         </section>
@@ -146,7 +146,7 @@
   <script src="/js/leedo_custom.js"></script>
   <script th:inline="javascript">
     var userId = [[${userInfo.userId}]]
-
+    var userNm = [[${userInfo.userNm}]]
 
     // 체크박스 전체 선택
     function selectAll(chkAll){
@@ -270,13 +270,72 @@
     }
 
   function modifyUser(button){
-
+    const  userReg = RegExp(/^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\s-]+$/); //한글, 영어,숫자만 입력 가능
+    if($('#btnModify').attr("checkResult") === "wait") {
       var spanElement = button.querySelector('span');
       button.classList.remove("btn-yellow")
       button.classList.add("btn-brown");
       spanElement.textContent = "저장";
-
       $('input[name="userInfo"]').prop('disabled', false);
+      $('#btnModify').attr("checkResult", "save");
+    }
+    else{
+
+      var newLoginId= $('#loginID').val();
+      var userId = $('#userId').val();
+      var userNm = $('#userNm').val();
+      var description = $('#description').val();
+
+      if (validData(newLoginId)) {
+        alert("로그인 ID를 작성해주세요");
+        $('#loginID').focus();
+        return false;
+      }
+      else if (validData(userNm)) {
+        alert("사용자명을 작성해주세요");
+        $('#userNm').focus();
+        return false;
+      }
+      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
+      else if (!userReg.test(newLoginId) || newLoginId.length > 64) {
+        alert("로그인 ID를 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
+        $('#loginID').focus();
+        return false;
+      }
+      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
+      else if (!userReg.test(userNm) || userNm.length > 64) {
+        alert("사용자 명을 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
+        $('#userNm').focus();
+        return false;
+      }
+      else if(description.length > 200){
+        alert("설명을 형식에 맞게 입력해주세요. \n200자 이내");
+        $('#description').focus();
+        return false;
+      }
+      const data = {"userId":userId, "loginID": newLoginId, "userNm": userNm, "description": description};
+      $.ajax({
+        url: "/userModifyProc",
+        data: JSON.stringify(data),
+        method: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+          if (data.code == "S00") {
+            alert("성공적으로 사용자가 수정 되었습니다.")
+            location.reload();
+          } else {
+            alert(data.msg);
+            button.classList.remove("bg-green");
+            button.innerHTML = "수정";
+            return;
+          }
+        },
+        error: function () {
+          alert("통신 에러 발생");
+        }
+      });
+    }
   }
 
   function resetPassword(){
@@ -345,5 +404,45 @@
       return;
     }
   }
+
+  function deleteUser(){
+    var userId = $('#userId').val();
+    if(confirm("("+userNm+") 사용자를 정말로 삭제하시겠습니까? \n삭제 후엔 되돌릴 수 없습니다.")) {
+      //2.1 사용자 할당 요청
+      $.ajax({
+        url: "/userDelProc",
+        data: JSON.stringify({"userId": userId}),
+        contentType: "application/json",
+        method: "POST",
+        dataType: "json",
+        success: function (responseData) {
+          if(responseData.code === "S00"){
+            alert("성공적으로 사용자가 삭제되었습니다.")
+            window.close();
+            opener.getUserList();
+          }
+          else{
+            alert(responseData.msg);
+            return;
+          }
+        },
+        error: function () {
+          alert("서버에 접속할 수 없습니다.")
+        }
+      });
+    }
+    else{
+      return;
+    }
+  }
+
+
+    // 데이터 유효성 검사
+    function validData(data) {
+      if (data == "" || data.length == 0)
+        return true;
+      else
+        return false;
+    }
   </script>
 </html>
