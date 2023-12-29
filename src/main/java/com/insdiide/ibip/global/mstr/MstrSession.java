@@ -55,6 +55,7 @@ public class MstrSession {
 
         try {
             mstrSessionId = serverSession.getSessionID();
+
         }catch (WebObjectsException ex){
             if(ex.getErrorCode() == -2147216959){
                 log.info("입력하신 아이디와 패스워드에 해당하는 사용자가 없습니다.");

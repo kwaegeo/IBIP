@@ -508,7 +508,7 @@ public class MstrObject extends MstrSession{
 
         search.submit();
         WebFolder f = search.getResults();
-
+//        WebPrivilegeCategories webPrivilegeCategories = factory.getObjectSource().getObject();
         System.out.println("보안역할 총 갯수: " + f.size());
 
         List<RoleVO> roleList = new ArrayList<>();
@@ -517,6 +517,11 @@ public class MstrObject extends MstrSession{
             for (int i = 0; i < f.size(); i++) {
                 WebSecurityRole role= (WebSecurityRole) f.get(i);
                 role.populate();
+                WebEditablePrivileges privileges = role.getPrivileges();
+                System.out.println("해당 보안 역할 : "+ role.getName());
+                for(int j=0; j<privileges.size(); j++){
+                    System.out.println(privileges.get(j).getName());
+                }
                 roleList.add(RoleVO.builder().
                         roleId(role.getID()).
                         roleNm(role.getDisplayName()).
@@ -901,7 +906,6 @@ public class MstrObject extends MstrSession{
             enumWoi = (WebObjectInfo) enumeration.nextElement();
 
             //WEBUSER로 캐스팅 불가능 한 것은 try catch로 묶던가 하자
-            enumWoi.populate();
             assignIds.add(enumWoi.getID());
         }
 
@@ -912,12 +916,13 @@ public class MstrObject extends MstrSession{
         search.setAsync(false);
         search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
         search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-
         search.submit();
         WebFolder f = search.getResults();
+
         List<GroupVO> groups = new ArrayList<>();
         System.out.println("그룹 총 갯수: " + f.size());
         System.out.println(assignIds);
+        userInfo.setParentsGroups(groups);
 
         if (f.size() > 0) {
             for (int i = 0; i < f.size(); i++) {
@@ -930,8 +935,7 @@ public class MstrObject extends MstrSession{
                     if (assignIds.contains(group.getID())) {
                         assignYn = "Y";
                     }
-
-                    groups.add(GroupVO.builder().
+                    GroupVO groupEn = GroupVO.builder().
                             groupId(group.getID()).
                             groupNm(group.getName()).
                             childCnt(group.getTotalChildCount()).
@@ -939,16 +943,47 @@ public class MstrObject extends MstrSession{
                             creationTime(group.getCreationTime()).
                             owner(group.getOwner().getName()).
                             assignYn(assignYn).
-                            build()
-                    );
+                            build();
+                    groups.add(groupEn);
                 }
             }
         }
-        userInfo.setParentsGroups(groups);
         return userInfo;
     }
 
+    public void getUserSecurityRole(UserVO userInfo) throws WebObjectsException {
 
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+        WebObjectInfo woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+
+
+        //채워넣기
+        woi.populate();
+
+        // 사용자 그룹 객체
+        WebUser user = (WebUser) woi;
+        user.populate();
+        System.out.println(user.getProjectId());
+        WebProject wp = (WebProject) objectSource.getObject("B19DEDCC11D4E0EFC000EB9495D0F44F", EnumDSSXMLObjectTypes.DssXmlTypeProject);
+
+        WebUserSecurityRoles securityRoles = user.getSecurityRoles();
+        WebSecurityRole[] roles = securityRoles.getRoles(wp);
+
+        for(int i=0; i< roles.length; i++){
+            System.out.println(roles[i].getName());
+            System.out.println(roles[i].getID());
+            System.out.println(roles[i].getDisplayName());
+            System.out.println(roles[i].getDescription());
+        }
+
+
+        System.out.println(securityRoles.size());
+
+    }
 
 
     public ResVO assignGroup(GroupVO groupInfo) {

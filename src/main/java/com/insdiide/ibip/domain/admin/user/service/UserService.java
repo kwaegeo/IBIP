@@ -30,6 +30,7 @@ public class UserService {
          * **/
         UserVO userInfo = mstrObject.getUserInfoById(userId);
         userInfo = mstrObject.getUserGroupList(userInfo);
+//        mstrObject.getUserSecurityRole(userInfo);
         return userInfo;
     }
 
