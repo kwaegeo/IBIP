@@ -83,7 +83,7 @@
 
 .gray-border{
   border: 2px solid #E2E2E2;
-  padding: 20px; /* 테두리와 내용 사이의 간격을 늘립니다. (선택 사항) */
+  padding: 3px; /* 테두리와 내용 사이의 간격을 늘립니다. (선택 사항) */
 }
 
 /* popup - popup__body content */

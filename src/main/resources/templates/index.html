@@ -62,9 +62,6 @@
         <!-- Divider -->
         <hr class="sidebar-divider my-0">
 
-        <!-- Divider -->
-        <hr class="sidebar-divider">
-
         <!-- Heading -->
         <div class="sidebar-heading">
             공유 리포트
@@ -132,7 +129,17 @@
                 <span>사용내역목록</span></a>
         </li>
 
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+
+        <!-- Sidebar Message -->
+        <div class="sidebar-card d-none d-lg-flex">
+            <img class="sidebar-card-illustration mb-2" src="img/undraw_rocket.svg" alt="...">
+            <p class="text-center mb-2"><strong>IBIP v1</strong> 해당 포탈이 마음에 든다면 계약&문의는 아래버튼을 클릭!</p>
+            <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">관리자에게 연락!</a>
+        </div>
     </ul>
+
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -152,7 +159,7 @@
                 <!-- Topbar Search -->
                 <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                     <div class="input-group">
-                        <input id="searchKeyword" type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                        <input id="searchKeyword" type="text" class="form-control bg-light border-0 small" placeholder="리포트 혹은 도씨에를 검색..."
                                aria-label="Search" aria-describedby="basic-addon2">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="button" onclick="searchReport()">
@@ -226,20 +233,20 @@
                              aria-labelledby="userDropdown">
                             <a class="dropdown-item" href="#">
                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profile
+                                내정보
                             </a>
                             <a class="dropdown-item" href="#">
                                 <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Settings
+                                환경설정
                             </a>
                             <a class="dropdown-item" href="#">
                                 <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Activity Log
+                                접속 이력
                             </a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Logout
+                                로그아웃
                             </a>
                         </div>
                     </li>
@@ -290,8 +297,8 @@
             </div>
             <div class="modal-body">현재 세션을 종료할 준비가 되었다면 아래 로그아웃을 클릭해주세요.</div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" onclick="logout()">Logout</a>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">취소</button>
+                <a class="btn btn-primary" onclick="logout()">로그아웃</a>
             </div>
         </div>
     </div>
@@ -339,29 +346,41 @@
                 },
                 "check_callback":true,
             },
-            'plugins' : ["types", "contextmenu"], // plugin 목록에 추가
+            'plugins' : ["types", "contextmenu", "sort"], // plugin 목록에 추가
             'types': {
                 8: { // tp 8= 폴더
                     "icon": "jstree-folder",
                 },
                 3:{ // tp 3= 리포트
-                    "icon": "/dist/themes/default/report.png", //file 아이콘
+                    // "icon": "/dist/themes/default/report.png", //file 아이콘
+                    "icon": "fa fa-file", //file 아이콘
                     "max_children": 0, //leaf이므로 자식을 못갖도록 설정
                     "max_depth":0,
                     "a_attr":{style: "font-color:black;"}
                 },
                 55:{ // tp 55= 다큐먼트
-                    "icon":"/dist/themes/default/document.png", //file 아이콘
+                    // "icon":"/dist/themes/default/document.png", //file 아이콘
+                    "icon": "fa fa-file text-success", //file 아이콘
                     "max_children": 0, //leaf이므로 자식을 못갖도록 설정
                     "max_depth":0,
                 },
-                10:{ // tp 10= 프롬프트
-                    "icon":"/dist/themes/default/prompt.png", //file 아이콘
-                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
-                    "max_depth":0,
-                },
+                // 10:{ // tp 10= 프롬프트
+                //     "icon":"/dist/themes/default/prompt.png", //file 아이콘
+                //     "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                //     "max_depth":0,
+                // },
                 "default":{
                     "icon": "jstree-icon jstree-folder"
+                }
+            },
+            'sort': function(a,b){
+                a1 = this.get_node(a);
+                b1 = this.get_node(b);
+                if (a1.icon == b1.icon) {
+                    return (a1.text > b1.text) ? 1 : -1;
+                }
+                else{
+                    return (a1.icon < b1.icon) ? 1 : -1;
                 }
             },
             'contextmenu': {
