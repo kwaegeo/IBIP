@@ -2392,6 +2392,83 @@ fieldset:disabled a.btn {
   box-shadow: 0 0 0 0.2rem rgba(105, 136, 228, 0.5);
 }
 
+/**gb**/
+
+.btn-gb {
+  color: #fff;
+  background-color: #172f54;
+  border-color: #172f54;
+}
+
+.btn-gb:hover {
+  color: #fff;
+  background-color: #2e4d7e;
+  border-color: #2e4d7e;
+}
+
+.btn-gb:focus, .btn-gb.focus {
+  color: #fff;
+  background-color: #2e59d9;
+  border-color: #2653d4;
+  box-shadow: 0 0 0 0.2rem rgba(105, 136, 228, 0.5);
+}
+
+.btn-gb.disabled, .btn-gb:disabled {
+  color: #fff;
+  background-color: #172f54;
+  border-color: #172f54;
+}
+
+.btn-gb:not(:disabled):not(.disabled):active, .btn-gb:not(:disabled):not(.disabled).active,
+.show > .btn-gb.dropdown-toggle {
+  color: #fff;
+  background-color: #172f54;
+  border-color: #172f54;
+}
+
+.btn-gb:not(:disabled):not(.disabled):active:focus, .btn-gb:not(:disabled):not(.disabled).active:focus,
+.show > .btn-gb.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(105, 136, 228, 0.5);
+}
+
+/**btn-dg**/
+.btn-dg {
+  color: #fff;
+  background-color: #007ca5;
+  border-color: #007ca5;
+}
+
+.btn-dg:hover {
+  color: #fff;
+  background-color: #2e4d7e;
+  border-color: #2e4d7e;
+}
+
+.btn-dg:focus, .btn-dg.focus {
+  color: #fff;
+  background-color: #007ca5;
+  border-color: #007ca5;
+  box-shadow: 0 0 0 0.2rem rgba(105, 136, 228, 0.5);
+}
+
+.btn-dg.disabled, .btn-dg:disabled {
+  color: #fff;
+  background-color: #007ca5;
+  border-color: #007ca5;
+}
+
+.btn-dg:not(:disabled):not(.disabled):active, .btn-dg:not(:disabled):not(.disabled).active,
+.show > .btn-dg.dropdown-toggle {
+  color: #fff;
+  background-color: #007ca5;
+  border-color: #007ca5;
+}
+
+.btn-dg:not(:disabled):not(.disabled):active:focus, .btn-dg:not(:disabled):not(.disabled).active:focus,
+.show > .btn-dg.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(105, 136, 228, 0.5);
+}
+
 .btn-secondary {
   color: #fff;
   background-color: #858796;
@@ -9943,6 +10020,20 @@ a:focus {
   background-image: linear-gradient(180deg, #f8f9fc 10%, #c2cbe5 100%);
   background-size: cover;
 }
+
+.bg-gradient-gb {
+  background-color: #122b4f;
+  background-image: linear-gradient(180deg, #122b4f 10%, #172f54 100%);
+  background-size: cover;
+}
+
+
+.bg-gradient-dg {
+  background-color: #007ca5;
+  background-image: linear-gradient(180deg, #007ca5 10%, #389dbe 100%);
+  background-size: cover;
+}
+
 
 .bg-gradient-dark {
   background-color: #5a5c69;

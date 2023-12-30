@@ -49,7 +49,7 @@
 <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" style="overflow:auto;">
+    <ul class="navbar-nav bg-gradient-gb sidebar sidebar-dark accordion" id="accordionSidebar" style="overflow:auto; overflow-y: scroll;height: 400px;">
 
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/main">
@@ -162,7 +162,7 @@
                         <input id="searchKeyword" type="text" class="form-control bg-light border-0 small" placeholder="리포트 혹은 도씨에를 검색..."
                                aria-label="Search" aria-describedby="basic-addon2">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" onclick="searchReport()">
+                            <button class="btn btn-gb" type="button" onclick="searchReport()">
                                 <i class="fas fa-search fa-sm"></i>
                             </button>
                         </div>
@@ -463,28 +463,33 @@
                 },
                 "check_callback":true,
             },
-            'plugins' : ["types", "contextmenu"], // plugin 목록에 추가
+            'plugins' : ["types", "contextmenu", "sort"], // plugin 목록에 추가
             'types': {
                 8: { // tp 8= 폴더
                     "icon": "jstree-folder",
                 },
                 3:{ // tp 3= 리포트
-                    "icon": "/dist/themes/default/report.png", //file 아이콘
+                    "icon": "fa fa-file",
                     "max_children": 0, //leaf이므로 자식을 못갖도록 설정
                     "max_depth":0,
                 },
                 55:{ // tp 55= 다큐먼트
-                    "icon":"/dist/themes/default/document.png", //file 아이콘
-                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
-                    "max_depth":0,
-                },
-                10:{ // tp 10= 프롬프트
-                    "icon":"/dist/themes/default/prompt.png", //file 아이콘
+                    "icon":"fa fa-file text-success",
                     "max_children": 0, //leaf이므로 자식을 못갖도록 설정
                     "max_depth":0,
                 },
                 "default":{
                     "icon": "jstree-icon jstree-folder"
+                }
+            },
+            'sort': function(a,b){
+                a1 = this.get_node(a);
+                b1 = this.get_node(b);
+                if (a1.icon == b1.icon) {
+                    return (a1.text > b1.text) ? 1 : -1;
+                }
+                else{
+                    return (a1.icon < b1.icon) ? 1 : -1;
                 }
             },
             'contextmenu': {
