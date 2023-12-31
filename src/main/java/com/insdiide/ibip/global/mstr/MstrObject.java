@@ -771,6 +771,7 @@ public class MstrObject extends MstrSession{
         WebObjectSource objectSource = factory.getObjectSource();
 
         //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+        objectSource.setFlags(objectSource.getFlags()|EnumDSSXMLObjectFlags.DssXmlObjectComments);
         WebObjectInfo woi = objectSource.getObject(userId ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
         //채워넣기
@@ -791,7 +792,7 @@ public class MstrObject extends MstrSession{
         WebUserList wul = user.getParents();
 
         System.out.println(wul.size());
-
+        System.out.println(user.getAbbreviation());
         Enumeration  enumeration = wul.elements();
         WebObjectInfo enumWoi = null;
         // 객체 수 만큼 반복
@@ -1093,6 +1094,9 @@ public class MstrObject extends MstrSession{
             WebUser user = (WebUser) woi;
             user.populate();
             user.setEnabled(userInfo.isEnableStatus());
+            String[] name=new String[1];
+            name[0]="kim";
+            user.setComments(name);
             objectSource.save(user);
 
         } catch (WebObjectsException e) {
