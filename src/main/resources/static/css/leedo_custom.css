@@ -42,3 +42,58 @@
     background-color: skyblue;
     border-color: skyblue;
 }
+
+.table-bmb {
+    border: 1px solid #e3e6f0;
+    /*border-top: 2px solid #353e4d;*/
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+    text-align: center;
+}
+
+.table-bmb tbody td {
+    padding: 14px 10px;
+    color: #666666;
+    /* font-size: 13px; */
+    font-size: 13px;
+    font-weight: 300;
+    border-bottom: 1px solid #cfcfd1;
+}
+.table-bmb thead {
+    border-bottom: 1px solid #cfcfd1;
+}
+
+.table-bmb thead th {
+    padding: 14px 10px;
+    color: #505050;
+    /* font-size: 14px; */
+    font-size: 14px;
+    font-weight: 400;
+    background-color: #f2f2f2;
+}
+
+.table-bmb tbody td._title {
+    text-align: left;
+    max-width: 85%;
+}
+
+.table-bmb tbody tr:hover {
+    background-color: #add8e6;  /* 옅은 푸른색으로 변경 (이 값은 원하는 색상으로 조절 가능) */
+}
+
+.table-bmb tbody td._desc {
+    text-align: left;
+    max-width: 85%;
+}
+
+.custom-ellipsis {
+    white-space: nowrap;         /* 텍스트를 한 줄로 강제로 표시 */
+    overflow: hidden;            /* 넘치는 텍스트 숨김 */
+    text-overflow: ellipsis;     /* 넘치는 텍스트에 대해 생략 부호(...) 표시 */
+}
+
+.custom-title-ellipsis{
+    font-weight: 700; max-width: 85%; display: inline-block;
+}

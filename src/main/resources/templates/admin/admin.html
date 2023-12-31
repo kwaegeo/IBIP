@@ -346,32 +346,36 @@
                                         <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
                                             <div class="row" id="searchDiv">
                                                 <div class="col-sm-12">
-                                                            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+                                                            <table class="table-bmb" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
                                                                 <thead>
                                                                 <tr role="row">
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;" aria-sort="ascending">그룹명
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;" aria-sort="ascending">번호
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 8%;" aria-sort="ascending">하위 개체 수
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 15%;" aria-sort="ascending">그룹명
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 55%;">설명
-                                                                    </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 15%;">생성일자
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 50%;" aria-sort="ascending">설명
                                                                     </th>
                                                                     <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">소유자
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">하위 개체 수
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">생성일자
                                                                     </th>
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                 `;
                     for (var i = 0; i < responseData.length; i++) {
+                        var reverseIndex = responseData.length - i;
                         inputTable +=
                             `
-                            <tr class="odd">
-                                <td><a href="#" onclick="getGroupInfo('${responseData[i].groupId}')">${responseData[i].groupNm}</a></td>
-                                <td>${responseData[i].childCnt}</td>
-                                <td>${responseData[i].description}</td>
-                                <td>${responseData[i].creationTime}</td>
+                            <tr class="odd" onclick="getGroupInfo('${responseData[i].groupId}')">
+                                <td>${reverseIndex}</td>
+                                <td class="_title"><a href="#" class="custom-ellipsis custom-title-ellipsis">${responseData[i].groupNm}</a></td>
+                                <td class="_desc custom-ellipsis">${responseData[i].description}</td>
                                 <td>${responseData[i].owner}</td>
+                                <td>${responseData[i].childCnt}</td>
+                                <td>${responseData[i].creationTime}</td>
                             </tr>
                         `
                     }

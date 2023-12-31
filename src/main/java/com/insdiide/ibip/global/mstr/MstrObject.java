@@ -27,7 +27,9 @@ import com.microstrategy.webapi.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -433,17 +435,24 @@ public class MstrObject extends MstrSession{
 
         List<GroupVO> groupList = new ArrayList<>();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         if (f.size() > 0) {
             for (int i = 0; i < f.size(); i++) {
                 WebUserGroup group= (WebUserGroup) f.get(i);
                 group.populate();
+                SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+                Date creationTime = null;
+                try {
+                    creationTime = originalFormat.parse(group.getCreationTime());
+                }catch (Exception e){}
                 if(group.isGroup()){
                     groupList.add(GroupVO.builder().
                             groupId(group.getID()).
                             groupNm(group.getName()).
                             childCnt(group.getTotalChildCount()).
                             description(group.getDescription()).
-                            creationTime(group.getCreationTime()).
+                            creationTime(sdf.format(creationTime)).
                             owner(group.getOwner().getName()).
                             build()
                     );
