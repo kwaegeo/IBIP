@@ -194,6 +194,8 @@ public class MstrObject extends MstrSession{
         SearchVO search = new SearchVO();
         List<SearchResultVO> searchList = new ArrayList<>();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         for(int i=0; i< objectResult.size(); i++){
             WebObjectInfo woi = objectResult.get(i);
             woi.populate();
@@ -215,12 +217,19 @@ public class MstrObject extends MstrSession{
                 }
                 reportPath += " > " + reportName;
                 System.out.println(reportPath);
+
+                SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+                Date creationTime = null;
+                try {
+                    creationTime = originalFormat.parse(woi.getCreationTime());
+                }catch (Exception e){}
+
                 SearchResultVO searchResult = new SearchResultVO(
                         woi.getID(),
                         woi.getName(),
                         woi.getType(),
                         woi.getOwner().getName(),
-                        woi.getCreationTime(),
+                        sdf.format(creationTime),
                         reportPath
                 );
                 searchList.add(searchResult);
@@ -481,11 +490,17 @@ public class MstrObject extends MstrSession{
 
         List<UserVO> userList = new ArrayList<>();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         if (f.size() > 0) {
             for (int i = 0; i < f.size(); i++) {
                 WebUser user= (WebUser) f.get(i);
                 user.populate();
-
+                SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+                Date modification = null;
+                try {
+                    modification = originalFormat.parse(user.getModificationTime());
+                }catch (Exception e){}
                 if(!user.isGroup()){
                     userList.add(UserVO.builder().
                             enableStatus(user.isEnabled()).
@@ -493,7 +508,7 @@ public class MstrObject extends MstrSession{
                             loginID(user.getLoginName()).
                             userNm(user.getDisplayName()).
                             owner(user.getOwner().getDisplayName()).
-                            modification(user.getModificationTime()).
+                            modification(sdf.format(modification)).
                             description(user.getDescription()).
                             build()
                     );
@@ -522,10 +537,19 @@ public class MstrObject extends MstrSession{
 
         List<RoleVO> roleList = new ArrayList<>();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         if (f.size() > 0) {
             for (int i = 0; i < f.size(); i++) {
                 WebSecurityRole role= (WebSecurityRole) f.get(i);
                 role.populate();
+
+                SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+                Date modification = null;
+                try {
+                    modification = originalFormat.parse(role.getModificationTime());
+                }catch (Exception e){}
+
                 WebEditablePrivileges privileges = role.getPrivileges();
                 System.out.println("해당 보안 역할 : "+ role.getName());
                 for(int j=0; j<privileges.size(); j++){
@@ -535,7 +559,7 @@ public class MstrObject extends MstrSession{
                         roleId(role.getID()).
                         roleNm(role.getDisplayName()).
                         owner(role.getOwner().getDisplayName()).
-                        modification(role.getModificationTime()).
+                        modification(sdf.format(modification)).
                         description(role.getDescription()).
                         build()
                 );

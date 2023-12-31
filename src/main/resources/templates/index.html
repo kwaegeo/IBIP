@@ -1169,7 +1169,9 @@
                     inputTable = `
 
                 <div class="container-fluid" name="">
-                    <h3 class="h5 text-gray-800 md-18">검색결과 총 ${responseData.searchList.length}건</h3>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h5 class="text-gray-800 md-18">검색결과 총 <strong style="color: #122b4f">${responseData.searchList.length}</strong>건</h5>
+                    </div>
                     <div class="rows">
                         <div id="contentDiv">
                             <div class="card shadow mb-4">
@@ -1178,21 +1180,18 @@
                                         <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
                                             <div class="row" id="searchDiv">
                                                 <div class="col-sm-12">
-                                                            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+                                                            <table class="table-bmb" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
                                                                 <thead>
                                                                 <tr role="row">
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 1%;" aria-sort="ascending">타입
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 4%;" aria-sort="ascending">번호
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 24%;" aria-sort="ascending">문서명
-                                                                    </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 8%;">소유자
-                                                                    </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 12%;">생성일자
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;" aria-sort="ascending">문서명
                                                                     </th>
                                                                     <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 50%;">경로
                                                                     </th>
-                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;">조회
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 11%;">소유자
                                                                     </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">생성일자
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -1200,23 +1199,26 @@
                     for (var i = 0; i < responseData.searchList.length; i++) {
                         var docName="";
                         var docType="";
+                        var iconClass = "fa fa-file jstree-themeicon-custom";
                         if(responseData.searchList[i].resultType === 3){
                             docName= "리포트";
                             docType = "R";
+
                         }
                         else if(responseData.searchList[i].resultType === 55){
                             docName= "다큐먼트(도씨에)";
                             docType = "D";
+                            iconClass += " text-success";
                         }
+                        var reverseIndex = responseData.searchList.length - i;
                         inputTable +=
                             `
-                            <tr class="odd">
-                                <td>${docName}</td>
-                                <td>${responseData.searchList[i].resultName}</td>
+                            <tr class="odd" onclick="getReportData('${responseData.searchList[i].resultId}','${docType}')">
+                                <td>${reverseIndex}</td>
+                                <td class="_title"><i class="jstree-icon jstree-themeicon ${iconClass}" style="margin-right: 10px;"></i><a href="#" class="custom-ellipsis custom-title-ellipsis">${responseData.searchList[i].resultName}</a></td>
+                                <td class="_desc custom-ellipsis">${responseData.searchList[i].resultPath}</td>
                                 <td>${responseData.searchList[i].resultOwner}</td>
                                 <td>${responseData.searchList[i].creationTime}</td>
-                                <td>${responseData.searchList[i].resultPath}</td>
-                                <td style="text-align: center;"><button style="margin: 0 auto;" onclick="getReportData('${responseData.searchList[i].resultId}', '${docType}')"><img src="/img/submit.png" style="width: 20px;"></img></button></td>
                             </tr>
                         `
                     }
