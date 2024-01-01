@@ -39,11 +39,7 @@ public class MstrSession {
     public String createSession(String userId, String pwd) throws WebObjectsException {
 
         serverSession = factory.getIServerSession();
-        System.out.println("처음으로 접속한 계정 : " + serverSession.getLogin());
-        if(!(serverSession.getLogin().isEmpty())){
-            serverSession.closeSession();
-            System.out.println(serverSession);
-        }
+
         serverSession.setServerName(serverName);
         serverSession.setServerPort(0);
         serverSession.setProjectName(mstrProjectName);
@@ -51,7 +47,6 @@ public class MstrSession {
         serverSession.setPassword(pwd);
         serverSession.setLocaleID(1042);
         serverSession.setAuthMode(1);
-        System.out.println("두번째로 접속한 계정 : " + serverSession.getLogin());
 
         try {
             mstrSessionId = serverSession.getSessionID();
@@ -81,12 +76,12 @@ public class MstrSession {
 
 
     public boolean userIsAlive(String mstrSessionId) {
-        serverSession = factory.getIServerSession();
+//        serverSession = factory.getIServerSession();
         //현재 살아있으면 false 죽어있으면 true
-        serverSession.setSessionID(mstrSessionId);
-        String usrSmgr = serverSession.saveState(0);
-        serverSession.restoreState(usrSmgr);    //session 가져오기 (복원에 성공하면 true??)
-        serverSession.setActive(); //이건 도대체 왜하는거여
+//        serverSession.setSessionID(mstrSessionId);
+//        String usrSmgr = serverSession.saveState(0);
+//        serverSession.restoreState(usrSmgr);    //session 가져오기 (복원에 성공하면 true??)
+//        serverSession.setActive(); //이건 도대체 왜하는거여
 
         try {
             if (serverSession.isAlive()) { // 살아있으면
@@ -101,7 +96,7 @@ public class MstrSession {
             log.info("Exception e >> userIsAlive");
         }
 
-        System.out.println(usrSmgr);
+//        System.out.println(usrSmgr);
         System.out.println(mstrSessionId);
         System.out.println("이거맞는지?");
 

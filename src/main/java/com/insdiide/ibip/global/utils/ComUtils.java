@@ -18,8 +18,10 @@ public class ComUtils {
     @Autowired
     private MstrObject mstrObject;
 
+    @Autowired MstrSession mstrSession;
+
     public void sessionCheck(String mstrSessionId, HttpServletRequest request, HttpServletResponse response){
-        if(mstrObject.userIsAlive(mstrSessionId)){
+        if(mstrSession.userIsAlive(mstrSessionId)){
             throw new CustomException(ResultCode.MSTR_NO_SESSION, request, response);
         }
     }

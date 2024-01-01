@@ -1,5 +1,6 @@
 package com.insdiide.ibip.global.mstr;
 
+import com.insdiide.ibip.domain.admin.license.vo.LicenseVO;
 import com.insdiide.ibip.domain.admin.role.vo.RoleVO;
 import com.insdiide.ibip.domain.admin.user.vo.UserVO;
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
@@ -44,7 +45,7 @@ public class MstrObject extends MstrSession{
      */
     protected WebObjectsFactory factory		= WebObjectsFactory.getInstance();
 
-    public WebIServerSession serverSession;
+//    public WebIServerSession serverSession;
 
     //세션 정보 입력
     public void setSession(String mstrSessionId){
@@ -543,7 +544,8 @@ public class MstrObject extends MstrSession{
             for (int i = 0; i < f.size(); i++) {
                 WebSecurityRole role= (WebSecurityRole) f.get(i);
                 role.populate();
-
+                System.out.println(role.getType());
+                System.out.println(role.getSubType());
                 SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
                 Date modification = null;
                 try {
@@ -554,6 +556,9 @@ public class MstrObject extends MstrSession{
                 System.out.println("해당 보안 역할 : "+ role.getName());
                 for(int j=0; j<privileges.size(); j++){
                     System.out.println(privileges.get(j).getName());
+                    System.out.println(privileges.get(j).getType());
+//                    System.out.println(privileges.get(j).);
+                    System.out.println(privileges.get(j).getDescription());
                 }
                 roleList.add(RoleVO.builder().
                         roleId(role.getID()).
@@ -809,6 +814,72 @@ public class MstrObject extends MstrSession{
 
         return userInfo;
     }
+
+    public RoleVO getRoleInfo(String roleId) throws WebObjectsException {
+
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        WebSearch search = objectSource.getNewSearchObject();
+
+        LicenseSource licenseSource = factory.getLicenseSource();
+
+
+//        System.out.println(licenseSource.getPrivilegesForLicenseType(EnumDSSXMLLicenseType.DssXmlLicenseTypeReserved));
+        CPULicenseDetails cpuLicenseDetails = licenseSource.getCPUCompliance();
+        NamedUserLicense[] namedUserLicenses = licenseSource.getNamedUserCompliance();
+//        namedUserLicenses[0].
+        System.out.println(cpuLicenseDetails.size());
+        System.out.println(cpuLicenseDetails.get(0).getCPUIDs());
+        System.out.println(cpuLicenseDetails.get(0).getMachineName());
+        System.out.println(cpuLicenseDetails.get(0).getNumberOfCPUs());
+        System.out.println(cpuLicenseDetails.get(0).isClustered());
+        System.out.println(namedUserLicenses.length);
+        for (int i=0; i< namedUserLicenses.length; i++){
+            System.out.println(namedUserLicenses[i].getName());
+            System.out.println(namedUserLicenses[i].getLicenseType());
+            System.out.println(namedUserLicenses[i].getCurrentUsage());
+            System.out.println(namedUserLicenses[i].getMaximumUsage());
+            System.out.println(namedUserLicenses[i].hasLicenseType());
+            System.out.println();
+//            System.out.println(namedUserLicenses[0].getMaximumUsage());
+//            System.out.println(namedUserLicenses[0].getCurrentUsage());
+//            System.out.println(namedUserLicenses[0].hasLicenseType());
+        }
+
+
+//        WebPrivilegeCategories webPrivilegeCategories = objectSource.getUserServicesSource().getPrivilegeCategories();
+
+
+
+        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+        WebObjectInfo woi = objectSource.getObject(roleId ,EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
+
+        //채워넣기
+        woi.populate();
+
+        // 사용자 그룹 객체
+        WebSecurityRole role = (WebSecurityRole) woi;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+
+        Date modification = null;
+        try {
+            modification = originalFormat.parse(role.getModificationTime());
+        }catch (Exception e){}
+        role.populate();
+
+        RoleVO roleInfo = RoleVO.builder().
+                roleId(role.getID()).
+                roleNm(role.getDisplayName()).
+                owner(role.getOwner().getDisplayName()).
+                modification(sdf.format(modification)).
+                description(role.getDescription()).
+                build();
+
+        return roleInfo;
+    }
+
 
     //그룹에 포함된 사용자 정보
     public GroupVO getGroupUserList(GroupVO groupInfo) throws WebObjectsException {
@@ -1152,16 +1223,18 @@ public class MstrObject extends MstrSession{
         WebObjectSource objectSource=factory.getObjectSource();
 
         LicenseSource ls = factory.getLicenseSource();
-
         WebUserEntity everyone = (WebUserEntity)objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F",34,true);
         UserLicenseAudit ula = ls.auditUsers(everyone);
         LicensedUsers lus = ula.getUnlicensedUsers();
+
+
         String message = "Unlicensed Users:\n" ;
         for (int i=0;i<lus.size();i++)
             message += lus.get(i).getDisplayName() + "\n";
 
 //Get user named licenses
         NamedUserLicense[] sl = ls.getNamedUserCompliance();
+
         message += "\n\nLicensed Users:\n";
 
 //loop over the different license types
@@ -1173,8 +1246,14 @@ public class MstrObject extends MstrSession{
 LicensedUsers collection would allow to display also
 the individual names of the licensed users*/
 
-            message += "Licensed Users: " + ula.getLicensedUsers(sl[i].getLicenseType()).size() + "\t";
+            message += "Licensed Users: " + ula.getLicensedUsers(sl[i].getLicenseType()).size() + "\n";
+//                                            ula.getUn
+//            message += "enabled user list: ";
+//            for(int j=0; j<lus2.size(); j++){
+//                message += lus2.get(j).getDisplayName() +"\n";
+//            }
 
+            message += "enabled: " + + sl[i].getCurrentUsage() + "\t";
 //Get license max usage
             message += " Max = " + sl[i].getMaximumUsage() + "\n";
         }
@@ -1182,6 +1261,84 @@ the individual names of the licensed users*/
         System.out.println( message);
     }
 
+    public List<LicenseVO> getLicenseList() throws WebObjectsException {
+        //라이센스 이름 (타입), Max 수, 총 유저 수, 활성화 된 수, 비활성화 된 수
+        WebObjectSource objectSource = factory.getObjectSource();
+        LicenseSource licenseSource = factory.getLicenseSource();
 
+        NamedUserLicense[] namedUserLicenses = licenseSource.getNamedUserCompliance();
 
+        //Everyone 그룹으로 모든 사용자 검색
+        WebUserEntity everyone = (WebUserEntity)objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F",34,true);
+        UserLicenseAudit audit = licenseSource.auditUsers(everyone);
+
+        List<LicenseVO> licenseList = new ArrayList<>();
+        for(int i=0; i< namedUserLicenses.length; i++){
+            int totalUsage = audit.getLicensedUsers(namedUserLicenses[i].getLicenseType(), EnumDSSXMLAuditUserFilter.DssXmlAuditIgnoreEnabledFlag).size();
+            int enableUsage = namedUserLicenses[i].getCurrentUsage();
+            int disableUsage = totalUsage - enableUsage;
+
+            LicenseVO license = LicenseVO.builder().
+                    licenseType(namedUserLicenses[i].getLicenseType()).
+                    licenseNm(namedUserLicenses[i].getName()).
+                    maxUsage(namedUserLicenses[i].getMaximumUsage()).
+                    totalUsage(totalUsage).
+                    enableUsage(enableUsage).
+                    disableUsage(disableUsage).
+                    build();
+
+            licenseList.add(license);
+        }
+        return licenseList;
+    }
+
+    public LicenseVO getLicenseInfo(int licenseType) throws WebObjectsException {
+        //라이센스 이름 (타입), Max 수, 총 유저 수, 활성화 된 수, 비활성화 된 수
+        WebObjectSource objectSource = factory.getObjectSource();
+        LicenseSource licenseSource = factory.getLicenseSource();
+        NamedUserLicense[] namedUserLicenses = licenseSource.getNamedUserCompliance();
+
+        //Everyone 그룹으로 모든 사용자 검색
+        WebUserEntity everyone = (WebUserEntity)objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F",34,true);
+
+        UserLicenseAudit audit = licenseSource.auditUsers(everyone);
+        LicensedUsers licensedUsers = audit.getLicensedUsers(licenseType);
+
+        List<UserVO> enableUsers = new ArrayList<>();
+        List<UserVO> disableUsers = new ArrayList<>();
+
+        for(int i=0; i<licensedUsers.size(); i++){
+            WebUser webUser = (WebUser) licensedUsers.get(i);
+            webUser.populate();
+            UserVO user = UserVO.builder().
+                    userId(webUser.getID()).
+                    loginID(webUser.getLoginName()).
+                    userNm(webUser.getDisplayName()).
+                    owner(webUser.getOwner().getDisplayName()).
+                    modification(webUser.getModificationTime()).
+                    description(webUser.getDescription()).
+                    enableStatus(webUser.isEnabled()).
+                    build();
+
+            if(user.isEnableStatus()){
+                enableUsers.add(user);
+            }
+            else{
+                disableUsers.add(user);
+            }
+        }
+
+        LicenseVO licenseInfo = new LicenseVO();
+        for(int i=0; i<namedUserLicenses.length; i++){
+            if(licenseType == namedUserLicenses[i].getLicenseType()){
+                licenseInfo.setLicenseNm(namedUserLicenses[i].getName());
+                licenseInfo.setLicenseType(namedUserLicenses[i].getLicenseType());
+            }
+        }
+
+        licenseInfo.setEnableUsers(enableUsers);
+        licenseInfo.setDisableUsers(disableUsers);
+
+        return licenseInfo;
+    }
 }

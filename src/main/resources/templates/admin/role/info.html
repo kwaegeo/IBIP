@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>보안역할 정보</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style2.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+    <!-- JS -->
+    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/common.js" defer></script>
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+      <div class="popup__head">
+        <h1>IBIP</h1>
+        <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+      </div>
+      <div class="popup__body">
+        <section>
+          <!--230222, section내용 전체 수정됨-->
+          <h2>보안역할 정보</h2>
+          <div class="search">
+            <form action="#" method="" name="userform">
+              <fieldset>
+                <legend>보안역할 정보</legend>
+                <ul class="form-input">
+                  <li>
+                    <div class="input-area">
+                      <label for="roleNm">보안역할명</label>
+                      <input type="text" name="roleInfo" id="roleNm" th:value="${roleInfo.roleNm}" disabled/>
+                    </div>
+                    <div class="input-area">
+                      <label for="description">설명</label>
+                      <input type="text"  id="description" th:value="${roleInfo.description}" disabled/>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="input-area">
+                      <label for="owner">소유자</label>
+                      <input type="text" id="owner" th:value="${roleInfo.owner}" disabled/>
+                    </div>
+                    <div class="input-area">
+                      <label for="modification">변경시간</label>
+                      <input type="text"  id="modification" value="" th:value="${roleInfo.modification}" disabled/>
+                    </div>
+                  </li>
+                </ul>
+              </fieldset>
+            </form>
+          </div>
+        </section>
+        <section>
+          <div class="tbl-top">
+            <div class="left"></div>
+            <div class="right">
+              <button type="button" id="btnModify" class="btn-edit btn-yellow" onclick="modifyUser(this)" checkResult="wait"><span>수정</span></button>
+              <button type="button" id="btn-delete" class="btn-danger btn-delete" onclick="deleteUser()"><span>삭제</span></button>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h3>권한 정보</h3>
+          <div class="box">
+            <div class="tbl-top">
+            </div>
+            <!--스크롤 테이블에 scroll 클래스 추가-->
+            <!--230222, 테이블 항목 수정-->
+<!--            <div class="tbl-list scroll">-->
+<!--              <table summary="선택, 할당유무, 사용자id, 사용자명, 생성일시 항목으로 구성된 사용자 관리 리스트 입니다.">-->
+<!--                <caption>-->
+<!--                  그룹 관리 리스트-->
+<!--                </caption>-->
+<!--                <colgroup>-->
+<!--                  <col style="width: 5%" />-->
+<!--                  <col style="width: 5%" />-->
+<!--                  <col style="width: 25%" />-->
+<!--                  <col style="width: 5%" />-->
+<!--                  <col style="width: 30%" />-->
+<!--                  <col style="width: 15%" />-->
+<!--                  <col style="width: 15%" />-->
+<!--                </colgroup>-->
+<!--                <thead>-->
+<!--                  <tr>-->
+<!--                    <th scope="col">-->
+<!--                      <input type="checkbox" id="chkAll" onclick="selectAll(this)"/>-->
+<!--                    </th>-->
+<!--                    <th scope="col">할당유무</th>-->
+<!--                    <th scope="col">그룹명</th>-->
+<!--                    <th scope="col">하위 개체 수</th>-->
+<!--                    <th scope="col">설명</th>-->
+<!--                    <th scope="col">생성일자</th>-->
+<!--                    <th scope="col">소유자</th>-->
+<!--                  </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                  <tr th:each="groups : ${roleInfo.parentsGroups}" th:class="${groups.assignYn} == 'Y'? 'pick' : '' ">-->
+<!--                    <td><input type="checkbox" id="c2" name="chk" th:value="${groups.groupId}"/></td>-->
+<!--                    <td th:text="${groups.assignYn}"></td>-->
+<!--                    <td th:text="${groups.groupNm}"></td>-->
+<!--                    <td th:text="${groups.childCnt}"></td>-->
+<!--                    <td th:text="${groups.description}"></td>-->
+<!--                    <td th:text="${groups.creationTime}"></td>-->
+<!--                    <td th:text="${groups.owner}"></td>-->
+<!--                  </tr>-->
+<!--                </tbody>-->
+<!--              </table>-->
+<!--            </div>-->
+            <!--230222, tbl-bottom 위치 수정 : <div class="box"> 안으로 이동-->
+            <div class="tbl-bottom">
+              <div class="left">
+                <button type="button" onclick="assignment('assign')"><span>할당</span></button>
+                <button type="button" onclick="assignment('unassign')"><span>회수</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!--230222, 버튼 영역 수정-->
+      <div class="popup__footer">
+        <button type="button" class="pop-close bg-gray"><span>닫기</span></button>
+      </div>
+    </div>
+  </body>
+  <script src="/js/leedo_custom.js"></script>
+  <script th:inline="javascript">
+
+    // 체크박스 전체 선택
+    function selectAll(chkAll){
+
+      $('input:checkbox[name="chk"]').each(function() {
+        this.checked = chkAll.checked
+      });
+
+    }
+    //전체 선택, 해제 비교
+    $("input[name=chk]").click(function() {
+      var total = $("input[name=chk]").length;
+      var checked = $("input[name=chk]:checked").length;
+
+      if(total != checked) $("#chkAll").prop("checked", false);
+      else $("#chkAll").prop("checked", true);
+    });
+
+    function validCheck(type){
+
+      //할당정보 YN
+      var checkAssign = true;
+      var checkmsg = "";
+
+      var type = type
+
+      if($('input[name=chk]:checked').length === 0){
+        checkmsg ="선택된 항목이 없습니다.";
+        checkAssign = false;
+      }
+
+      else {
+        // 체크 된 ID중 할당정보에 따른 검사
+        $('input[name=chk]:checked').each(function (index) {
+          //선택된 체크박스의 tr
+          var selectedTr = $(this).parent().parent();
+          //선택된 체크박스의 td
+          var selectedTd = selectedTr.children();
+          //선택된 체크박스의 할당 정보
+          var selectedAssign = selectedTd.eq(1).text();
+
+          if (type === "assign") {
+            if (selectedAssign == "Y") {
+              checkmsg = "할당되지 않은 그룹만 할당 가능합니다.";
+              checkAssign = false;
+              return false;
+            }
+          } else if (type === "unassign") {
+
+            if (selectedAssign == "N") {
+              checkmsg = "할당 된 그룹만 회수 가능합니다.";
+              checkAssign = false;
+              return false;
+            }
+          }
+        })
+      }
+      if(!checkAssign) {
+        alert(checkmsg);
+        return false;
+      }
+      else {
+        return true;
+      }
+    }
+
+
+
+    function assignment(assignmentType) {
+      if (validCheck(assignmentType)) {
+
+        // 1. 사용명 추출
+        var userId = $('#userId').val();
+
+        // 1.1 그룹 ID를 담을 배열 선언
+        var groups = []
+
+        // 1.2 checkbox에 해당된 ID 배열에 추가
+        $("input[name=chk]:checked").each(function (index) {
+          var id = $(this).val();
+          group = {groupId: id}
+          groups.push(group);
+        })
+
+
+        //2. 요청값 설정
+        const data = {
+          "userId": userId,
+          "parentsGroups": groups,
+          "assignmentType": assignmentType
+        };
+
+        //2.1 사용자 할당 요청
+        $.ajax({
+          url: "/userManageAssignment",
+          data: JSON.stringify(data),
+          contentType: "application/json",
+          method: "POST",
+          dataType: "json",
+          success: function (responseData) {
+            var msg = "";
+            if(responseData.code === "S00"){
+              if(assignmentType == 'assign'){
+                msg="그룹이 정상적으로 할당되었습니다.";
+              }
+              else{
+                msg="그룹이 정상적으로 회수되었습니다.";
+              }
+              alert(msg);
+              $(".cm-loading").show();
+
+              location.reload();
+            }
+
+          },
+          error: function () {
+            alert("서버에 접속할 수 없습니다.")
+          }
+        });
+      }
+    }
+
+  function modifyUser(button){
+    const  userReg = RegExp(/^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\s-]+$/); //한글, 영어,숫자만 입력 가능
+    if($('#btnModify').attr("checkResult") === "wait") {
+      var spanElement = button.querySelector('span');
+      button.classList.remove("btn-yellow")
+      button.classList.add("btn-brown");
+      spanElement.textContent = "저장";
+      $('input[name="roleInfo"]').prop('disabled', false);
+      $('#btnModify').attr("checkResult", "save");
+    }
+    else{
+
+      var newLoginId= $('#loginID').val();
+      var userId = $('#userId').val();
+      var userNm = $('#userNm').val();
+      var description = $('#description').val();
+
+      if (validData(newLoginId)) {
+        alert("로그인 ID를 작성해주세요");
+        $('#loginID').focus();
+        return false;
+      }
+      else if (validData(userNm)) {
+        alert("사용자명을 작성해주세요");
+        $('#userNm').focus();
+        return false;
+      }
+      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
+      else if (!userReg.test(newLoginId) || newLoginId.length > 64) {
+        alert("로그인 ID를 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
+        $('#loginID').focus();
+        return false;
+      }
+      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
+      else if (!userReg.test(userNm) || userNm.length > 64) {
+        alert("사용자 명을 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
+        $('#userNm').focus();
+        return false;
+      }
+      else if(description.length > 200){
+        alert("설명을 형식에 맞게 입력해주세요. \n200자 이내");
+        $('#description').focus();
+        return false;
+      }
+      const data = {"userId":userId, "loginID": newLoginId, "userNm": userNm, "description": description};
+      $.ajax({
+        url: "/userModifyProc",
+        data: JSON.stringify(data),
+        method: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+          if (data.code == "S00") {
+            alert("성공적으로 사용자가 수정 되었습니다.")
+            location.reload();
+          } else {
+            alert(data.msg);
+            button.classList.remove("bg-green");
+            button.innerHTML = "수정";
+            return;
+          }
+        },
+        error: function () {
+          alert("통신 에러 발생");
+        }
+      });
+    }
+  }
+
+  function deleteUser(){
+    var userId = $('#userId').val();
+    if(confirm("("+userNm+") 사용자를 정말로 삭제하시겠습니까? \n삭제 후엔 되돌릴 수 없습니다.")) {
+      //2.1 사용자 할당 요청
+      $.ajax({
+        url: "/userDelProc",
+        data: JSON.stringify({"userId": userId}),
+        contentType: "application/json",
+        method: "POST",
+        dataType: "json",
+        success: function (responseData) {
+          if(responseData.code === "S00"){
+            alert("성공적으로 사용자가 삭제되었습니다.")
+            window.close();
+            opener.getUserList();
+          }
+          else{
+            alert(responseData.msg);
+            return;
+          }
+        },
+        error: function () {
+          alert("서버에 접속할 수 없습니다.")
+        }
+      });
+    }
+    else{
+      return;
+    }
+  }
+
+
+    // 데이터 유효성 검사
+    function validData(data) {
+      if (data == "" || data.length == 0)
+        return true;
+      else
+        return false;
+    }
+  </script>
+</html>

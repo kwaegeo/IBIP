@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>라이센스 정보</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style2.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+    <!-- JS -->
+    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/common.js" defer></script>
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+      <div class="popup__head">
+        <h1>IBIP</h1>
+        <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+      </div>
+      <div class="popup__body">
+        <section>
+          <!--230222, section내용 전체 수정됨-->
+          <h2>라이센스 정보</h2>
+          <div class="search">
+            <form action="#" method="" name="userform">
+              <fieldset>
+                <legend>라이센스 정보</legend>
+                <ul class="form-input">
+                  <li>
+                    <div class="input-area">
+                      <label for="licenseNm">라이센스 타입</label>
+                      <input type="text" name="userInfo" th:value="${licenseInfo.licenseNm}" id="licenseNm" disabled>
+                    </div>
+                  </li>
+                </ul>
+              </fieldset>
+            </form>
+          </div>
+        </section>
+        <section class="row gap-10 center">
+          <div class="w47p">
+            <h2>활성화 사용자</h2>
+            <div class="box h533">
+              <div class="tbl-list select-list scroll maxh100p">
+                <table>
+                  <colgroup>
+                    <col style="width: 10%">
+                    <col style="width: 37%">
+                  </colgroup>
+                  <thead>
+                  <tr>
+                    <th scope="col">번호</th>
+                    <th scope="col">사용자명</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="enableUsers, iterStat : ${licenseInfo.enableUsers}">
+                    <td th:text="${iterStat.size - iterStat.count + 1}"></td>
+                    <td class="_title" th:text="${enableUsers.userNm}"></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="w47p">
+            <h2>비활성화 사용자</h2>
+            <div class="box h533">
+              <div class="tbl-list select-list scroll maxh100p">
+                <table>
+                  <colgroup>
+                    <col style="width: 10%">
+                    <col style="width: 37%">
+                  </colgroup>
+                  <tr>
+                    <th scope="col">번호</th>
+                    <th scope="col">사용자명</th>
+                  </tr>
+                  <tbody>
+                  <tr th:each="disableUsers, iterStat : ${licenseInfo.disableUsers}">
+                    <td th:text="${iterStat.size - iterStat.count + 1}"></td>
+                    <td class="_title" th:text="${disableUsers.userNm}"></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!--230222, 버튼 영역 수정-->
+      <div class="popup__footer">
+        <button type="button" class="pop-close bg-gray"><span>닫기</span></button>
+      </div>
+    </div>
+  </body>
+  <script src="/js/leedo_custom.js"></script>
+  <script th:inline="javascript">
+
+    // 데이터 유효성 검사
+    function validData(data) {
+      if (data == "" || data.length == 0)
+        return true;
+      else
+        return false;
+    }
+  </script>
+</html>
+

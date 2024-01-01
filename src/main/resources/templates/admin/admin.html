@@ -111,7 +111,7 @@
 
         <!-- Nav Item - Tables -->
         <li class="nav-item">
-            <a class="nav-link" href="tables.html">
+            <a class="nav-link" href="#" onclick="getLicenseList()">
                 <i class="fas fa-fw fa-table"></i>
                 <span>라이센스 관리</span></a>
         </li>
@@ -571,8 +571,96 @@
         })
     }
 
+    function getLicenseList(){
+        $.ajax({
+            url: '/getLicenseList',
+            method: 'POST',
+            dataType: "json",
+            success: function (responseData) {
+                var inputTable =`
+
+                <div class="container-fluid" name="">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h5 class="text-gray-800 md-18">라이센스 관리 총 <strong style="color: #007ca5">${responseData.length}</strong>건</h5>
+                    </div>
+
+                    <div class="rows">
+                        <div id="contentDiv">
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                                            <div class="row" id="searchDiv">
+                                                <div class="col-sm-12">
+                                                            <table class="table-bmb" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+                                                                <thead>
+                                                                <tr role="row">
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;" aria-sort="ascending">번호
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 20%;" aria-sort="ascending">라이센스 타입
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 55%;" aria-sort="ascending">최대 사용자 수
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">총 사용자 수
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">활성화 사용자 수
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">비활성화 사용자 수
+                                                                    </th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                `;
+                for (var i = 0; i < responseData.length; i++) {
+                    var reverseIndex = responseData.length - i;
+                    inputTable +=
+                        `
+                            <tr class="odd" onclick="getLicenseInfo('${responseData[i].licenseType}')">
+                                <td>${reverseIndex}</td>
+                                <td class="_title"><a href="#" class="custom-ellipsis custom-title-ellipsis">${responseData[i].licenseNm}</a></td>
+                                <td>${responseData[i].maxUsage}</td>
+                                <td>${responseData[i].totalUsage}</td>
+                                <td>${responseData[i].enableUsage}</td>
+                                <td>${responseData[i].disableUsage}</td>
+                            </tr>
+                        `
+                }
+                inputTable +=
+                    `
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                `;
+
+                $("#main-content").empty();
+                $("#main-content").append(inputTable);
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        });
+
+    }
+
     function getUserInfo(userId){
         window.open("/userInfo?userId="+userId,'', 'width=995,height=813,location=no,status=no,scrollbars=yes');
+    }
+
+    function getRoleInfo(roleId){
+        window.open("/roleInfo?roleId="+roleId,'', 'width=995,height=813,location=no,status=no,scrollbars=yes');
+    }
+
+    function getLicenseInfo(licenseType){
+        window.open("/licenseInfo?licenseType="+licenseType,'','width=995,height=813,location=no,status=no,scrollbars=yes');
     }
 </script>
 </html>

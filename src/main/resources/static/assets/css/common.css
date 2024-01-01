@@ -408,6 +408,13 @@ button.bg-gray span {
 .w50p {
   width: 50% !important;
 }
+
+.w47p {
+  width: 47% !important;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
 .w55p {
   width: 55% !important;
 }
@@ -1026,10 +1033,23 @@ button:disabled {
 .tbl-list {
   width: 100%;
 }
+
+.tbl-list-50 {
+  width: 100%;
+}
+
+
 .tbl-list table {
   width: 100%;
   border-bottom: 1px solid #dde2e9;
 }
+
+.tbl-list-50 table {
+  width: 50%;
+  border-bottom: 1px solid #dde2e9;
+  vertical-align: top;
+}
+
 .tbl-list table th {
   padding: 14px 16px;
   min-height: 30px;
@@ -1089,6 +1109,7 @@ button:disabled {
   overflow-y: auto;
   max-height: 396px;
 }
+
 .tbl-list.scroll table {
   border-bottom: 0;
 }
