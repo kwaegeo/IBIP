@@ -340,6 +340,9 @@
     console.log("현재 접속한 사용자의 userId : " + userId);
 
     $(document).ready(function () {
+
+        getDashboardURL();
+
         $('#jstree').jstree({
             'core': {
                 'data': {
@@ -1144,6 +1147,39 @@
 
                         <div class="container-fluid">
                             <h3 class="h5 text-gray-800 md-18">내 구독물</h3>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                            </div>
+                            <div class="gray-border">
+                                <iframe src="${responseData}", style="height: 720px; width: 100%;">
+                                </iframe>
+                            </div>
+                        </div>
+
+`;
+                $("#main-content").empty();
+                $("#main-content").append(makeHtml);
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        })
+
+    }
+
+    function getDashboardURL() {
+
+        $.ajax({
+            url: '/getDashboardURL',
+            data: JSON.stringify({"userId": userId}),
+            contentType: "application/json",
+            method: 'POST',
+            dataType: "text",
+            success: function (responseData) {
+                console.log(responseData)
+                var makeHtml = `
+
+                        <div class="container-fluid">
+                            <h5 class="text-gray-800 md-18">Dashboard</h5>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
                             </div>
                             <div class="gray-border">

@@ -5,6 +5,7 @@ import com.insdiide.ibip.domain.main.service.MainService;
 import com.insdiide.ibip.domain.main.vo.SearchVO;
 import com.insdiide.ibip.domain.main.vo.SideBarItemVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
+import com.insdiide.ibip.domain.report.vo.ReportVO;
 import com.insdiide.ibip.global.exception.CustomException;
 import com.insdiide.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.*;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -110,6 +112,34 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
 
         return subscriptionURL;
     }
+
+    @PostMapping("/getDashboardURL")
+    @ResponseBody
+    public String getDashboard(@RequestBody Map<String,String> userInfo, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
+
+        //1. 사용자 세션 (MSTR) 유효성 검사
+        //2. 나의 구독물 URL 생성 반환
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        try{
+            comUtils.sessionCheck(mstrSessionId, request, response);
+        }catch(CustomException ex){
+            throw ex;
+        }
+        String userId = userInfo.get("userId");
+        System.out.println("확인");
+        System.out.println(userId);
+
+        String usrSmgr = comUtils.getUsrSmgr();
+        ReportVO reportInfo = mainService.getDashboardReport(userId);
+        String dashboardURL = mainService.getDashboardURL(reportInfo, usrSmgr);
+        System.out.println(dashboardURL);
+        return dashboardURL;
+    }
+
 
     @GetMapping("/searchReport")
     @ResponseBody

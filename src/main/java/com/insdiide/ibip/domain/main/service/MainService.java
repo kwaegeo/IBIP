@@ -4,6 +4,7 @@ import com.insdiide.ibip.domain.login.vo.FolderVO;
 import com.insdiide.ibip.domain.main.vo.SearchVO;
 import com.insdiide.ibip.domain.main.vo.SideBarItemVO;
 import com.insdiide.ibip.domain.main.vo.UserInfoVO;
+import com.insdiide.ibip.domain.report.vo.ReportVO;
 import com.insdiide.ibip.global.mstr.MstrObject;
 import com.insdiide.ibip.global.mstr.MstrSession;
 import com.insdiide.ibip.global.utils.UrlUtils;
@@ -60,6 +61,13 @@ public class MainService {
         return sideBarItem;
     }
 
+    public ReportVO getDashboardReport(String userId) throws WebObjectsException {
+        ReportVO reportInfo = mstrObject.getDashboardReport(userId);
+
+
+        return reportInfo;
+    }
+
     public UserInfoVO getUserInfo(String mstrSessionId) throws WebObjectsException {
         mstrObject.setSession(mstrSessionId);
         UserInfoVO userInfo = mstrObject.getUserInfo();
@@ -76,6 +84,12 @@ public class MainService {
         String subscriptionURL = UrlUtils.getSubscriptionURL(usrSmgr);
 
         return subscriptionURL;
+    }
+
+    public String getDashboardURL(ReportVO reportInfo, String usrSmgr){
+        String dashboardURL = UrlUtils.getDashboardURL(reportInfo, usrSmgr);
+
+        return dashboardURL;
     }
 
     public SearchVO searchReport(String searchKeyword) throws WebObjectsException {

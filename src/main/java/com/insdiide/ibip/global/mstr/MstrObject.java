@@ -28,6 +28,7 @@ import com.microstrategy.webapi.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
+import java.io.ObjectStreamClass;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1275,8 +1276,8 @@ the individual names of the licensed users*/
         List<LicenseVO> licenseList = new ArrayList<>();
         for(int i=0; i< namedUserLicenses.length; i++){
             int totalUsage = audit.getLicensedUsers(namedUserLicenses[i].getLicenseType(), EnumDSSXMLAuditUserFilter.DssXmlAuditIgnoreEnabledFlag).size();
-            int enableUsage = namedUserLicenses[i].getCurrentUsage();
-            int disableUsage = totalUsage - enableUsage;
+            int enableUsage =  audit.getLicensedUsers(namedUserLicenses[i].getLicenseType(), EnumDSSXMLAuditUserFilter.DssXmlAuditEnabledUsers).size();
+            int disableUsage =  audit.getLicensedUsers(namedUserLicenses[i].getLicenseType(), EnumDSSXMLAuditUserFilter.DssXmlAuditDisabledUsers).size();
 
             LicenseVO license = LicenseVO.builder().
                     licenseType(namedUserLicenses[i].getLicenseType()).
@@ -1302,13 +1303,14 @@ the individual names of the licensed users*/
         WebUserEntity everyone = (WebUserEntity)objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F",34,true);
 
         UserLicenseAudit audit = licenseSource.auditUsers(everyone);
-        LicensedUsers licensedUsers = audit.getLicensedUsers(licenseType);
+        LicensedUsers enableLicensedUsers = audit.getLicensedUsers(licenseType, EnumDSSXMLAuditUserFilter.DssXmlAuditEnabledUsers);
+        LicensedUsers disableLicensedUsers = audit.getLicensedUsers(licenseType, EnumDSSXMLAuditUserFilter.DssXmlAuditDisabledUsers);
 
         List<UserVO> enableUsers = new ArrayList<>();
         List<UserVO> disableUsers = new ArrayList<>();
 
-        for(int i=0; i<licensedUsers.size(); i++){
-            WebUser webUser = (WebUser) licensedUsers.get(i);
+        for(int i=0; i<enableLicensedUsers.size(); i++){
+            WebUser webUser = (WebUser) enableLicensedUsers.get(i);
             webUser.populate();
             UserVO user = UserVO.builder().
                     userId(webUser.getID()).
@@ -1319,13 +1321,22 @@ the individual names of the licensed users*/
                     description(webUser.getDescription()).
                     enableStatus(webUser.isEnabled()).
                     build();
+            enableUsers.add(user);
+        }
 
-            if(user.isEnableStatus()){
-                enableUsers.add(user);
-            }
-            else{
-                disableUsers.add(user);
-            }
+        for(int i=0; i<disableLicensedUsers.size(); i++){
+            WebUser webUser = (WebUser) disableLicensedUsers.get(i);
+            webUser.populate();
+            UserVO user = UserVO.builder().
+                    userId(webUser.getID()).
+                    loginID(webUser.getLoginName()).
+                    userNm(webUser.getDisplayName()).
+                    owner(webUser.getOwner().getDisplayName()).
+                    modification(webUser.getModificationTime()).
+                    description(webUser.getDescription()).
+                    enableStatus(webUser.isEnabled()).
+                    build();
+            disableUsers.add(user);
         }
 
         LicenseVO licenseInfo = new LicenseVO();
@@ -1341,4 +1352,46 @@ the individual names of the licensed users*/
 
         return licenseInfo;
     }
+
+    public ReportVO getDashboardReport(String userId) {
+
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+        ReportVO reportInfo = null;
+        try {
+            //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+            objectSource.setFlags(objectSource.getFlags() | EnumDSSXMLObjectFlags.DssXmlObjectComments);
+            WebObjectInfo woi = objectSource.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+
+            //채워넣기
+            woi.populate();
+
+            // 사용자 그룹 객체
+            WebUser user = (WebUser) woi;
+            user.populate();
+            String reportId = "";
+            try {
+                 reportId = user.getComments()[0];
+            }catch (NullPointerException ne){
+//                throw new CustomException(ResultCode.INVALID_DOCUMENT_ID);
+                reportId="1D85D9E74D3B0C66C2F4D7BF52D252F8";
+            }
+            System.out.println("reportID 확인 :");
+            System.out.println(reportId);
+            WebObjectInfo woi2 = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition);
+            woi2.populate();
+
+            reportInfo = ReportVO.builder().
+                    reportId(woi2.getID()).
+                    reportNm(woi2.getDisplayName()).
+                    build();
+        }catch (WebObjectsException ex) {
+            System.out.println(ex.getErrorCode());
+            System.out.println(ex.getMessage());
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.INVALID_DOCUMENT_ID);
+        }
+        return reportInfo;
+    }
+
 }

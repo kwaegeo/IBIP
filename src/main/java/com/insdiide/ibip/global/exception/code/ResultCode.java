@@ -37,6 +37,9 @@ public enum ResultCode {
     INVALID_PASSWORD("E14", "비밀번호와 비밀번호 확인이 같지 않습니다."),
 
     EXIST_LOGIN_ID("E15", "중복된 로그인 ID 입니다."),
+
+    INVALID_DOCUMENT_ID("E16", "해당 리포트가 이미 삭제되었거나 존재하지 않습니다."),
+
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다.");
 
 

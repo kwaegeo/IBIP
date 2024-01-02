@@ -1,10 +1,7 @@
 package com.insdiide.ibip.domain.report.vo;
 
 import com.insdiide.ibip.domain.prompt.vo.PromptVO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class ReportVO {
 
     private String reportId; //리포트 ID
