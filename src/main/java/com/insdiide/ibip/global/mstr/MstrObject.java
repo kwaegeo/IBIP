@@ -1,10 +1,7 @@
 package com.insdiide.ibip.global.mstr;
 
 import com.insdiide.ibip.domain.admin.license.vo.LicenseVO;
-import com.insdiide.ibip.domain.admin.role.vo.CategoryVO;
-import com.insdiide.ibip.domain.admin.role.vo.PrivilegeVO;
-import com.insdiide.ibip.domain.admin.role.vo.RoleVO;
-import com.insdiide.ibip.domain.admin.role.vo.StateVO;
+import com.insdiide.ibip.domain.admin.role.vo.*;
 import com.insdiide.ibip.domain.admin.user.vo.UserVO;
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.admin.group.vo.GroupVO;
@@ -896,7 +893,7 @@ public class MstrObject extends MstrSession{
             categoryList.add(category);
         }
         roleInfo.setCategories(categoryList);
-        objectSource.save(role);
+
         return roleInfo;
     }
 
@@ -1413,4 +1410,29 @@ the individual names of the licensed users*/
         return reportInfo;
     }
 
+    public ResVO savePrivileges(PrivilegeAssignVO privilegeList) throws WebObjectsException {
+
+        //ObjectSourcec 객체 생성
+        WebObjectSource objectSource = factory.getObjectSource();
+
+        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+        WebObjectInfo woi = objectSource.getObject(privilegeList.getRoleId() ,EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
+
+        //채워넣기
+        woi.populate();
+
+        // 사용자 그룹 객체
+        WebSecurityRole role = (WebSecurityRole) woi;
+        role.populate();
+
+
+        // 배당 보안역할의 권한을 뽑아내기 위해 권한목록 객체 생성
+        WebPrivilegeCategories categories = objectSource.getUserServicesSource().getPrivilegeCategories(role);
+//        for(int i=0; i<privilegeList.getAddedPrivileges().size(); i++){
+//            categories.getItemByType(privilegeList.getAddedPrivileges().get(i).get).getItemByPrivilegeType()
+//        }
+
+
+        return new ResVO();
+    }
 }

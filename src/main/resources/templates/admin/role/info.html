@@ -52,6 +52,7 @@
                   <li>
                     <div class="input-area">
                       <label for="roleNm">보안역할명</label>
+                      <input type="hidden" name="roleInfo" id="roleId" th:value="${roleInfo.roleId}" disabled/>
                       <input type="text" name="roleInfo" id="roleNm" th:value="${roleInfo.roleNm}" disabled/>
                     </div>
                     <div class="input-area">
@@ -274,15 +275,43 @@
       var oldSet = new Set(mergedArray.map(item => item.text));
       var currentSet = new Set(currentData.map(item => item.text));
 
-      // 추가된 항목을 찾습니다.
-      var addedItems = currentData.filter(item => !oldSet.has(item.text));
+      // 추가된 항목
+      var addedItems = currentData.filter(item => !oldSet.has(item.text) && !item.categoryNm);
 
-      // 제거된 항목을 찾습니다.
+      // 제거된 항목
       var removedItems = mergedArray.filter(item => !currentSet.has(item.text));
 
       // 결과 출력
       console.log("추가된 항목:", addedItems);
       console.log("제거된 항목:", removedItems);
+
+      var roleId = $("#roleId").val();
+
+      var data = {
+        'roleId': roleId,
+        'addedPrivileges': addedItems,
+        'removedPrivileges' : removedItems
+      };
+
+      $.ajax({
+        url: "/savePrivileges",
+        data: JSON.stringify(data),
+        method: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+          if (data.code == "S00") {
+            alert("성공적으로 권한이 저장되었습니다.")
+            location.reload();
+          } else {
+            alert(data.msg);
+            return;
+          }
+        },
+        error: function () {
+          alert("통신 에러 발생");
+        }
+      });
     }
 
   function modifyUser(button){

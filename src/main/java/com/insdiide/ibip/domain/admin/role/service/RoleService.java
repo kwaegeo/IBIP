@@ -1,9 +1,11 @@
 package com.insdiide.ibip.domain.admin.role.service;
 
 import com.insdiide.ibip.domain.admin.group.vo.GroupVO;
+import com.insdiide.ibip.domain.admin.role.vo.PrivilegeAssignVO;
 import com.insdiide.ibip.domain.admin.role.vo.RoleVO;
 import com.insdiide.ibip.domain.admin.user.vo.UserVO;
 import com.insdiide.ibip.global.mstr.MstrObject;
+import com.insdiide.ibip.global.vo.ResVO;
 import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,11 @@ public class RoleService {
         RoleVO roleInfo = mstrObject.getRoleInfo(roleId);
 //        roleInfo = mstrObject.getUserGroupList(roleInfo);
         return roleInfo;
+    }
+
+    public ResVO savePrivileges(PrivilegeAssignVO privilegeList) throws WebObjectsException {
+        ResVO result = mstrObject.savePrivileges(privilegeList);
+        return result;
     }
 
 }
