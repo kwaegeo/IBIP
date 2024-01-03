@@ -2,6 +2,8 @@ package com.insdiide.ibip.domain.admin.role.vo;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,6 @@ public class RoleVO {
     private String modification;
 
     private String description;
+
+    private List<CategoryVO> categories;
 }

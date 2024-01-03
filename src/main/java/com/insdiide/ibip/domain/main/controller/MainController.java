@@ -130,7 +130,6 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
             throw ex;
         }
         String userId = userInfo.get("userId");
-        System.out.println("확인");
         System.out.println(userId);
 
         String usrSmgr = comUtils.getUsrSmgr();
@@ -139,7 +138,6 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
         System.out.println(dashboardURL);
         return dashboardURL;
     }
-
 
     @GetMapping("/searchReport")
     @ResponseBody

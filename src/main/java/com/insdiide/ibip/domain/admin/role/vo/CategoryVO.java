@@ -5,17 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PrivilegeVO {
+public class CategoryVO {
 
-    private String privilegeNm;
+    private String categoryNm;
 
-    private String description;
+    private int categoryType;
 
-    private int privilegeType;
+    List<PrivilegeVO> children;
 
 
     //트리 구조를 위한 매개변수 설정
@@ -23,8 +25,4 @@ public class PrivilegeVO {
     private String text;
 
     private String type;
-
-    private String assignYn;
-
-    private StateVO state;
 }

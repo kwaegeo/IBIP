@@ -1,7 +1,10 @@
 package com.insdiide.ibip.global.mstr;
 
 import com.insdiide.ibip.domain.admin.license.vo.LicenseVO;
+import com.insdiide.ibip.domain.admin.role.vo.CategoryVO;
+import com.insdiide.ibip.domain.admin.role.vo.PrivilegeVO;
 import com.insdiide.ibip.domain.admin.role.vo.RoleVO;
+import com.insdiide.ibip.domain.admin.role.vo.StateVO;
 import com.insdiide.ibip.domain.admin.user.vo.UserVO;
 import com.insdiide.ibip.domain.folder.vo.EntityVO;
 import com.insdiide.ibip.domain.admin.group.vo.GroupVO;
@@ -821,38 +824,6 @@ public class MstrObject extends MstrSession{
         //ObjectSourcec 객체 생성
         WebObjectSource objectSource = factory.getObjectSource();
 
-        WebSearch search = objectSource.getNewSearchObject();
-
-        LicenseSource licenseSource = factory.getLicenseSource();
-
-
-//        System.out.println(licenseSource.getPrivilegesForLicenseType(EnumDSSXMLLicenseType.DssXmlLicenseTypeReserved));
-        CPULicenseDetails cpuLicenseDetails = licenseSource.getCPUCompliance();
-        NamedUserLicense[] namedUserLicenses = licenseSource.getNamedUserCompliance();
-//        namedUserLicenses[0].
-        System.out.println(cpuLicenseDetails.size());
-        System.out.println(cpuLicenseDetails.get(0).getCPUIDs());
-        System.out.println(cpuLicenseDetails.get(0).getMachineName());
-        System.out.println(cpuLicenseDetails.get(0).getNumberOfCPUs());
-        System.out.println(cpuLicenseDetails.get(0).isClustered());
-        System.out.println(namedUserLicenses.length);
-        for (int i=0; i< namedUserLicenses.length; i++){
-            System.out.println(namedUserLicenses[i].getName());
-            System.out.println(namedUserLicenses[i].getLicenseType());
-            System.out.println(namedUserLicenses[i].getCurrentUsage());
-            System.out.println(namedUserLicenses[i].getMaximumUsage());
-            System.out.println(namedUserLicenses[i].hasLicenseType());
-            System.out.println();
-//            System.out.println(namedUserLicenses[0].getMaximumUsage());
-//            System.out.println(namedUserLicenses[0].getCurrentUsage());
-//            System.out.println(namedUserLicenses[0].hasLicenseType());
-        }
-
-
-//        WebPrivilegeCategories webPrivilegeCategories = objectSource.getUserServicesSource().getPrivilegeCategories();
-
-
-
         //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
         WebObjectInfo woi = objectSource.getObject(roleId ,EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
 
@@ -861,6 +832,7 @@ public class MstrObject extends MstrSession{
 
         // 사용자 그룹 객체
         WebSecurityRole role = (WebSecurityRole) woi;
+        role.populate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
 
@@ -878,6 +850,53 @@ public class MstrObject extends MstrSession{
                 description(role.getDescription()).
                 build();
 
+        List<CategoryVO> categoryList = new ArrayList<>();
+
+        List<Integer> assignIds = new ArrayList<>();
+        String assignYn = "N";
+        StateVO state = null;
+        for(int i=0; i<role.getPrivileges().size(); i++){
+            assignIds.add(role.getPrivileges().get(i).getType());
+        }
+        System.out.println(assignIds);
+
+        // 배당 보안역할의 권한을 뽑아내기 위해 권한목록 객체 생성
+        WebPrivilegeCategories categories = objectSource.getUserServicesSource().getPrivilegeCategories(role);
+        for(int i=0; i< categories.size(); i++){
+            CategoryVO category = CategoryVO.builder().
+                    categoryNm(categories.get(i).getName()).
+                    categoryType(categories.get(i).getType()).
+                    type("cat").
+                    text(categories.get(i).getName()).
+                    build();
+
+            List<PrivilegeVO> privilegeList = new ArrayList<>();
+
+            for(int j=0; j < categories.get(i).size(); j++){
+                System.out.println(categories.get(i).get(j).getType());
+                if(assignIds.contains(categories.get(i).get(j).getType())){
+                    assignYn = "Y";
+                    state = new StateVO(true);
+                } else{
+                    assignYn = "N";
+                    state = new StateVO(false);
+                }
+                    PrivilegeVO privilege = PrivilegeVO.builder().
+                        privilegeNm(categories.get(i).get(j).getName()).
+                        privilegeType(categories.get(i).get(j).getType()).
+                        description(categories.get(i).get(j).getDescription()).
+                        text(categories.get(i).get(j).getName()).
+                        assignYn(assignYn).
+                        type("pri").
+                        state(state).
+                        build();
+                privilegeList.add(privilege);
+            }
+            category.setChildren(privilegeList);
+            categoryList.add(category);
+        }
+        roleInfo.setCategories(categoryList);
+        objectSource.save(role);
         return roleInfo;
     }
 
