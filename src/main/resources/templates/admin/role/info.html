@@ -89,51 +89,9 @@
           <div class="box" style="background-color: #d9f1eb">
             <div class="tbl-top">
             </div>
-            <!--스크롤 테이블에 scroll 클래스 추가-->
-            <!--230222, 테이블 항목 수정-->
-<!--            <div class="tbl-list scroll">-->
-<!--              <table summary="선택, 할당유무, 사용자id, 사용자명, 생성일시 항목으로 구성된 사용자 관리 리스트 입니다.">-->
-<!--                <caption>-->
-<!--                  그룹 관리 리스트-->
-<!--                </caption>-->
-<!--                <colgroup>-->
-<!--                  <col style="width: 5%" />-->
-<!--                  <col style="width: 5%" />-->
-<!--                  <col style="width: 25%" />-->
-<!--                  <col style="width: 5%" />-->
-<!--                  <col style="width: 30%" />-->
-<!--                  <col style="width: 15%" />-->
-<!--                  <col style="width: 15%" />-->
-<!--                </colgroup>-->
-<!--                <thead>-->
-<!--                  <tr>-->
-<!--                    <th scope="col">-->
-<!--                      <input type="checkbox" id="chkAll" onclick="selectAll(this)"/>-->
-<!--                    </th>-->
-<!--                    <th scope="col">할당유무</th>-->
-<!--                    <th scope="col">그룹명</th>-->
-<!--                    <th scope="col">하위 개체 수</th>-->
-<!--                    <th scope="col">설명</th>-->
-<!--                    <th scope="col">생성일자</th>-->
-<!--                    <th scope="col">소유자</th>-->
-<!--                  </tr>-->
-<!--                </thead>-->
-<!--                <tbody>-->
-<!--                  <tr th:each="groups : ${roleInfo.parentsGroups}" th:class="${groups.assignYn} == 'Y'? 'pick' : '' ">-->
-<!--                    <td><input type="checkbox" id="c2" name="chk" th:value="${groups.groupId}"/></td>-->
-<!--                    <td th:text="${groups.assignYn}"></td>-->
-<!--                    <td th:text="${groups.groupNm}"></td>-->
-<!--                    <td th:text="${groups.childCnt}"></td>-->
-<!--                    <td th:text="${groups.description}"></td>-->
-<!--                    <td th:text="${groups.creationTime}"></td>-->
-<!--                    <td th:text="${groups.owner}"></td>-->
-<!--                  </tr>-->
-<!--                </tbody>-->
-<!--              </table>-->
-<!--            </div>-->
-            <!--230222, tbl-bottom 위치 수정 : <div class="box"> 안으로 이동-->
+            <div class="tbl-list scroll" style="border-top: #dde2e9;">
             <div id="jstree">
-
+            </div>
             </div>
             <div class="tbl-bottom">
               <div class="left">
