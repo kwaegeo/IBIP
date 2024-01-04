@@ -17,6 +17,7 @@ public class PrivilegeVO {
 
     private int privilegeType;
 
+    private int categoryType;
 
     //트리 구조를 위한 매개변수 설정
 

@@ -883,6 +883,7 @@ public class MstrObject extends MstrSession{
                         privilegeType(categories.get(i).get(j).getType()).
                         description(categories.get(i).get(j).getDescription()).
                         text(categories.get(i).get(j).getName()).
+                        categoryType(categories.get(i).getType()).
                         assignYn(assignYn).
                         type("pri").
                         state(state).
@@ -1428,11 +1429,18 @@ the individual names of the licensed users*/
 
         // 배당 보안역할의 권한을 뽑아내기 위해 권한목록 객체 생성
         WebPrivilegeCategories categories = objectSource.getUserServicesSource().getPrivilegeCategories(role);
-//        for(int i=0; i<privilegeList.getAddedPrivileges().size(); i++){
-//            categories.getItemByType(privilegeList.getAddedPrivileges().get(i).get).getItemByPrivilegeType()
-//        }
+        for(int i=0; i<privilegeList.getAddedPrivileges().size(); i++){
+            categories.getItemByType(privilegeList.getAddedPrivileges().get(i).getCategoryType()).
+                    getItemByPrivilegeType(privilegeList.getAddedPrivileges().get(i).getPrivilegeType()).grant();
+        }
 
+        for(int i=0; i<privilegeList.getRemovedPrivileges().size(); i++){
+            categories.getItemByType(privilegeList.getRemovedPrivileges().get(i).getCategoryType()).
+                    getItemByPrivilegeType(privilegeList.getRemovedPrivileges().get(i).getPrivilegeType()).revoke();
+        }
 
-        return new ResVO();
+        objectSource.save(role);
+
+        return new ResVO(ResultCode.SUCCESS);
     }
 }
