@@ -132,6 +132,18 @@ public class MstrObject extends MstrSession{
         return userInfo;
     }
 
+    public String getUserLoginName(String userId){
+        WebUser webUser = null;
+        try {
+            webUser = (WebUser) factory.getObjectSource().getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            webUser.populate();
+        } catch (WebObjectsException e) {
+            throw new CustomException(ResultCode.INVALID_USER_ID);
+        } catch(IllegalArgumentException iax) {
+            throw new CustomException(ResultCode.INVALID_USER_ID);
+        }
+        return webUser.getLoginName();
+    }
     //하위 전체 요소 조회 (TreeVO로 저장)
 //    public List<EntityVO> getSubList(String folderId, String parentId) throws WebObjectsException {
 //        List<EntityVO> subList = new ArrayList<>();

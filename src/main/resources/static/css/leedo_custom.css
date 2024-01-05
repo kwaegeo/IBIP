@@ -31,6 +31,8 @@
     border-color: #e7b252;
 }
 
+.btn-danger{color:#fff;background-color:#e74a3b;border-color:#e74a3b;}
+
 .btn-brown {
 .   color: #fff;
     background-color: #9b4c4c;
@@ -96,4 +98,11 @@
 
 .custom-title-ellipsis{
     font-weight: 700; max-width: 85%; display: inline-block;
+}
+
+.gray-border2{
+    border: 2px solid #E2E2E2;
+    padding: 3px; /* 테두리와 내용 사이의 간격을 늘립니다. (선택 사항) */
+    height: 330px;
+
 }

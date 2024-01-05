@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.insdiide.ibip.domain.admin.notice.mapper.NoticeMapper">
+
+    <select id="getNoticeList" resultType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+        SELECT
+            notice_id as noticeId,
+            title as title,
+            writer as writer,
+            to_char(reg_ts, 'YYYY-MM-DD HH24:MI:SS') as regTs,
+            to_char(mod_ts, 'YYYY-MM-DD HH24:MI:SS') as modTs,
+            popup_yn as popupYn
+        FROM
+            tb_notice
+        WHERE
+            use_yn = 'Y'
+        ORDER BY
+            regTs
+        DESC
+    </select>
+
+    <select id="getNotice" parameterType="string"  resultType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+        SELECT
+            notice_id as noticeId,
+            title as title,
+            writer as writer,
+            content as content,
+            to_char(reg_ts, 'YYYY-MM-DD HH24:MI:SS') as regTs,
+            use_yn as useYn,
+            popup_yn as popupYn
+        FROM
+            tb_notice
+        WHERE
+            notice_id = #{noticeId}
+    </select>
+
+    <select id="getNoticePopup" parameterType="string"  resultType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+        SELECT
+            title as title,
+            writer as writer,
+            content as content,
+        FROM
+            tb_notice
+        WHERE
+            use_yn = 'Y'
+          AND
+            popup_yn = 'Y'
+    </select>
+
+    <select id="getNoticePopupList" resultType="string">
+        SELECT
+            notice_id as noticeId
+        FROM
+            tb_notice
+        WHERE
+            use_yn = 'Y'
+                AND
+            popup_yn = 'Y'
+    </select>
+
+    <insert id="insertNotice" parameterType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+        INSERT INTO
+            tb_notice
+            (
+                notice_id,
+                title,
+                writer,
+                content,
+                reg_ts,
+                mod_ts,
+                popup_yn,
+                use_yn
+            )
+        VALUES
+            (
+                'NO' || TO_CHAR(CURRENT_TIMESTAMP, 'YYMMDDHH24MISS') || LPAD(nextval('seq_tb_notice')::text, 6, '0'),
+                #{title},
+                #{writer},
+                #{content},
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP,
+                #{popupYn},
+                'Y'
+            )
+    </insert>
+
+    <update id="modifyNotice" parameterType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+        UPDATE
+            tb_notice
+        SET
+            title = #{title},
+            content = #{content},
+            mod_ts = CURRENT_TIMESTAMP,
+            popup_yn = #{popupYn}
+        WHERE
+            notice_id = #{noticeId}
+    </update>
+
+    <update id="deleteNotice" parameterType="string">
+        UPDATE
+            tb_notice
+        SET
+            use_yn = 'N'
+        WHERE
+            notice_id = #{noticeId}
+    </update>
+</mapper>
+

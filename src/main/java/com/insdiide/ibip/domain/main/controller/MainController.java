@@ -63,6 +63,7 @@ public String getMainPage(HttpServletRequest request, Model model, HttpServletRe
     UserInfoVO userInfo = mainService.getUserInfo(mstrSessionId);
     model.addAttribute("userInfo", userInfo);
 
+    httpSession.setAttribute("userId", userInfo.getUserId());
 //    return "/newIndex";
     return "/index";
 }

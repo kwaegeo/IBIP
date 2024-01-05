@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>공지사항</title>
+
+
+        <link rel="stylesheet" href="assets/css/style2.css" />
+
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+        <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
+
+
+        <!-- JS -->
+        <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript" src="assets/js/common.js" defer></script>
+
+
+        <link rel="stylesheet" href="/css/summernote/summernote-lite.css" />
+        <script type="text/javascript" src="/js/summernote/lang/summernote-ko-KR.js"></script>
+        <script type="text/javascript" src="/js/summernote/summernote-lite.js"></script>
+
+    </head>
+
+    <body>
+    <div class="popup-window">
+        <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+        <div class="popup__head">
+            <h1>공지사항</h1>
+            <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+        </div>
+        <div class="popup__body">
+        <section>
+            <div class="tbl-top">
+                <div class="left"><h2 th:text="${noticeInfo.title}"></h2></div>
+            </div>
+        </section>
+        <section>
+            <div class="gray-border2">
+                <div class="input-area">
+                    <span id="" style="overflow-y: auto;" class="hAuto opinion-area" rows="12" readonly th:utext="${noticeInfo.content}" disabled></span>
+                </div>
+            </div>
+        </section>
+        </div>
+        <div class="popup__footer">
+            <button type="button" class="pop-close bg-gray"><span>닫기</span></button>
+            <button type="button" class="pop-close bg-green" onclick="close3hour()"><span>3시간 동안 보이지 않기</span></button>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        var noticeId = [[${noticeInfo.noticeId}]]
+
+        // 데이터 유효성 검사
+        function validData(data) {
+            if (data == "" || data.length == 0)
+                return true;
+            else
+                return false;
+        }
+
+        function close3hour(){
+            setCookie(noticeId,"done", 1);
+        }
+
+        function setCookie(name, value, exDay){
+            var todayDate = new Date();
+            todayDate.setDate( todayDate.getDate() + exDay );
+            document.cookie = name + "=" + escape( value ) + "; path=/; expires=" + todayDate.toGMTString() + ";"
+            console.log(document.cookie);
+        }
+
+    </script>
+  </body>
+</html>

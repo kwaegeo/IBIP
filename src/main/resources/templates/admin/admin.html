@@ -125,16 +125,23 @@
             설정 및 공지
         </div>
 
-        <!-- Nav Item - Tables -->
         <li class="nav-item">
-            <a class="nav-link" href="tables.html">
-                <i class="fas fa-fw fa-table"></i>
-                <span>환경설정</span></a>
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                <i class="fas fa-fw fa-cog"></i>
+                <span>환경설정</span>
+            </a>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">환경설정:</h6>
+                    <a class="collapse-item" href="buttons.html">인사 정보 DB 동기화</a>
+                    <a class="collapse-item" href="cards.html">리포팅 섹션 관리</a>
+                </div>
+            </div>
         </li>
 
         <!-- Nav Item - Tables -->
         <li class="nav-item">
-            <a class="nav-link" href="tables.html">
+            <a class="nav-link" href="#" onclick="getNoticeList()">
                 <i class="fas fa-fw fa-table"></i>
                 <span>공지사항</span></a>
         </li>
@@ -571,6 +578,86 @@
         })
     }
 
+    function getNoticeList(){
+        $.ajax({
+            url: '/getNoticeList',
+            method: 'POST',
+            dataType: "json",
+            success: function (responseData) {
+                var inputTable =`
+
+                <div class="container-fluid" name="">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h5 class="text-gray-800 md-18">공지사항 관리 총 <strong style="color: #007ca5">${responseData.length}</strong>건</h5>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-dg shadow-sm" onclick="window.open('/noticeAdd', '', 'width=1000,height=540,location=no,status=no,scrollbars=yes')">공지사항 생성</a>
+                    </div>
+
+                    <div class="rows">
+                        <div id="contentDiv">
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                                            <div class="row" id="searchDiv">
+                                                <div class="col-sm-12">
+                                                            <table class="table-bmb" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+                                                                <thead>
+                                                                <tr role="row">
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;" aria-sort="ascending">번호
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 35%;" aria-sort="ascending">제목
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;" aria-sort="ascending">작성자
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 20%;" aria-sort="ascending">등록일자
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 20%;" aria-sort="ascending">수정일자
+                                                                    </th>
+                                                                    <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;" aria-sort="ascending">팝업유무
+                                                                    </th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                `;
+                for (var i = 0; i < responseData.length; i++) {
+                    var reverseIndex = responseData.length - i;
+                    inputTable +=
+                        `
+                            <tr class="odd" onclick="getNoticeInfo('${responseData[i].noticeId}')">
+                                <td>${reverseIndex}</td>
+                                <td class="_title"><a href="#" class="custom-ellipsis custom-title-ellipsis">${responseData[i].title}</a></td>
+                                <td>${responseData[i].writer}</td>
+                                <td>${responseData[i].regTs}</td>
+                                <td>${responseData[i].modTs}</td>
+                                <td>${responseData[i].popupYn}</td>
+                            </tr>
+                        `
+                }
+                inputTable +=
+                    `
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                `;
+
+                $("#main-content").empty();
+                $("#main-content").append(inputTable);
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        });
+    }
+
     function getLicenseList(){
         $.ajax({
             url: '/getLicenseList',
@@ -661,6 +748,10 @@
 
     function getLicenseInfo(licenseType){
         window.open("/licenseInfo?licenseType="+licenseType,'','width=995,height=813,location=no,status=no,scrollbars=yes');
+    }
+
+    function getNoticeInfo(noticeId){
+        window.open("/noticeInfo?noticeId="+noticeId,'','width=1000,height=781,location=no,status=no,scrollbars=yes');
     }
 </script>
 </html>

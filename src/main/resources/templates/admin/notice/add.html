@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>공지사항</title>
+
+
+        <link rel="stylesheet" href="assets/css/style2.css" />
+
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+        <!-- JS -->
+        <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript" src="assets/js/common.js" defer></script>
+
+
+        <link rel="stylesheet" href="/css/summernote/summernote-lite.css" />
+        <script type="text/javascript" src="/js/summernote/lang/summernote-ko-KR.js"></script>
+        <script type="text/javascript" src="/js/summernote/summernote-lite.js"></script>
+
+    </head>
+
+    <body>
+    <div class="popup-window">
+        <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+        <div class="popup__head">
+            <h1>공지사항</h1>
+            <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+        </div>
+        <div class="popup__body">
+        <section>
+            <div class="tbl-top">
+                <div class="left"><h2>제목</h2></div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="title" style="width: calc(100% - 6px);">
+            </div>
+        </section>
+        <section>
+            <div class="tbl-top">
+                <div class="left"><h2>팝업 여부</h2></div>
+            </div>
+            <div class="input-area">
+                <div class="radioBox">
+                    <label for="rd1"><input type="radio" id="rd1" name="rd" value="Y">Y</label>
+                    <label for="rd2"><input type="radio" id="rd2" name="rd" checked="true" value="N">N</label>
+                </div>
+            </div>
+        </section>
+        <section>
+            <div class="tbl-top">
+                <div class="left"><h2>내용</h2></div>
+            </div>
+            <div class="input-area">
+                <textarea id="summernote" class="hAuto opinion-area" rows="12" readonly></textarea>
+            </div>
+        </section>
+        </div>
+        <div class="popup__footer">
+            <button type="button" class="pop-close bg-gray"><span>취소</span></button>
+            <button type="button" onclick="addNotice()"><span>등록</span></button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //여기 아래 부분
+            $('#summernote').summernote({
+                height: 300,                 // 에디터 높이
+                minHeight: null,             // 최소 높이
+                maxHeight: null,             // 최대 높이
+                focus: true,                  // 에디터 로딩후 포커스를 맞출지 여부
+                lang: "ko-KR",					// 한글 설정
+                placeholder: '최대 2048자까지 쓸 수 있습니다',	//placeholder 설정
+                toolbar: [
+                    // [groupName, [list of button]]
+                    ['fontname', ['fontname']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['style', ['bold', 'italic', 'underline','strikethrough', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']]
+                ],
+                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New','맑은 고딕','궁서','굴림체','굴림','돋움체','바탕체'],
+                fontSizes: ['8','9','10','11','12','14','16','18','20','22','24','28','30','36','50','72']
+
+            });
+        });
+
+        function addNotice(){
+            const title = $('#title').val();
+            const content = $('#summernote').val();
+            const popupYn = $("input[name='rd']:checked").val();
+
+            if(validData(title)){
+                alert("제목을 입력해주세요");
+                $('#title').focus();
+                return;
+            }
+            else if(!$("input[name='rd']:checked").val()){
+                alert("팝업 유무를 선택해주세요");
+                return;
+            }
+            else if(validData(content)){
+                alert("내용을 입력해주세요");
+                $('#summernote').focus();
+                return;
+            }
+            else if(content.length > 2048){
+                alert("내용은 2048자 까지 입력할 수 있습니다.");
+                $('#content').focus();
+                return;
+            }
+
+            const data = {"title": title, "content": content, "popupYn": popupYn};
+
+            $.ajax({
+                url: "/noticeAddProc",
+                data: JSON.stringify(data),
+                method: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                success: function (data) {
+                    if (data.code == "S00") {
+                        alert("성공적으로 공지사항이 등록되었습니다.")
+                        window.close();
+                        opener.getNoticeList();
+                    } else {
+                        alert(data.msg);
+                        return;
+                    }
+                },
+                error: function () {
+                    alert("통신 에러 발생");
+                }
+            });
+        }
+
+        // 데이터 유효성 검사
+        function validData(data) {
+            if (data == "" || data.length == 0)
+                return true;
+            else
+                return false;
+        }
+    </script>
+  </body>
+</html>

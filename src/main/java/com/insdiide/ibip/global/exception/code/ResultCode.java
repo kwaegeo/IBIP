@@ -40,6 +40,10 @@ public enum ResultCode {
 
     INVALID_DOCUMENT_ID("E16", "해당 리포트가 이미 삭제되었거나 존재하지 않습니다."),
 
+    INVALID_TITLE("E17", "제목을 입력하지 않았습니다."),
+
+    INVALID_CONTENT("E18", "내용을 입력하지 않았습니다"),
+
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다.");
 
 
