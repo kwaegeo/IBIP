@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.insdiide.ibip.domain.admin.notice.mapper.NoticeMapper">
+<mapper namespace="com.inside.ibip.domain.admin.notice.mapper.NoticeMapper">
 
-    <select id="getNoticeList" resultType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+    <select id="getNoticeList" resultType="com.inside.ibip.domain.admin.notice.vo.NoticeVO">
         SELECT
             notice_id as noticeId,
             title as title,
@@ -19,7 +19,7 @@
         DESC
     </select>
 
-    <select id="getNotice" parameterType="string"  resultType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+    <select id="getNotice" parameterType="string"  resultType="com.inside.ibip.domain.admin.notice.vo.NoticeVO">
         SELECT
             notice_id as noticeId,
             title as title,
@@ -34,7 +34,7 @@
             notice_id = #{noticeId}
     </select>
 
-    <select id="getNoticePopup" parameterType="string"  resultType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+    <select id="getNoticePopup" parameterType="string"  resultType="com.inside.ibip.domain.admin.notice.vo.NoticeVO">
         SELECT
             title as title,
             writer as writer,
@@ -58,7 +58,7 @@
             popup_yn = 'Y'
     </select>
 
-    <insert id="insertNotice" parameterType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+    <insert id="insertNotice" parameterType="com.inside.ibip.domain.admin.notice.vo.NoticeVO">
         INSERT INTO
             tb_notice
             (
@@ -84,7 +84,7 @@
             )
     </insert>
 
-    <update id="modifyNotice" parameterType="com.insdiide.ibip.domain.admin.notice.vo.NoticeVO">
+    <update id="modifyNotice" parameterType="com.inside.ibip.domain.admin.notice.vo.NoticeVO">
         UPDATE
             tb_notice
         SET

@@ -12,8 +12,8 @@
 
     <typeAliases>
         <!-- 공통 -->
-        <typeAlias alias="testvo" type="com.insdiide.ibip.domain.test.vo.TestVO"/>
-        <typeAlias alias="TemplateVO" type="com.insdiide.ibip.domain.template.TemplateVO"/>
+        <typeAlias alias="testvo" type="com.inside.ibip.global.test.vo.TestVO"/>
+        <typeAlias alias="TemplateVO" type="com.inside.ibip.domain.guest.template.TemplateVO"/>
 
     </typeAliases>
 
