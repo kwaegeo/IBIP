@@ -87,14 +87,12 @@ public class MstrSession {
     }
 
     public boolean userIsAlive(String mstrSessionId) {
-
-        //현재 살아있으면 false 죽어있으면 true
         try {
 
-            if (serverSession.isAlive()) { // 살아있으면
+            if (serverSession.isAlive()) {
                 return false;
             } else {
-                closeSession(serverSession); //죽어있으면 연결을 끊어
+                closeSession(serverSession);
             }
         } catch (WebObjectsException e) {
             log.info("WebObjectsException e >> userIsAlive");

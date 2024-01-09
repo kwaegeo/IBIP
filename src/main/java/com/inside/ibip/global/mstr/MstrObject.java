@@ -3,7 +3,7 @@ package com.inside.ibip.global.mstr;
 import com.inside.ibip.domain.admin.license.vo.LicenseVO;
 import com.inside.ibip.domain.admin.role.vo.*;
 import com.inside.ibip.domain.admin.user.vo.UserVO;
-import com.inside.ibip.domain.guest.folder.vo.EntityVO;
+import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.admin.group.vo.GroupVO;
 import com.inside.ibip.domain.guest.auth.vo.FolderVO;
 import com.inside.ibip.domain.guest.main.vo.SearchResultVO;
@@ -75,18 +75,23 @@ public class MstrObject extends MstrSession{
     }
 
     //하위 폴더 요소 가져오기
-    public List<EntityVO> getRootFolderList(String folderId) throws WebObjectsException {
-        List<EntityVO> rootFolderList = new ArrayList<>();
-        WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
-        folder.populate();
-        for(int i=0; i<folder.getChildCount(); i++){
-            if(folder.get(i).getType() == EnumDSSXMLObjectTypes.DssXmlTypeFolder) {
-                rootFolderList.add(new EntityVO(folder.get(i).getID(), folder.get(i).getName(), "#", folder.get(i).getType(), true));
-                System.out.println(folder.get(i));
+    public List<TreeVO> getShareReport(String folderId) {
+        List<TreeVO> shareReportList = new ArrayList<>();
+        try {
+            WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+            folder.populate();
+            for (int i = 0; i < folder.getChildCount(); i++) {
+                if (folder.get(i).getType() == EnumDSSXMLObjectTypes.DssXmlTypeFolder) {
+                    shareReportList.add(new TreeVO(folder.get(i).getID(), folder.get(i).getName(), "#", folder.get(i).getType(), true));
+                    System.out.println(folder.get(i));
+                }
             }
+        }catch (WebObjectsException ex){
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.INVALID_FOLDER);
         }
-        System.out.println(rootFolderList + "zz");
-        return rootFolderList;
+        return shareReportList;
     }
 
     //폴더 ID 불러오기
@@ -122,6 +127,9 @@ public class MstrObject extends MstrSession{
         }catch (WebObjectsException woe){
             log.error("폴더 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
             throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("폴더 정보 조회 중 에러 발생 [Error msg]: " + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_FOLDER);
         }
         return folderInfo;
     }
@@ -180,22 +188,41 @@ public class MstrObject extends MstrSession{
 //        return subList;
 //    }
 
-    public List<EntityVO> getSubList(String folderId, String parentId, List<EntityVO> subList) throws WebObjectsException {
 
-        WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
-        folder.populate();
+    /**
+     * 특정 폴더 목록 조회
+     * @Method Name   : getShareReport
+     * @Date / Author : 2023.12.01  이도현
+     * @param folderId 하위 목록 조회 할 폴더 ID
+     * @param parentId 부모 ID
+     * @param subList 하위 목록 리스트
+     * @return 폴더 하위 목록 리스트
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public List<TreeVO> getSubList(String folderId, String parentId, List<TreeVO> subList){
 
-        for(int i =0; i<folder.getChildCount(); i++){
-            if(folder.get(i).getType() == 8){
-                folder.get(i).populate();
-                System.out.println(folder.get(i).getChildUnits().size());
-                if(folder.get(i).getChildUnits().size()>0){
-                    getSubList(folder.get(i).getID(), folder.get(i).getParent().getID(), subList);
+        try {
+            WebFolder folder = (WebFolder) factory.getObjectSource().getObject(folderId, EnumDSSXMLObjectTypes.DssXmlTypeFolder);
+            folder.populate();
+
+            for (int i = 0; i < folder.getChildCount(); i++) {
+                if (folder.get(i).getType() == 8) {
+                    folder.get(i).populate();
+                    System.out.println(folder.get(i).getChildUnits().size());
+                    if (folder.get(i).getChildUnits().size() > 0) {
+                        getSubList(folder.get(i).getID(), folder.get(i).getParent().getID(), subList);
+                    }
                 }
+                subList.add(new TreeVO(folder.get(i).getID(), folder.get(i).getName(), folder.get(i).getParent().getID(), folder.get(i).getType(), false));
             }
-            subList.add(new EntityVO(folder.get(i).getID(), folder.get(i).getName(), folder.get(i).getParent().getID(), folder.get(i).getType(), false));
+        } catch (WebObjectsException e) {
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        } catch(IllegalArgumentException iax) {
+            throw new CustomException(ResultCode.INVALID_FOLDER);
         }
-        System.out.println(subList);
         return subList;
     }
 

@@ -25,38 +25,6 @@ public class MainService {
         mstrObject.setSession(mstrSessionId);
     }
 
-    /**
-     * 사이드 바에 필요한 정보를 불러오는 함수
-     * **/
-    public SideBarItemVO getSideBarItems() {
-
-        //1. 폴더 객체 생성 [공유리포트, 내리포트, 즐겨찾기]
-        List<FolderVO> shareFolderItems;
-        FolderVO myReport;
-        FolderVO myFavorite;
-
-        //1. 먼저 공유 폴더의 아이디를 가져오는 함수를 부른다.
-        String shareFolderId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNamePublicReports);
-
-        //2. 공유 리포트 하위 목록 조회
-        shareFolderItems = mstrObject.getSubfolderList(shareFolderId);
-
-        //3. 내 리포트, 즐겨찾기 가져오기 (사용내역 목록, 구독 목록은 안된다 iframe으로 직접 띄워야 함.)
-        String myReportId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileReports);
-        String myFavoriteId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileFavorites);
-        myReport = mstrObject.getFolderInfo(myReportId);
-        myFavorite = mstrObject.getFolderInfo(myFavoriteId);
-        myReport.setName(EnumFolderNamesKR.myReport);
-        myFavorite.setName(EnumFolderNamesKR.myFavorite);
-
-        SideBarItemVO sideBarItem = SideBarItemVO.builder()
-                .shareFolderItems(shareFolderItems)
-                .myReport(myReport)
-                .myFavorite(myFavorite)
-                .build();
-
-        return sideBarItem;
-    }
 
     public ReportVO getDashboardReport(String userId) throws WebObjectsException {
         ReportVO reportInfo = mstrObject.getDashboardReport(userId);
@@ -65,8 +33,7 @@ public class MainService {
         return reportInfo;
     }
 
-    public UserInfoVO getUserInfo(String mstrSessionId){
-        mstrObject.setSession(mstrSessionId);
+    public UserInfoVO getUserInfo(){
         UserInfoVO userInfo = mstrObject.getUserInfo();
         return userInfo;
     }

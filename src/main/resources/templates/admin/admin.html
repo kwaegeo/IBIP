@@ -133,8 +133,8 @@
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">환경설정:</h6>
-                    <a class="collapse-item" href="buttons.html">인사 정보 DB 동기화</a>
-                    <a class="collapse-item" href="cards.html">리포팅 섹션 관리</a>
+                    <a class="collapse-item" href="#" onclick="getPersonalSync()">인사 정보 DB 동기화</a>
+                    <a class="collapse-item" href="#" onclick="">리포팅 섹션 관리</a>
                 </div>
             </div>
         </li>
@@ -413,6 +413,10 @@
 
     function getGroupInfo(groupId){
         window.open("/groupInfo?groupId="+groupId,'', 'width=995,height=813,location=no,status=no,scrollbars=yes');
+    }
+
+    function getPersonalSync(){
+
     }
 
     function getRoleList(){

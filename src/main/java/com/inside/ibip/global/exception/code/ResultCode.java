@@ -44,6 +44,8 @@ public enum ResultCode {
 
     INVALID_CONTENT("E18", "내용을 입력하지 않았습니다"),
 
+    INVALID_FOLDER("E19", "해당 폴더가 이미 삭제되었거나 존재하지 않습니다."),
+
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다. IntelligenceServer가  정상적으로 동작하는지 확인해주세요.");
 
 

@@ -79,16 +79,6 @@
         <div id="jstree">
 
         </div>
-<!--        &lt;!&ndash; Nav Item - Pages Collapse Menu &ndash;&gt;-->
-<!--        <li class="nav-item" th:each="shareFolderItem : ${sideBarItem.shareFolderItems}">-->
-<!--            <a class="nav-link collapsed" href="#"-->
-<!--               th:attr="folderItemId=${shareFolderItem.id}"-->
-<!--               aria-expanded="true" aria-controls="collapseTwo" th:id="${folderItemId}"-->
-<!--               onclick="openFolder(this.getAttribute('folderItemId'))">-->
-<!--                <i class="fas fa-fw fa-folder"></i>-->
-<!--                <span th:text="${{shareFolderItem.name}}"></span>-->
-<!--            </a>-->
-<!--        </li>-->
 
 
         <!-- Divider -->
@@ -99,22 +89,6 @@
             My Data
         </div>
 
-
-<!--        &lt;!&ndash; Nav Item - Charts &ndash;&gt;-->
-<!--        <li class="nav-item">-->
-<!--            <a class="nav-link" href="#" th:attr="myReportId=${sideBarItem.myReport.id}"-->
-<!--               onclick="openFolder(this.getAttribute('myReportId'))">-->
-<!--                <i class="fas fa-fw fa-chart-area"></i>-->
-<!--                <span th:id="${sideBarItem.myReport.id}" th:text="${sideBarItem.myReport.name}"></span></a>-->
-<!--        </li>-->
-
-<!--        &lt;!&ndash; Nav Item - Charts &ndash;&gt;-->
-<!--        <li class="nav-item">-->
-<!--            <a class="nav-link" href="#" th:attr="myFavoriteId=${sideBarItem.myFavorite.id}"-->
-<!--               onclick="openFolder(this.getAttribute('myFavoriteId'))">-->
-<!--                <i class="fas fa-fw fa-chart-area"></i>-->
-<!--                <span th:id="${sideBarItem.myFavorite.id}" th:text="${sideBarItem.myFavorite.name}"></span></a>-->
-<!--        </li>-->
 
         <div id="jstree2">
 
@@ -349,7 +323,7 @@
             'core': {
                 'data': {
                     'url': function (node) {
-                        return node.id === '#' ? '/getRootFolder' : '/getSubFolder?folderId='+node.id;
+                        return node.id === '#' ? '/folder/get/shareReport' : '/folder/getSubFolder?folderId='+node.id;
                         // Adjust the URLs based on your server-side implementation
                     },
                     'data': function (node) {

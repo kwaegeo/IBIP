@@ -20,7 +20,7 @@ $(document).ajaxComplete(function (event, xhr, settings){
         var responseData = JSON.parse(xhr.responseText);
         if(responseData.code === "M04"){
             alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-            window.location.href = "/login";
+            window.location.href = "/auth/login";
         }
     }
 })

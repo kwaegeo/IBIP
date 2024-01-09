@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class ChildEntityVO {
-    List<EntityVO> childList;
+    List<TreeVO> childList;
 }

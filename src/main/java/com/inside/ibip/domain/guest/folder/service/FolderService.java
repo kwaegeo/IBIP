@@ -1,6 +1,6 @@
 package com.inside.ibip.domain.guest.folder.service;
 
-import com.inside.ibip.domain.guest.folder.vo.EntityVO;
+import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.guest.folder.vo.TopItemVO;
 import com.inside.ibip.domain.guest.auth.vo.FolderVO;
 import com.inside.ibip.global.mstr.MstrObject;
@@ -36,36 +36,53 @@ public class FolderService {
         return topItem;
     }
 
-    public List<EntityVO> getSubList(String mstrSessionId, String folderId) throws WebObjectsException{
+    /**
+     * 특정 폴더 목록 조회
+     * @Method Name   : getShareReport
+     * @Date / Author : 2023.12.01  이도현
+     * @param folderId 하위 목록 조회 할 폴더 ID
+     * @return 폴더 하위 목록 리스트
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public List<TreeVO> getSubList(String folderId){
         //세션 정보 삽입
-        mstrObject.setSession(mstrSessionId);
 
-        List<EntityVO> subList = new ArrayList<>();
+        List<TreeVO> subList = new ArrayList<>();
         subList = mstrObject.getSubList(folderId, "", subList);
 
         return subList;
     }
 
-    public List<EntityVO> getRootFolderList(String mstrSessionId) throws WebObjectsException {
+    /**
+     * 공유 리포트 하위 폴더 목록 조회
+     * @Method Name   : getShareReport
+     * @Date / Author : 2023.12.01  이도현
+     * @return 폴더 리스트 (공유리포트 하위 폴더 목록)
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public List<TreeVO> getShareReport(){
 
-        //1. 담을 리스트를 만들어 주고
-        List<EntityVO> rootFolderList;
+        //1. 공유 리포트 하위 폴더 목록 담을 리스트 생성
+        List<TreeVO> shareReportList;
 
-        //1-1. mstr set session을 먼저 해준다.
-        mstrObject.setSession(mstrSessionId);
-
-        //1. 먼저 공유 폴더의 아이디를 가져오는 함수를 부른다.
+        //1. 공유 리포트 폴더 ID 조회
         String shareFolderId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNamePublicReports);
-        System.out.println(shareFolderId);
-        //2. 받은 폴더 ID가지고 목록을 가져오는 함수를 부른다
-        rootFolderList = mstrObject.getRootFolderList(shareFolderId);
 
-        return rootFolderList;
+        //2. 폴더 ID로 하위 목록 조회
+        shareReportList = mstrObject.getShareReport(shareFolderId);
+
+        return shareReportList;
     }
 
-    public List<EntityVO> getUserFolderList(String mstrSessionId) throws WebObjectsException {
+    public List<TreeVO> getUserFolderList(String mstrSessionId) throws WebObjectsException {
         //1. 담을 리스트를 만들어 주고
-        List<EntityVO> userFolderList = new ArrayList<>();
+        List<TreeVO> userFolderList = new ArrayList<>();
 
         //1-1. mstr set session을 먼저 해준다.
         mstrObject.setSession(mstrSessionId);
@@ -78,14 +95,14 @@ public class FolderService {
         FolderVO myReportInfo = mstrObject.getFolderInfo(myReportId);
         FolderVO myFavoriteInfo = mstrObject.getFolderInfo(myFavoriteId);
 
-        userFolderList.add(new EntityVO(myReportInfo.getId(), EnumFolderNamesKR.myReport, "#", myReportInfo.getTp(), true));
-        userFolderList.add(new EntityVO(myFavoriteInfo.getId(), EnumFolderNamesKR.myFavorite, "#", myFavoriteInfo.getTp(), true));
+        userFolderList.add(new TreeVO(myReportInfo.getId(), EnumFolderNamesKR.myReport, "#", myReportInfo.getTp(), true));
+        userFolderList.add(new TreeVO(myFavoriteInfo.getId(), EnumFolderNamesKR.myFavorite, "#", myFavoriteInfo.getTp(), true));
 
         return userFolderList;
     }
 
-    public List<EntityVO> getSubList2(String folderId) throws WebObjectsException {
-        List<EntityVO> subList = new ArrayList<>();
+    public List<TreeVO> getSubList2(String folderId) throws WebObjectsException {
+        List<TreeVO> subList = new ArrayList<>();
         subList = mstrObject.getSubList(folderId, "", subList);
         return subList;
     }

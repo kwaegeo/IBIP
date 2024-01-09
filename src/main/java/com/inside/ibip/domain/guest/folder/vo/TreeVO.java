@@ -9,7 +9,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class EntityVO {
+public class TreeVO {
 
     private String id;
 
@@ -21,7 +21,7 @@ public class EntityVO {
 
     private boolean children;
 
-    public EntityVO (String id, String text, String parent, int type){
+    public TreeVO(String id, String text, String parent, int type){
         this.id = id;
         this.text = text;
         this.parent = parent;

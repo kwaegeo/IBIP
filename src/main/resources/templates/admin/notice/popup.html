@@ -39,15 +39,15 @@
         </section>
         <section>
             <div class="gray-border2">
-                <div class="input-area">
-                    <span id="" style="overflow-y: auto;" class="hAuto opinion-area" rows="12" readonly th:utext="${noticeInfo.content}" disabled></span>
+                <div class="input-area" style="overflow-y: auto;">
+                    <span id="" class="hAuto opinion-area" rows="12" readonly th:utext="${noticeInfo.content}" disabled></span>
                 </div>
             </div>
         </section>
         </div>
         <div class="popup__footer">
             <button type="button" class="pop-close bg-gray"><span>닫기</span></button>
-            <button type="button" class="pop-close bg-green" onclick="close3hour()"><span>3시간 동안 보이지 않기</span></button>
+            <button type="button" class="pop-close bg-green" onclick="close3hour()"><span>하루동안 보이지 않기</span></button>
         </div>
     </div>
     <script th:inline="javascript">

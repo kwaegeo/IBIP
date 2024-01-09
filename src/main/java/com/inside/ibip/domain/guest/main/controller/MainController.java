@@ -1,14 +1,14 @@
 package com.inside.ibip.domain.guest.main.controller;
 
-import com.inside.ibip.domain.guest.folder.vo.EntityVO;
+import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.guest.main.vo.SearchVO;
-import com.inside.ibip.domain.guest.main.vo.SideBarItemVO;
 import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.main.service.MainService;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +32,7 @@ import java.util.Map;
  *   2023.12.01     이도현         최초작성
  *
  */
+@Slf4j
 @Controller
 @RequestMapping("/main")
 public class MainController {
@@ -71,18 +72,24 @@ public class MainController {
         //1-1. mstrObject 세션 정보 주입
         mainService.setMstrSession(mstrSessionId);
 
-        //2. 좌측 리스트 가져오기
-        SideBarItemVO sideBarItems = mainService.getSideBarItems();
-        model.addAttribute("sideBarItem", sideBarItems);
-
-        //3. 사용자 정보 가져오기
-        UserInfoVO userInfo = mainService.getUserInfo(mstrSessionId);
+        //2. 사용자 정보 가져오기
+        UserInfoVO userInfo = mainService.getUserInfo();
         model.addAttribute("userInfo", userInfo);
 
         httpSession.setAttribute("userId", userInfo.getUserId());
-    //    return "/newIndex";
         return "/index";
     }
+
+
+
+
+
+
+
+
+
+
+
 
     @PostMapping("/getHistoryListURL")
     @ResponseBody
@@ -186,13 +193,13 @@ public class MainController {
 
     @GetMapping("/root_data")
     @ResponseBody
-    public List<EntityVO> getRootData() {
+    public List<TreeVO> getRootData() {
         System.out.println("루트");
-        List<EntityVO> subList = new ArrayList<>();
-        subList.add(new EntityVO("EDDA24FD432866CE918CADA08F0A63C6", "이도현 개발", "#", 4, true));
-        subList.add(new EntityVO("F025A94B4C03B6DCEE0F5D9DA825DA67", "나무 개발", "#", 4, true));
-        subList.add(new EntityVO("032A5E114A59D28267BDD8B6D9E58B22", "바람 개발", "#", 4, true));
-        subList.add(new EntityVO("92ADD0F84D07AC532AD03BA0F92A836B", "태양 개발", "#", 4, true));
+        List<TreeVO> subList = new ArrayList<>();
+        subList.add(new TreeVO("EDDA24FD432866CE918CADA08F0A63C6", "이도현 개발", "#", 4, true));
+        subList.add(new TreeVO("F025A94B4C03B6DCEE0F5D9DA825DA67", "나무 개발", "#", 4, true));
+        subList.add(new TreeVO("032A5E114A59D28267BDD8B6D9E58B22", "바람 개발", "#", 4, true));
+        subList.add(new TreeVO("92ADD0F84D07AC532AD03BA0F92A836B", "태양 개발", "#", 4, true));
 
 
         // 로트 노드의 데이터를 반환하는 로직
@@ -201,15 +208,15 @@ public class MainController {
 
     @GetMapping("/child_data")
     @ResponseBody
-    public List<EntityVO> getChildData(@RequestParam String id) {
+    public List<TreeVO> getChildData(@RequestParam String id) {
         System.out.println("차일드");
         // 특정 노드의 하위 노드 데이터를 반환하는 로직
         // 여기에서는 id에 따라 다른 데이터를 반환하도록 예시로 작성
-        List<EntityVO> subList = new ArrayList<>();
-        subList.add(new EntityVO("ss", "a 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4, true));
-        subList.add(new EntityVO("ccc", "b 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
-        subList.add(new EntityVO("ss", "c 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
-        subList.add(new EntityVO("zz", "d 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
+        List<TreeVO> subList = new ArrayList<>();
+        subList.add(new TreeVO("ss", "a 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4, true));
+        subList.add(new TreeVO("ccc", "b 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
+        subList.add(new TreeVO("ss", "c 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
+        subList.add(new TreeVO("zz", "d 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
         System.out.println(subList);
         return subList;
     }
@@ -227,7 +234,7 @@ public class MainController {
         }
 
         //3. 사용자 정보 가져오기
-        UserInfoVO userInfo = mainService.getUserInfo(mstrSessionId);
+        UserInfoVO userInfo = mainService.getUserInfo();
         model.addAttribute("userInfo", userInfo);
 
         return "/admin/admin";
