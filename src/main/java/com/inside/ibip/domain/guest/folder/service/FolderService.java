@@ -2,7 +2,7 @@ package com.inside.ibip.domain.guest.folder.service;
 
 import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.guest.folder.vo.TopItemVO;
-import com.inside.ibip.domain.guest.auth.vo.FolderVO;
+import com.inside.ibip.domain.guest.folder.vo.FolderVO;
 import com.inside.ibip.global.mstr.MstrObject;
 import com.inside.ibip.global.vo.EnumFolderNamesKR;
 import com.microstrategy.web.objects.WebObjectsException;
@@ -71,7 +71,7 @@ public class FolderService {
         //1. 공유 리포트 하위 폴더 목록 담을 리스트 생성
         List<TreeVO> shareReportList;
 
-        //1. 공유 리포트 폴더 ID 조회
+        //1-1. 공유 리포트 폴더 ID 조회
         String shareFolderId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNamePublicReports);
 
         //2. 폴더 ID로 하위 목록 조회
@@ -80,30 +80,34 @@ public class FolderService {
         return shareReportList;
     }
 
-    public List<TreeVO> getUserFolderList(String mstrSessionId) throws WebObjectsException {
-        //1. 담을 리스트를 만들어 주고
-        List<TreeVO> userFolderList = new ArrayList<>();
+    /**
+     * 내 리포트 하위 목록 조회
+     * @Method Name   : getMyData
+     * @Date / Author : 2023.12.01  이도현
+     * @return 폴더 리스트 (내 리포트 하위 목록, 즐겨찾기)
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public List<TreeVO> getMyData() {
 
-        //1-1. mstr set session을 먼저 해준다.
-        mstrObject.setSession(mstrSessionId);
+        //1. 내 리포트 및 즐겨찾기 목록 담을 리스트 생성
+        List<TreeVO> myData = new ArrayList<>();
 
-        //1. 먼저 공유 폴더의 아이디를 가져오는 함수를 부른다.
+        //1-1. 내 리포트, 즐겨찾기 ID 조회
         String myReportId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileReports);
         String myFavoriteId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileFavorites);
 
-        //2. 받은 폴더 ID가지고 목록을 가져오는 함수를 부른다
+        //2. 폴더 ID로 폴더 정보 조회
         FolderVO myReportInfo = mstrObject.getFolderInfo(myReportId);
         FolderVO myFavoriteInfo = mstrObject.getFolderInfo(myFavoriteId);
 
-        userFolderList.add(new TreeVO(myReportInfo.getId(), EnumFolderNamesKR.myReport, "#", myReportInfo.getTp(), true));
-        userFolderList.add(new TreeVO(myFavoriteInfo.getId(), EnumFolderNamesKR.myFavorite, "#", myFavoriteInfo.getTp(), true));
+        //3. 2개의 Root Tree로 나눠서 전달 (내 리포트, 즐겨찾기)
+        myData.add(new TreeVO(myReportInfo.getId(), EnumFolderNamesKR.myReport, "#", myReportInfo.getTp(), true));
+        myData.add(new TreeVO(myFavoriteInfo.getId(), EnumFolderNamesKR.myFavorite, "#", myFavoriteInfo.getTp(), true));
 
-        return userFolderList;
+        return myData;
     }
 
-    public List<TreeVO> getSubList2(String folderId) throws WebObjectsException {
-        List<TreeVO> subList = new ArrayList<>();
-        subList = mstrObject.getSubList(folderId, "", subList);
-        return subList;
-    }
 }

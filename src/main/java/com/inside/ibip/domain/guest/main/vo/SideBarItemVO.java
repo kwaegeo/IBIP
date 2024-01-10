@@ -1,6 +1,6 @@
 package com.inside.ibip.domain.guest.main.vo;
 
-import com.inside.ibip.domain.guest.auth.vo.FolderVO;
+import com.inside.ibip.domain.guest.folder.vo.FolderVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

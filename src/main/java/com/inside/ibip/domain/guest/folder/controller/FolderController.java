@@ -3,7 +3,6 @@ package com.inside.ibip.domain.guest.folder.controller;
 import com.inside.ibip.domain.guest.folder.service.FolderService;
 import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.guest.folder.vo.TopItemVO;
-import com.inside.ibip.domain.guest.auth.vo.FolderVO;
 import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.prompt.vo2.PromptDataVO;
 import com.inside.ibip.global.exception.CustomException;
@@ -11,8 +10,6 @@ import com.inside.ibip.global.utils.ComUtils;
 import com.microstrategy.utils.json.JSONException;
 import com.microstrategy.utils.json.XML;
 import com.microstrategy.web.objects.*;
-import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
-import com.microstrategy.webapi.EnumDSSXMLPrivilegeTypes;
 import com.microstrategy.webapi.EnumDSSXMLStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,53 +226,6 @@ public class FolderController {
         return urlSB.toString();
     }
 
-    @GetMapping("/folder")
-    public String getFolderPage(@RequestParam(name = "folderId") String folderId, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
-
-        //1. 세션 체크
-        //2. 전달 받은 상위 폴더 ID 추출
-        //2-1. 상위 폴더 하위의 모든 폴더 정보 가져오기
-        //2-2. 전달 받은 폴더의 하위 모든 요소들 출력
-
-        HttpSession httpSession = request.getSession(true);
-        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
-
-        //1. 세션 체크
-        try {
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        } catch (CustomException ex) {
-            throw ex;
-        }
-
-        /**
-         * 상위 메뉴 조회
-         * **/
-
-        // 상위 폴더의 하위 폴더 정보 조회
-        TopItemVO topItem = folderService.getTopItem(mstrSessionId, folderId);
-
-        //전달 받은 폴더의 하위 목록 조회
-//        List<EntityVO> subList = folderService.getSubList(mstrSessionId, folderId);
-
-        /**
-         * 왼쪽 사이드 메뉴 조회 (jstree) child yn이 따로 있는지?
-         * **/
-
-        //사용자 정보 조회
-        UserInfoVO userInfo = comUtils.getUserInfo(mstrSessionId);
-
-        //왼쪽 폴더메뉴 트리형태로 구현
-        //펼치기, 눌렀을 때 펼쳐지는 것은 Ajax요청으로
-        //처음에는 일단 그것만 있으면 되잖아(폴더의 하위목록전체 뽑는 것)
-
-
-        model.addAttribute("topItem", topItem);
-//        model.addAttribute("subList", subList);
-        model.addAttribute("reqFolderId", folderId);
-        model.addAttribute("userInfo", userInfo);
-
-        return "/folder/folder";
-    }
 
     /**
      * 특정 폴더 하위 목록 조회
@@ -290,7 +240,7 @@ public class FolderController {
      *
      * @Description
      */
-    @GetMapping("/folder/getSubFolder")
+    @GetMapping("/subList")
     @ResponseBody
     public List<TreeVO> getSubList(@RequestParam(name = "folderId") String folderId, HttpServletRequest request, HttpServletResponse response){
 
@@ -338,25 +288,32 @@ public class FolderController {
 
 
 
-
-    @GetMapping("/getUserFolder")
+    /**
+     * 내 리포트, 즐겨찾기 데이터 조회
+     * @Method Name   : getMyData
+     * @Date / Author : 2023.12.01  이도현
+     * @param request request 객체
+     * @param response response 객체
+     * @return 폴더 리스트 (내 리포트, 즐겨찾기)
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @GetMapping("/myData")
     @ResponseBody
-    public List<TreeVO> getUserFolder(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+    public List<TreeVO> getMyData(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
 
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try {
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        } catch (CustomException ex) {
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
         //전달 받은 폴더의 하위 목록 조회
-        List<TreeVO> subList = folderService.getUserFolderList(mstrSessionId);
-        return subList;
+        List<TreeVO> myData = folderService.getMyData();
+        return myData;
 
     }
 

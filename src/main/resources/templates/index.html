@@ -52,7 +52,7 @@
     <ul class="navbar-nav bg-gradient-gb sidebar sidebar-dark accordion" id="accordionSidebar" style="overflow:auto; overflow-y: scroll;height: 400px;">
 
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/main">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/main/guest">
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
@@ -323,7 +323,7 @@
             'core': {
                 'data': {
                     'url': function (node) {
-                        return node.id === '#' ? '/folder/get/shareReport' : '/folder/getSubFolder?folderId='+node.id;
+                        return node.id === '#' ? '/folder/get/shareReport' : '/folder/subList?folderId='+node.id;
                         // Adjust the URLs based on your server-side implementation
                     },
                     'data': function (node) {
@@ -388,50 +388,7 @@
                                 }
                             }
                         }
-                    } else if($node.type == 3) { //리포트
-                        return {
-                            "Menu1": {
-                                "separator_before": false,
-                                "separator_after": true,
-                                "label": "조회", //메뉴 표기 (제목)
-                                "icon": 'jstree-file', //menu icon
-                                action: function(obj){
-                                    console.log(obj)
-                                    var requestData = {'reportId': $node.id}
-
-                                    $.ajax({
-                                        // url: '/folder/report',
-                                        url: '/getReport',
-                                        data: requestData,
-                                        method: 'GET',
-                                        dataType: "json",
-                                        success: function (responseData) {
-                                            console.log(responseData)
-                                            if(responseData.promptExist){
-                                                promptSetting(responseData);
-                                            }
-                                            else{
-                                                alert("해당 리포트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.")
-                                            }
-                                        },
-                                        error: function () {
-                                            alert("서버에 접속할 수 없습니다.")
-                                        }
-                                    })
-                                }
-                            },
-                            "Menu2": {
-                                "separator_before": false,
-                                "separator_after": true,
-                                "label": "수정", //메뉴 표기 (제목)
-                                "icon": 'jstree-file', //menu icon
-                                action: function(obj){
-                                    console.log(obj);
-                                }
-                            }
-                        }
                     }
-
                 }
             }
         });
@@ -440,7 +397,7 @@
             'core': {
                 'data': {
                     'url': function (node) {
-                        return node.id === '#' ? '/getUserFolder' : '/getSubFolder?folderId='+node.id;
+                        return node.id === '#' ? '/folder/myData' : '/folder/subList?folderId='+node.id;
                         // Adjust the URLs based on your server-side implementation
                     },
                     'data': function (node) {
@@ -515,8 +472,7 @@
                 var requestData = {'reportId': node.id, 'documentType' : 'R'}
 
                 $.ajax({
-                    // url: '/folder/report',
-                    url: '/getReport',
+                    url: '/report/get',
                     data: requestData,
                     method: 'GET',
                     dataType: "json",
@@ -526,7 +482,12 @@
                             promptSetting(responseData);
                         }
                         else{
-                            alert("해당 리포트에 문제가 발생하였습니다. 확인 후 재실행해주세요.");
+                            if(responseData.code){
+                                alert(responseData.msg);
+                            }
+                            else{
+                                alert("해당 리포트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                            }
                         }
                     },
                     error: function () {
@@ -538,20 +499,21 @@
                 var requestData = {'reportId': node.id, 'documentType' : 'D'}
 
                 $.ajax({
-                    // url: '/folder/report',
-                    url: '/getReport',
+                    url: '/report/get',
                     data: requestData,
                     method: 'GET',
                     dataType: "json",
                     success: function (responseData) {
-                        console.log("이 다큐먼트의 정보는 : ")
-                        console.log(responseData.promptExist)
-                        console.log(responseData)
                         if(responseData.promptExist){
                             promptSetting(responseData);
                         }
                         else{
-                            alert("해당 다큐먼트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.")
+                            if(responseData.code){
+                                alert(responseData.msg);
+                            }
+                            else{
+                                alert("해당 다큐먼트 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                            }
                         }
                     },
                     error: function () {
@@ -572,7 +534,7 @@
 
                 $.ajax({
                     // url: '/folder/report',
-                    url: '/getReport',
+                    url: '/report/get',
                     data: requestData,
                     method: 'GET',
                     dataType: "json",
@@ -582,7 +544,12 @@
                             promptSetting(responseData);
                         }
                         else{
-                            alert("해당 리포트에 문제가 발생하였습니다. 확인 후 재실행해주세요.");
+                            if(responseData.code){
+                                alert(responseData.msg);
+                            }
+                            else{
+                                alert("해당 다큐먼트 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                            }
                         }
                     },
                     error: function () {
@@ -595,27 +562,27 @@
 
                 $.ajax({
                     // url: '/folder/report',
-                    url: '/getReport',
+                    url: '/report/get',
                     data: requestData,
                     method: 'GET',
                     dataType: "json",
                     success: function (responseData) {
-                        console.log("이 다큐먼트의 정보는 : ")
-                        console.log(responseData.promptExist)
-                        console.log(responseData)
                         if(responseData.promptExist){
                             promptSetting(responseData);
                         }
                         else{
-                            alert("해당 다큐먼트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.")
+                            if(responseData.code){
+                                alert(responseData.msg);
+                            }
+                            else{
+                                alert("해당 다큐먼트 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                            }
                         }
                     },
                     error: function () {
                         alert("서버에 접속할 수 없습니다.")
                     }
                 })
-            }else if (node.type === 10){
-                alert("프롬프트입니다.")
             }
         })
 
@@ -633,8 +600,6 @@
 
     // 프롬프트 세팅
     function promptSetting(reportInfo){
-
-        console.log(reportInfo);
 
         $("#main-content").empty();
 
@@ -658,7 +623,7 @@
                                     <div class="popup-window gray-border" id="reportDataDiv">
                                         <div class="popup__head id="${reportInfo.reportId}">
                                             <input type="hidden" id="reportNm" value="${reportInfo.reportNm}" />
-                                            <h3>${reportInfo.reportNm}</h3>
+                                            <h5 class="h5_custom_leedo">${reportInfo.reportNm}</h5>
                                         </div>
                                         <div id="promptDiv">
                                         </div>
@@ -809,7 +774,7 @@
         reportInfo.exportType = exportType;
 
         $.ajax({
-            url: '/getReportURL',
+            url: '/report/get/URL',
             data: JSON.stringify(reportInfo),
             contentType: "application/json",
             method: 'POST',
@@ -825,10 +790,10 @@
                     window.open(responseData, '', 'width=1400,height=600');
                 }
                 else{
-                    var $reportDataDiv = $('#reportDataDiv');
-                    if ($reportDataDiv.css('display') != 'none' ) {
+                    var $promptDiv = $('#promptDiv');
+                    if ( $promptDiv.css('display') != 'none' ) {
                         $('#foldAndOpen').text('프롬프트 펼치기');
-                        $reportDataDiv.toggle();
+                        $promptDiv.toggle();
                     }
                     // promptToggle();
                     // // iframe을 한번 비운 뒤에
@@ -844,9 +809,9 @@
     }
 
     function promptToggle(){
-        var $reportDataDiv = $('#reportDataDiv');
-        $reportDataDiv.toggle();
-        if ($reportDataDiv.css('display') == 'none' ) {
+        var $promptDiv = $('#promptDiv');
+        $promptDiv.toggle();
+        if ($promptDiv.css('display') == 'none' ) {
             $('#foldAndOpen').text('프롬프트 펼치기');
         }
         else{
@@ -1079,8 +1044,8 @@
     function getHistoryListURL() {
 
         $.ajax({
-            url: '/getHistoryListURL',
-            data: JSON.stringify({userId: userId}),
+            url: '/main/historyList',
+            data: JSON.stringify(),
             contentType: "application/json",
             method: 'POST',
             dataType: "text",
@@ -1112,8 +1077,8 @@
     function getSubscriptionURL() {
 
         $.ajax({
-            url: '/getSubscriptionURL',
-            data: JSON.stringify({userId: userId}),
+            url: '/main/subscription',
+            data: JSON.stringify(),
             contentType: "application/json",
             method: 'POST',
             dataType: "text",
@@ -1179,8 +1144,13 @@
 
         var searchKeyword = $('#searchKeyword').val();
 
+        if(validData(searchKeyword)){
+            alert("검색어를 입력해주세요.");
+            return;
+        }
+
         $.ajax({
-            url: '/searchReport' + "?searchKeyword="+searchKeyword,
+            url: '/main/search' + "?searchKeyword="+searchKeyword,
             method: 'GET',
             dataType: "json",
             success: function (responseData) {
@@ -1352,7 +1322,7 @@
         var requestData = {'reportId': reportId, 'documentType' : docType}
 
         $.ajax({
-            url: '/getReport',
+            url: '/report/get',
             data: requestData,
             method: 'GET',
             dataType: "json",
@@ -1362,7 +1332,12 @@
                     promptSetting(responseData);
                 }
                 else{
-                    alert("해당 리포트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.")
+                    if(responseData.code){
+                        alert(responseData.msg);
+                    }
+                    else{
+                        alert("해당 리포트에 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                    }
                 }
             },
             error: function () {
@@ -1439,6 +1414,12 @@
 
     }
 
+    function validData(data){
+        if(data == "" || data.length == 0)
+            return true;
+        else
+            return false;
+    }
 </script>
 </body>
 

@@ -5,6 +5,7 @@ import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.WebObjectsException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ * @FileName     : ReportController.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : 리포트 Controller, 리포트 정보 및 프롬프트 정보 조회
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
+@Log4j2
 @Controller
+@RequestMapping("/report")
 public class ReportController {
 
     @Autowired
@@ -24,59 +39,68 @@ public class ReportController {
 
 
     /**
-     * 1. 세션체크
-     * 2. Prompt가 있는지 확인 = 2-1. 없을 시 그대로 retrun 있을 시 Prompt 조회한 다음 return
+     * 리포트 정보 조회
+     * @Method Name   : getReport
+     * @Date / Author : 2023.12.01  이도현
+     * @param reportId 리포트의 ID
+     * @param documentType 문서 타입
+     * @param request request 객체
+     * @param response response 객체
+     * @return 리포트 객체
+     * @History
+     * 2023.12.01	최초생성
      *
-     * **/
-
-    @GetMapping("/getReport")
+     * @Description
+     */
+    @GetMapping("/get")
     @ResponseBody
-    public ReportVO getReport(@RequestParam(name = "reportId")String reportId, @RequestParam(name = "documentType")String documentType, HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+    public ReportVO getReport(@RequestParam(name = "reportId")String reportId, @RequestParam(name = "documentType")String documentType, HttpServletRequest request, HttpServletResponse response){
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try {
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        } catch (CustomException ex) {
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
-        System.out.println(documentType);
+        //2. 리포트 정보 조회
+        ReportVO reportInfo = reportService.getReportInfo(reportId, documentType);
 
-        //2. Prompt가 있는지 확인하면서 걍 return 때려버려
-        ReportVO reportInfo = reportService.getPromptData(mstrSessionId, reportId, documentType);
-
-        System.out.println(reportInfo);
-       return reportInfo;
+        return reportInfo;
     }
 
-    @PostMapping("/getReportURL")
+    /**
+     * 리포트 URL 조회 (리포트 실행)
+     * @Method Name   : getReport
+     * @Date / Author : 2023.12.01  이도현
+     * @param reportInfo 리포트 정보 객체
+     * @param request request 객체
+     * @param response response 객체
+     * @return 리포트 객체
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @PostMapping("/get/URL")
     @ResponseBody
     public String getReportURL(@RequestBody ReportVO reportInfo, HttpServletRequest request, HttpServletResponse response){
-        System.out.println(reportInfo);
-        
-        
+
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try {
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        } catch (CustomException ex) {
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
-        //2. xml 생성
+        //2. Prompt XML 생성
         String promptXml = reportService.getPromptXml(reportInfo);
 
-        //2.5 usrSmgr 가져오기
+        //2.1 usrSmgr 가져오기
         String usrSmgr = reportService.getUsrSmgr();
 
-        //3. URL 생성
+        //3. 리포트 실행 URL 생성
         String reportURL = reportService.getReportURL(reportInfo, promptXml, usrSmgr);
-        //4. return
+
+        //4. 응답
         return reportURL;
     }
 

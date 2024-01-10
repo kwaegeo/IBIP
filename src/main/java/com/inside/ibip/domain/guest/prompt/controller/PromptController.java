@@ -1,6 +1,6 @@
 package com.inside.ibip.domain.guest.prompt.controller;
 
-import com.inside.ibip.domain.guest.auth.vo.FolderVO;
+import com.inside.ibip.domain.guest.folder.vo.FolderVO;
 import com.microstrategy.web.objects.WebFolder;
 import com.microstrategy.web.objects.WebIServerSession;
 import com.microstrategy.web.objects.WebObjectsException;

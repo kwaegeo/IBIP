@@ -3,19 +3,27 @@ package com.inside.ibip.global.utils;
 import com.inside.ibip.domain.guest.prompt.vo.ObjectVO;
 import com.inside.ibip.domain.guest.prompt.vo2.ElementVO;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
 
+@Component
 public class UrlUtils {
 
-    public static String makeXML(ReportVO reportInfo){
+    @Value("${mstrServerName}")
+    private String serverName;
 
-        return "";
-    }
+    @Value("${mstrProjectName}")
+    private String mstrProjectName;
 
-    public static String generateXML(ReportVO reportVO) {
+    @Value("${mstrWebPort}")
+    private String mstrWebPort;
+
+    public String generateXML(ReportVO reportVO) {
 
         StringWriter sw = new StringWriter();
         String middleTag = "";
@@ -99,7 +107,7 @@ public class UrlUtils {
         return sw.toString();
     }
 
-    public static String getReportURL(ReportVO reportInfo, String promptXML, String usrSmgr){
+    public String getReportURL(ReportVO reportInfo, String promptXML, String usrSmgr){
 
         /**
          *
@@ -143,21 +151,22 @@ public class UrlUtils {
         return urlSB.toString();
     }
 
-    public static String getHistoryURL(String usrSmgr){
+    /**
+     * 사용내역 목록의 URL 조회 (로그인 계정)
+     * @Method Name   : getHistoryURL
+     * @Date / Author : 2023.12.01  이도현
+     * @return 사용자 정보
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public String getHistoryURL(String usrSmgr){
 
-        /**
-         *
-         * 사용내역목록 불러오기
-         *
-         * **/
-
-        // Return session
         StringBuilder urlSB = new StringBuilder();
-        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("http").append("://").append(serverName).append(":").append(mstrWebPort); //Web Server name and port
         urlSB.append("/MicroStrategy/servlet/mstrWeb");
-        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        urlSB.append("?server=").append(serverName); //I Server name
         urlSB.append("&port=0");
-        urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
+        urlSB.append("&project=").append(mstrProjectName); // Project name
         urlSB.append("&evt=").append("3018");
         urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append("3018");
         urlSB.append("&usrSmgr=").append(usrSmgr);
@@ -168,21 +177,23 @@ public class UrlUtils {
         return urlSB.toString();
     }
 
-    public static String getSubscriptionURL(String usrSmgr){
-
-        /**
-         *
-         * 구독물 목록 가져오기
-         *
-         * **/
+    /**
+     * 내 구독물 URL 조회 (로그인 계정)
+     * @Method Name   : getSubscriptionURL
+     * @Date / Author : 2023.12.01  이도현
+     * @return 사용자 정보
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public String getSubscriptionURL(String usrSmgr){
 
         // Return session
         StringBuilder urlSB = new StringBuilder();
-        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("http").append("://").append(serverName).append(":").append(mstrWebPort); //Web Server name and port
         urlSB.append("/MicroStrategy/servlet/mstrWeb");
-        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        urlSB.append("?server=").append(serverName); //I Server name
         urlSB.append("&port=0");
-        urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
+        urlSB.append("&project=").append(mstrProjectName); // Project name
         urlSB.append("&evt=").append("3031");
         urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append("3031");
         urlSB.append("&usrSmgr=").append(usrSmgr);
@@ -194,7 +205,7 @@ public class UrlUtils {
     }
 
 
-    public static String getDashboardURL(ReportVO reportInfo, String usrSmgr){
+    public String getDashboardURL(ReportVO reportInfo, String usrSmgr){
 
 
         int evtType = 2048001; // 리포트 단순 조회

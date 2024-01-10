@@ -1,15 +1,41 @@
 package com.inside.ibip.global.mstr.prompt;
 
 import com.inside.ibip.domain.guest.prompt.vo.PromptVO;
+import com.inside.ibip.global.exception.CustomException;
+import com.inside.ibip.global.exception.code.ResultCode;
 import com.microstrategy.web.objects.WebConstantPrompt;
 import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.web.objects.WebPrompt;
+import lombok.extern.log4j.Log4j2;
 
+/**
+ * @FileName     : ConstantPrompt.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : 값 프롬프트 파싱 클래스
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
+@Log4j2
 public class ConstantPrompt {
 
-    public PromptVO getConstantPromptInfo(PromptVO prompt, WebPrompt webPrompt) throws WebObjectsException {
+    /**
+     * 값 프롬프트 파싱 함수
+     * @Method Name   : getConstantPromptInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param prompt 프롬프트 VO 객체
+     * @param webPrompt WebPrompt 객체
+     * @return 값 프롬프트 객체
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public PromptVO getConstantPromptInfo(PromptVO prompt, WebPrompt webPrompt){
 
-        // 값 프롬프트 객체 생성
+        //1. 값 프롬프트 객체 생성
         WebConstantPrompt constantPrompt = (WebConstantPrompt) webPrompt;
         prompt.setPromptId(constantPrompt.getID());
         prompt.setPromptNm(constantPrompt.getMeaning());
@@ -19,22 +45,15 @@ public class ConstantPrompt {
         prompt.setPromptType("value");
         prompt.setPt(String.valueOf(constantPrompt.getDSSPromptType()));
 
-        // 프롬프트 채우기
-        constantPrompt.populate();
+        //1-1. 프롬프트 채우기
+        try {
+            constantPrompt.populate();
+        }catch (WebObjectsException woe){
+            log.error("값 프롬프트 불러오는 도중 오류 발생 [Error msg]: "+ woe.getMessage());
+            throw new CustomException(ResultCode.INVALID_PROMPT);
+        }
 
-        System.out.println(constantPrompt.getID());
-        System.out.println(constantPrompt.getMeaning());
-        System.out.println(constantPrompt.getTitle());
-        System.out.println(constantPrompt.getMin());
-        System.out.println(constantPrompt.getMax());
-        System.out.println(constantPrompt.getDefaultAnswer());
-        System.out.println(constantPrompt.getAnswer());
-        System.out.println(constantPrompt.getShortAnswerXML(true));
-        System.out.println(constantPrompt.getPromptType());
-        System.out.println(constantPrompt.getDataType());
-        System.out.println(constantPrompt.getDSSPromptType());
-
-        // 기본 값 정보 파싱
+        //2. 프롬프트의 기본 값 정보 파싱
         if(constantPrompt.hasDefaultAnswer()){
             prompt.setVal(constantPrompt.getDefaultAnswer());
         }

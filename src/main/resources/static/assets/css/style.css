@@ -84,6 +84,13 @@
 .gray-border{
   border: 2px solid #E2E2E2;
   padding: 3px; /* 테두리와 내용 사이의 간격을 늘립니다. (선택 사항) */
+  border-radius: 0.35rem;
+}
+
+.h5_custom_leedo{
+  font-weight: 700!important;
+  color: #242731!important;
+  font-size: 1rem;
 }
 
 /* popup - popup__body content */

@@ -7,6 +7,7 @@ import com.inside.ibip.domain.guest.main.service.MainService;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
+import com.inside.ibip.global.utils.UrlUtils;
 import com.microstrategy.web.objects.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,56 +81,63 @@ public class MainController {
         return "/index";
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    @PostMapping("/getHistoryListURL")
+    /**
+     * 사용내역 목록 URL 조회
+     * @Method Name   : getHistoryList
+     * @Date / Author : 2023.12.01  이도현
+     * @param request request 객체
+     * @param response response 객체
+     * @return 사용내역 목록 URL
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     *  1. 사용자 세션 (MSTR) 유효성 검사
+     *  2. usrSmgr 조회
+     *  3. historyList 기본 웹 URL 조합 후 반환
+     */
+    @PostMapping("/historyList")
     @ResponseBody
-    public String getHistoryList(@RequestBody String userId, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
-
-        //1. 사용자 세션 (MSTR) 유효성 검사
-        //2. 사용내역목록 URL 생성 반환
+    public String getHistoryList(HttpServletRequest request, HttpServletResponse response) {
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
         String usrSmgr = comUtils.getUsrSmgr();
+
         String historyListURL = mainService.getHistoryURL(usrSmgr);
 
         return historyListURL;
     }
 
-    @PostMapping("/getSubscriptionURL")
+    /**
+     * 내 구독물 URL 조회
+     * @Method Name   : getSubscription
+     * @Date / Author : 2023.12.01  이도현
+     * @param request request 객체
+     * @param response response 객체
+     * @return 사용내역 목록 URL
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     *  1. 사용자 세션 (MSTR) 유효성 검사
+     *  2. usrSmgr 조회
+     *  3. subscription 기본 웹 URL 조합 후 반환
+     */
+    @PostMapping("/subscription")
     @ResponseBody
-    public String getSubscription(@RequestBody String userId, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
+    public String getSubscription(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
 
-        //1. 사용자 세션 (MSTR) 유효성 검사
-        //2. 나의 구독물 URL 생성 반환
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
         String usrSmgr = comUtils.getUsrSmgr();
         String subscriptionURL = mainService.getSubscriptionURL(usrSmgr);
@@ -163,64 +171,53 @@ public class MainController {
         return dashboardURL;
     }
 
-    @GetMapping("/searchReport")
+    /**
+     * 문서 검색 (리포트, 다큐먼트)
+     * @Method Name   : search
+     * @Date / Author : 2023.12.01  이도현
+     * @param searchKeyword 검색 키워드
+     * @param request request 객체
+     * @param response response 객체
+     * @return 사용내역 목록 URL
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     *  1. 사용자 세션 (MSTR) 유효성 검사
+     *  2. 검색 키워드로 MSTR 내부의 문서 검색
+     */
+    @GetMapping("/search")
     @ResponseBody
-    public SearchVO searchReport(@RequestParam String searchKeyword, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
+    public SearchVO search(@RequestParam String searchKeyword, HttpServletRequest request, HttpServletResponse response) {
 
-        //1. 사용자 세션 (MSTR) 유효성 검사
-        //2. 나의 구독물 URL 생성 반환
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
-        System.out.println(searchKeyword);
-
-        SearchVO search = mainService.searchReport(searchKeyword);
+        SearchVO search = mainService.search(searchKeyword);
         return search;
     }
 
-    @GetMapping("/tree")
-    public String getTree(){
-    return "/tree";
-    }
 
-    @GetMapping("/root_data")
-    @ResponseBody
-    public List<TreeVO> getRootData() {
-        System.out.println("루트");
-        List<TreeVO> subList = new ArrayList<>();
-        subList.add(new TreeVO("EDDA24FD432866CE918CADA08F0A63C6", "이도현 개발", "#", 4, true));
-        subList.add(new TreeVO("F025A94B4C03B6DCEE0F5D9DA825DA67", "나무 개발", "#", 4, true));
-        subList.add(new TreeVO("032A5E114A59D28267BDD8B6D9E58B22", "바람 개발", "#", 4, true));
-        subList.add(new TreeVO("92ADD0F84D07AC532AD03BA0F92A836B", "태양 개발", "#", 4, true));
-
-
-        // 로트 노드의 데이터를 반환하는 로직
-        return subList;
-    }
-
-    @GetMapping("/child_data")
-    @ResponseBody
-    public List<TreeVO> getChildData(@RequestParam String id) {
-        System.out.println("차일드");
-        // 특정 노드의 하위 노드 데이터를 반환하는 로직
-        // 여기에서는 id에 따라 다른 데이터를 반환하도록 예시로 작성
-        List<TreeVO> subList = new ArrayList<>();
-        subList.add(new TreeVO("ss", "a 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4, true));
-        subList.add(new TreeVO("ccc", "b 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
-        subList.add(new TreeVO("ss", "c 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
-        subList.add(new TreeVO("zz", "d 개발", "EDDA24FD432866CE918CADA08F0A63C6", 4));
-        System.out.println(subList);
-        return subList;
-    }
-
+    /**
+     * 메인 페이지 조회 (사용자)
+     * @Method Name   : getGuestMain
+     * @Date / Author : 2023.12.01  이도현
+     * @param request request 객체
+     * @param response response 객체
+     * @param model model 객체
+     * @return 메인 페이지 (사용자)
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     *  1. 사용자 세션 (MSTR) 유효성 검사
+     *  2. 좌측 리스트 메뉴 가져오기 (폴더명, 폴더ID)
+     *  3. 사용자 정보 가져오기 (이름, 계정ID)
+     */
     @GetMapping("/admin")
     public String adminPage( HttpServletRequest request, HttpServletResponse response, Model model) throws WebObjectsException {
         HttpSession httpSession = request.getSession(true);

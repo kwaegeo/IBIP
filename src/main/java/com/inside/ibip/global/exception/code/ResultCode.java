@@ -46,6 +46,12 @@ public enum ResultCode {
 
     INVALID_FOLDER("E19", "해당 폴더가 이미 삭제되었거나 존재하지 않습니다."),
 
+    INVALID_CREATION_TIME("E20", "해당 개체의 생성일자가 올바르지 않습니다. 확인 후 재시도 해주세요."),
+
+    INVALID_DOCUMENT("E17", "해당 문서가 이미 삭제되었거나 존재하지 않습니다. 확인 후 재시도 해주세요."),
+
+    INVALID_PROMPT("E18", "프롬프트를 불러오는 도중 오류가 발생하였습니다. 해당 문서의 프롬프트를 확인 후 재시도 해주세요"),
+
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다. IntelligenceServer가  정상적으로 동작하는지 확인해주세요.");
 
 

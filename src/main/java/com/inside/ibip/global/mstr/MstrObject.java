@@ -5,7 +5,7 @@ import com.inside.ibip.domain.admin.role.vo.*;
 import com.inside.ibip.domain.admin.user.vo.UserVO;
 import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.admin.group.vo.GroupVO;
-import com.inside.ibip.domain.guest.auth.vo.FolderVO;
+import com.inside.ibip.domain.guest.folder.vo.FolderVO;
 import com.inside.ibip.domain.guest.main.vo.SearchResultVO;
 import com.inside.ibip.domain.guest.main.vo.SearchVO;
 import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
@@ -44,8 +44,18 @@ public class MstrObject extends MstrSession{
      * MSTR Object Source
      */
     private WebObjectSource objectSource = factory.getObjectSource();
+    private WebDocumentSource documentSource = factory.getDocumentSource();
 
-    //세션 정보 입력
+    private WebReportSource reportSource = factory.getReportSource();
+
+    /**
+     * Mstr 세션 적용 함수
+     * @Method Name   : setSession
+     * @Date / Author : 2023.12.01  이도현
+     * @param mstrSessionId MstrSession에서 받은 세션 정보 Id
+     * @History
+     * 2023.12.01	최초생성
+     */
     public void setSession(String mstrSessionId){
         serverSession = factory.getIServerSession();
         serverSession.setSessionID(mstrSessionId);
@@ -134,7 +144,17 @@ public class MstrObject extends MstrSession{
         return folderInfo;
     }
 
-    //사용자 정보 불러오기
+    /**
+     * 로그인 한 MSTR 세션의 사용자 정보를 가져온다.
+     * @Method Name   : getUserInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @return 사용자 정보
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     * 권한을 추가로 조회하여 관리자인지 사용자인지 체크
+     */
     public UserInfoVO getUserInfo() {
         UserInfoVO userInfo = new UserInfoVO();
         try {
@@ -146,7 +166,7 @@ public class MstrObject extends MstrSession{
                 userInfo.setAdminYn("Y");
             }
         }catch (WebObjectsException e){
-            throw new CustomException(ResultCode.MSTR_NO_SESSION);
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
         return userInfo;
     }
@@ -194,7 +214,7 @@ public class MstrObject extends MstrSession{
      * @Method Name   : getShareReport
      * @Date / Author : 2023.12.01  이도현
      * @param folderId 하위 목록 조회 할 폴더 ID
-     * @param parentId 부모 ID
+     * @param parentId 부모 ID (재귀를 위해 부모 폴더 지정)
      * @param subList 하위 목록 리스트
      * @return 폴더 하위 목록 리스트
      * @History
@@ -211,7 +231,6 @@ public class MstrObject extends MstrSession{
             for (int i = 0; i < folder.getChildCount(); i++) {
                 if (folder.get(i).getType() == 8) {
                     folder.get(i).populate();
-                    System.out.println(folder.get(i).getChildUnits().size());
                     if (folder.get(i).getChildUnits().size() > 0) {
                         getSubList(folder.get(i).getID(), folder.get(i).getParent().getID(), subList);
                     }
@@ -233,172 +252,239 @@ public class MstrObject extends MstrSession{
         return usrSmgr;
     }
 
+    /**
+     * 문서 검색 (리포트, 다큐먼트)
+     * @Method Name   : search
+     * @Date / Author : 2023.12.01  이도현
+     * @param searchKeyword 검색 키워드
+     * @return 검색 리스트
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public SearchVO search(String searchKeyword){
 
-    public SearchVO searchReport(String searchKeyword) throws WebObjectsException {
-        WebSearch webSearch = factory.getObjectSource().getNewSearchObject();
-        webSearch.setNamePattern("*" + searchKeyword + "*");
-        webSearch.setSearchFlags(webSearch.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
-        webSearch.setAsync(false);
-        webSearch.submit();
-        WebFolder objectResult = webSearch.getResults();
-        System.out.println(objectResult);
-
+        //1. 검색 객체,  검색 결과 리스트 객체 생성
         SearchVO search = new SearchVO();
         List<SearchResultVO> searchList = new ArrayList<>();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
 
-        for(int i=0; i< objectResult.size(); i++){
-            WebObjectInfo woi = objectResult.get(i);
-            woi.populate();
+            //2. WebSearch 객체 생성
+            WebSearch webSearch = objectSource.getNewSearchObject();
 
-            if(woi.getType() == 3 || woi.getType() == 55){
-                SimpleList lst = woi.getAncestors(); //Path 경로 넣는 것
+            //2-1. 검색 키워드, 검색 종류, 검색 패턴, 지정
+            webSearch.setNamePattern("*" + searchKeyword + "*");
+            webSearch.setSearchFlags(webSearch.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+            webSearch.setAsync(false);
 
-                String reportPath = "";
-                String reportName = woi.getName();
-                for(int j=0; j< lst.size(); j++){
-                    WebObjectInfo obj = (WebObjectInfo)lst.item(j);
-                    System.out.println(obj.getName());
-                    if ("".equals(reportPath)){
-                        reportPath += obj.getName();
+            //2-2. 조회 및 파싱 (검색 결과는 WebFolder로 파싱)
+            webSearch.submit();
+            WebFolder objectResult = webSearch.getResults();
+
+            //2-3. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date creationTime = null;
+
+            //3. 결과의 하위 목록 (결과 리스트 파싱)
+            for (int i = 0; i < objectResult.size(); i++) {
+
+                //3-1. 결과 목록 파싱 후 채워넣기
+                WebObjectInfo woi = objectResult.get(i);
+                woi.populate();
+
+                //3-2. 타입이 리포트 혹은 다큐먼트만 선별
+                if (woi.getType() == 3 || woi.getType() == 55) {
+
+                    //3-3. 결과 목록의 경로 추출
+                    SimpleList lst = woi.getAncestors();
+
+                    String path = "";
+                    String reportName = woi.getName();
+                    for (int j = 0; j < lst.size(); j++) {
+                        WebObjectInfo obj = (WebObjectInfo) lst.item(j);
+                        if ("".equals(path)) {
+                            path += obj.getName();
+                        } else {
+                            path += " > " + obj.getName();
+                        }
                     }
-                    else {
-                        reportPath += " > " + obj.getName();
+                    path += " > " + reportName;
+
+                    //3-4. 생성일자 포맷 변경 (yyyy-MM-dd HH:mm:ss)
+                    try {
+                        creationTime = originalParser.parse(woi.getCreationTime());
+                    } catch (Exception e) {
+                        log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                        throw new CustomException(ResultCode.INVALID_CREATION_TIME);
                     }
+
+                    //3-5. 결과 생성 후 삽입
+                    SearchResultVO searchResult = new SearchResultVO(
+                            woi.getID(),
+                            woi.getName(),
+                            woi.getType(),
+                            woi.getOwner().getName(),
+                            normalParser.format(creationTime),
+                            path
+                    );
+                    searchList.add(searchResult);
                 }
-                reportPath += " > " + reportName;
-                System.out.println(reportPath);
-
-                SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
-                Date creationTime = null;
-                try {
-                    creationTime = originalFormat.parse(woi.getCreationTime());
-                }catch (Exception e){}
-
-                SearchResultVO searchResult = new SearchResultVO(
-                        woi.getID(),
-                        woi.getName(),
-                        woi.getType(),
-                        woi.getOwner().getName(),
-                        sdf.format(creationTime),
-                        reportPath
-                );
-                searchList.add(searchResult);
             }
+        }catch (WebObjectsException woe){
+            log.error("문서 검색 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
 
+        //4. 반환
         search.setSearchList(searchList);
         return search;
 
     }
 
 
-    //리포트 정보 가져오기 (리포트 정보만)
-    public ReportVO getReportInfo(String reportId, String documentType) throws WebObjectsException {
+    /**
+     * 리포트 정보 조회
+     * @Method Name   : getReportInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param reportId 리포트의 ID
+     * @param documentType 문서 타입
+     * @return 리포트 객체
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public ReportVO getReportInfo(String reportId, String documentType){
+
+        //1. 리포트 객체 생성 및 Id, type 지정
         ReportVO reportInfo = new ReportVO();
         reportInfo.setReportId(reportId);
         reportInfo.setDocumentType(documentType);
 
-        WebObjectSource objectSource = this.serverSession.getFactory().getObjectSource();
+        //1-1. 문서 정보 조회를 위한 문서 타입 설정
         int dssObjectTypes;
 
-        if("D".equals(documentType)){
+        if("D".equals(documentType)){ //다큐먼트, 도씨에
             dssObjectTypes = EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition;
         }
-        else{
+        else{ //리포트
             dssObjectTypes = EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition;
         }
-        WebObjectInfo report = objectSource.getObject(reportId, dssObjectTypes);
 
-        report.populate();
-        String reportName = report.getName();
-        reportInfo.setReportNm(reportName);
+        //2. 리포트 정보 조회
+        try {
+            WebObjectInfo report = objectSource.getObject(reportId, dssObjectTypes);
+            report.populate();
 
-        SimpleList lst = report.getAncestors();
-        String reportPath = "";
-        for(int i=0; i< lst.size()-3; i++){
-            WebObjectInfo obj = (WebObjectInfo)lst.item(i+3);
-            System.out.println(obj.getName());
-            if ("".equals(reportPath)){
-              reportPath += obj.getName();
+            String reportName = report.getName();
+            reportInfo.setReportNm(reportName);
+
+            // 리포트 경로를 위한 list 객체 생성 후 파싱
+            SimpleList lst = report.getAncestors();
+            String reportPath = "";
+            for (int i = 0; i < lst.size() - 3; i++) {
+                WebObjectInfo obj = (WebObjectInfo) lst.item(i + 3);
+                if ("".equals(reportPath)) {
+                    reportPath += obj.getName();
+                } else {
+                    reportPath += " > " + obj.getName();
+                }
             }
-            else {
-                reportPath += " > " + obj.getName();
-            }
+            reportPath += " > " + reportName;
+            reportInfo.setReportPath(reportPath);
+
+        }catch (WebObjectsException woe){
+            log.error("리포트 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("리포트 정보 조회 중  에러 발생 (리포트 Id로 객체 조회 실패) [Error msg]: "+ iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_DOCUMENT);
         }
-        reportPath += " > " + reportName;
-        reportInfo.setReportPath(reportPath);
-
-        System.out.println(reportPath);
 
         return reportInfo;
     }
 
 
 
-    // 리포트 데이터 정보 가져오기 (프롬프트 데이터 포함) (유형에 맞게 나눠서)
-    public ReportVO getReportDataInfo(String reportId, ReportVO reportInfo) throws WebObjectsException {
+    /**
+     * 리포트 정보 조회
+     * @Method Name   : getReportInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param reportId 리포트의 ID
+     * @param reportInfo 리포트 정보를 담은 객체
+     * @return 리포트 객체
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public ReportVO getReportDataInfo(String reportId, ReportVO reportInfo){
 
-        WebResultSetInstance webReportInstance = null;
+        //1. WebInstance 객체 생성
+        WebResultSetInstance resultInstance = null;
 
-        if("D".equals(reportInfo.getDocumentType())){
-            webReportInstance = (WebDocumentInstance) serverSession.getFactory().getDocumentSource().getNewInstance(reportId);
+        //1-1. 문서타입에 따라 상속 된 Instance로 초기화
+        try {
+            if ("D".equals(reportInfo.getDocumentType())) {
+                resultInstance = (WebDocumentInstance) documentSource.getNewInstance(reportId);
+            } else {
+                resultInstance = (WebReportInstance) reportSource.getNewInstance(reportId);
+            }
+        }catch(WebObjectsException woe){
+            log.error("리포트 데이터, 프롬프트 조회 중  에러 발생 (문서 타입으로 source 객체 생성 중 오류 발생) [Error msg]: "+ woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
-        else{
-            webReportInstance = (WebReportInstance) serverSession.getFactory().getReportSource().getNewInstance(reportId);
+
+        //Prompts 객체 (Prompt List) 선언
+        WebPrompts webPrompts = null;
+        try {
+            //1-2. 해당 문서에 프롬프트가 존재하는지 확인 존재하지 않을경우 return
+            if (resultInstance.pollStatus() != EnumDSSXMLStatus.DssXmlStatusPromptXML) {
+                reportInfo.setPromptExist("N");
+                return reportInfo;
+            }
+
+            //1-2. 프롬프트 존재 시 변수 설정
+            reportInfo.setPromptExist("Y");
+
+            //1-3. WebPrompts 객체 조회
+            webPrompts = resultInstance.getPrompts();
+
+        }catch (WebObjectsException woe){
+            log.error("프롬프트 불러오는 도중 오류 발생 [Error msg]: "+ woe.getMessage());
+            throw new CustomException(ResultCode.INVALID_PROMPT);
         }
 
-        //프롬프트가 있는지 없는지 확인 없으면 return
-        if(webReportInstance.pollStatus() != EnumDSSXMLStatus.DssXmlStatusPromptXML){
-            reportInfo.setPromptExist("N");
-            return reportInfo;
-        }
-
-        //프롬프트 사이즈가 0이 아니라면 (1개 이상이라면) 있다
-        reportInfo.setPromptExist("Y");
-
-        //프롬프트들의 객체 생성
-        WebPrompts webPrompts = webReportInstance.getPrompts();
-
+        //2. 프롬프트 List 객체 생성
         List<PromptVO> promptList = new ArrayList<>();
 
-        System.out.println(webPrompts.size());
-        //프롬프트 개수만큼 반복
+        //2-1. 프롬프트 List 수 만큼 반복
         for(int i=0; i<webPrompts.size(); i++) {
 
-            //프롬프트 객체 생성
+            //2-2. 프롬프트 객체 생성
             WebPrompt webPrompt = webPrompts.get(i);
             PromptVO prompt = new PromptVO();
-            System.out.println("타입이?");
-            System.out.println(webPrompt.getPromptType());
-
 
             /**
              *
              * prompt 타입에 따라 분기 처리
              * TYPE = 1 날짜 프롬프트
-             * TYPE = 2 구성요소 프롬프트 (화면 꾸려야 하니까 먼저 처리)
-             * TYPE = 3 계층 프롬프트 (잠시 보류) 계층의 경우 파악 먼저
+             * TYPE = 2 구성요소 프롬프트
+             * TYPE = 3 계층 프롬프트
              * TYPE = 4 개체 프롬프트
+             *
              * **/
             if (webPrompt.getPromptType() == EnumWebPromptType.WebPromptTypeConstant) { //값 프롬프트
                 ConstantPrompt constantPrompt = new ConstantPrompt();
                 prompt = constantPrompt.getConstantPromptInfo(prompt, webPrompt);
-                System.out.println(prompt);
 
             } else if (webPrompt.getPromptType() == EnumWebPromptType.WebPromptTypeElements) { // 구성요소 프롬프트
                 ElementPrompt elementPrompt = new ElementPrompt();
                 prompt = elementPrompt.getElementPromptInfo(prompt, webPrompt);
-                System.out.println(prompt);
 
-            } else if (webPrompt.getPromptType() == 3) { // 계층 프롬프트
-                //계층 프롬프트 개발 전
+            } else if (webPrompt.getPromptType() == EnumWebPromptType.WebPromptTypeExpression) { // 계층 프롬프트
+                /** 계층 프롬프트 보류 중 **/
 
             } else if (webPrompt.getPromptType() == EnumWebPromptType.WebPromptTypeObjects) { // 개체 프롬프트
                 ObjectPrompt objectPrompt = new ObjectPrompt();
                 prompt = objectPrompt.getObjectPromptInfo(prompt, webPrompt);
-                System.out.println(prompt);
             }
             promptList.add(prompt);
         }
@@ -432,50 +518,6 @@ public class MstrObject extends MstrSession{
         return new ArrayList<>();
     }
 
-//    public List<GroupVO> getGroupList() throws WebObjectsException {
-//
-//        //ObjectSourcec 객체 생성
-//        WebObjectSource objectSource = factory.getObjectSource();
-//
-//        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
-//        WebObjectInfo woi = objectSource.getObject("3D0F5EF8978D4AE086012C196BF01EBA" ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
-//
-//        //채워넣기
-//        woi.populate();
-//
-//        // 사용자 그룹 객체
-//        WebUserGroup groups = (WebUserGroup) woi;
-//
-//        //MicroStrategy Groups하위의 모든 그룹 가져오기위한 UserList 객체 초기화
-//        WebUserList members = groups.getMembers();
-//
-//        //하위 요소들을 Enumeration으로 치환
-//        Enumeration  enumeration = members.elements();
-//
-//        //WebUserGroup 객체 선언
-//        WebUserGroup group = null;
-//        List<GroupVO> groupList = new ArrayList<>();
-//
-//        // 객체 수 만큼 반복
-//        while(enumeration.hasMoreElements()){
-//            //그룹 채워넣기
-//            group = (WebUserGroup) enumeration.nextElement();
-//            group.populate();
-//
-//            if(group.isGroup()){
-//                groupList.add(GroupVO.builder().
-//                        groupId(group.getID()).
-//                        groupNm(group.getName()).
-//                        childCnt(group.getTotalChildCount()).
-//                        description(group.getDescription()).
-//                        creationTime(group.getCreationTime()).
-//                        owner(group.getOwner().getName()).
-//                        build()
-//                );
-//            }
-//        }
-//        return groupList;
-//    }
 
     public List<GroupVO> getGroupList() throws WebObjectsException {
 

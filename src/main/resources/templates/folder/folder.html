@@ -890,7 +890,7 @@
             success: function (responseData) {
                 console.log(responseData)
                 if (responseData.code === 'S00') {
-                    location.href = "/login"
+                    location.href = "/auth/login"
                 } else {
                     alert(responseData.msg)
                 }
