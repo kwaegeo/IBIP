@@ -93,7 +93,6 @@ public class MstrObject extends MstrSession{
             for (int i = 0; i < folder.getChildCount(); i++) {
                 if (folder.get(i).getType() == EnumDSSXMLObjectTypes.DssXmlTypeFolder) {
                     shareReportList.add(new TreeVO(folder.get(i).getID(), folder.get(i).getName(), "#", folder.get(i).getType(), true));
-                    System.out.println(folder.get(i));
                 }
             }
         }catch (WebObjectsException ex){

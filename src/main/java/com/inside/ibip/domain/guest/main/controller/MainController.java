@@ -1,13 +1,11 @@
 package com.inside.ibip.domain.guest.main.controller;
 
-import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.guest.main.vo.SearchVO;
 import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.main.service.MainService;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
-import com.inside.ibip.global.utils.UrlUtils;
 import com.microstrategy.web.objects.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -162,7 +158,6 @@ public class MainController {
             throw ex;
         }
         String userId = userInfo.get("userId");
-        System.out.println(userId);
 
         String usrSmgr = comUtils.getUsrSmgr();
         ReportVO reportInfo = mainService.getDashboardReport(userId);

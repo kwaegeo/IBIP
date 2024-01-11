@@ -9,6 +9,18 @@ import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @FileName     : MainService.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : 메인 페이지 사이드 바 관리, 검색, URL 생성 처리
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
 @Service
 public class MainService {
 

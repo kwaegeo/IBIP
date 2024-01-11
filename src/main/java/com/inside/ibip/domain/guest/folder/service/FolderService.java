@@ -1,11 +1,9 @@
 package com.inside.ibip.domain.guest.folder.service;
 
 import com.inside.ibip.domain.guest.folder.vo.TreeVO;
-import com.inside.ibip.domain.guest.folder.vo.TopItemVO;
 import com.inside.ibip.domain.guest.folder.vo.FolderVO;
 import com.inside.ibip.global.mstr.MstrObject;
 import com.inside.ibip.global.vo.EnumFolderNamesKR;
-import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.webapi.EnumDSSXMLFolderNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,28 +11,23 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @FileName     : FolderService.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : 폴더 Service, 폴더 정보 조회 및 하위 목록 조회
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
 @Service
 public class FolderService {
 
     @Autowired
     private MstrObject mstrObject;
-
-    public TopItemVO getTopItem(String mstrSessionId, String folderId) throws WebObjectsException {
-        //세션 정보 삽입
-        mstrObject.setSession(mstrSessionId);
-
-        // 폴더 ID를 통해 부모 폴더 ID 조회
-        String parentFolderId = mstrObject.getParentFolderId(folderId);
-
-        // 부모 폴더의 하위 폴더 목록 조회
-        List<FolderVO> subFolderList = mstrObject.getSubfolderList(parentFolderId);
-
-
-        TopItemVO  topItem = new TopItemVO();
-        topItem.setSubFolderItems(subFolderList);
-
-        return topItem;
-    }
 
     /**
      * 특정 폴더 목록 조회

@@ -2,14 +2,11 @@ package com.inside.ibip.domain.guest.report.controller;
 
 import com.inside.ibip.domain.guest.report.service.ReportService;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
-import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
-import com.microstrategy.web.objects.WebObjectsException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;

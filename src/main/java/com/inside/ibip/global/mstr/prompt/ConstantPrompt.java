@@ -6,6 +6,7 @@ import com.inside.ibip.global.exception.code.ResultCode;
 import com.microstrategy.web.objects.WebConstantPrompt;
 import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.web.objects.WebPrompt;
+import com.microstrategy.webapi.EnumDSSXMLObjectSubTypes;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -37,6 +38,15 @@ public class ConstantPrompt {
 
         //1. 값 프롬프트 객체 생성
         WebConstantPrompt constantPrompt = (WebConstantPrompt) webPrompt;
+
+        if(webPrompt.getSubType() == EnumDSSXMLObjectSubTypes.DssXmlSubTypePromptDate){
+            prompt.setPromptSubType("date");
+        }else if(webPrompt.getSubType() == EnumDSSXMLObjectSubTypes.DssXmlSubTypePromptDouble){
+            prompt.setPromptSubType("double");
+        }else if(webPrompt.getSubType() == EnumDSSXMLObjectSubTypes.DssXmlSubTypePromptString){
+            prompt.setPromptSubType("string");
+        }
+
         prompt.setPromptId(constantPrompt.getID());
         prompt.setPromptNm(constantPrompt.getMeaning());
         prompt.setTitle(constantPrompt.getTitle());

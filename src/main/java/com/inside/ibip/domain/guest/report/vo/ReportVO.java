@@ -5,6 +5,18 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * @FileName     : ReportVO.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : 리포트 VO
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,22 +24,33 @@ import java.util.List;
 @Builder
 public class ReportVO {
 
-    private String reportId; //리포트 ID
+    /** 리포트 ID **/
+    private String reportId;
 
-    private String reportNm; //리포트 명
+    /** 리포트 명 **/
+    private String reportNm;
 
-    private String reportPath; //리포트 경로
+    /** 리포트 경로 **/
+    private String reportPath;
 
-    private String promptExist; //프롬프트 유무
+    /** 프롬프트 유무 **/
+    private String promptExist;
 
-    private String templateExist; //템플릿 유무
+    /** 템플릿 유무 **/
+    private String templateExist;
 
-    private List<PromptVO> prompts; //프롬프트 리스트
+    /** 프롬프트 리스트 **/
+    private List<PromptVO> prompts;
 
-    private String editYn = "N"; //편집 모드 YN
+    /** 편집 모드 YN **/
+    private String editYn = "N";
 
-    private String exportType; // 내보내기 타입
+    /** 내보내기 타입 **/
+    private String exportType;
 
-    private String documentType; // 문서 타입
+    /** 문서 타입**/
+    private String documentType;
 
+    /** 값 프롬프트 전용 tmpId **/
+    private String tmpId;
 }

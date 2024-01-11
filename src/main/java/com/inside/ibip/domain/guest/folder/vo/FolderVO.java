@@ -5,6 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @FileName     : FolderVO.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : 폴더 VO
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
 @Data
 @Builder
 @NoArgsConstructor

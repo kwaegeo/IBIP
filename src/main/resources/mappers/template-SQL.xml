@@ -99,15 +99,74 @@
         </foreach>
     </insert>
 
+    <insert id="insertElement" parameterType="java.util.List">
+        INSERT INTO
+        tb_entity
+        (
+        entn_id,
+        entn_mstr_id,
+        prpt_id,
+        entn_type,
+        entn_nm,
+        default_yn,
+        tmp_id
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            'EN' || TO_CHAR(CURRENT_TIMESTAMP, 'YYMMDDHH24MISS') || LPAD(nextval('seq_tb_entity')::text, 6, '0'),
+            #{item.elementId},
+            #{item.promptId},
+            20000,
+            #{item.elementNm},
+            #{item.defaultAnswerYn},
+            #{item.tmpId}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertValue" parameterType="com.inside.ibip.domain.guest.prompt.vo.PromptVO">
+        INSERT INTO
+        tb_entity
+        (
+        entn_id,
+        entn_mstr_id,
+        prpt_id,
+        entn_type,
+        entn_nm,
+        default_yn,
+        tmp_id
+        )
+        VALUES
+        (
+        'EN' || TO_CHAR(CURRENT_TIMESTAMP, 'YYMMDDHH24MISS') || LPAD(nextval('seq_tb_entity')::text, 6, '0'),
+        #{promptId},
+        #{promptId},
+        10000,
+        #{val},
+        'N',
+        #{tmpId}
+        )
+    </insert>
+
     <select id="selectTemplate" resultType="com.inside.ibip.domain.guest.template.TemplateVO">
         SELECT
-            *
+            tmp_id as tmpId,
+            report_id as reportId,
+            doc_type as docType,
+            user_id as userId,
+            user_nm as userNm,
+            to_char(reg_ts, 'YYYY-MM-DD HH24:MI:SS') as regTs,
+            tmp_nm as tmpNm,
+            remark
         FROM
             tb_template
         WHERE
             report_id=#{reportId}
         AND
             user_id=#{userId}
+        AND
+            use_yn='Y'
     </select>
 
     <select id="getTemplate" resultType="com.inside.ibip.domain.guest.prompt.vo.ObjectVO">

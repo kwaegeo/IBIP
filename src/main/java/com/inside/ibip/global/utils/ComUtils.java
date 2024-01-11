@@ -42,8 +42,7 @@ public class ComUtils {
         }
     }
 
-    public UserInfoVO getUserInfo(String mstrSessionId) throws WebObjectsException {
-        mstrObject.setSession(mstrSessionId);
+    public UserInfoVO getUserInfo() {
         UserInfoVO userInfo = mstrObject.getUserInfo();
         return userInfo;
     }

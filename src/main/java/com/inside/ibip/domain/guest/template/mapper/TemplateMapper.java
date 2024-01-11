@@ -1,5 +1,6 @@
 package com.inside.ibip.domain.guest.template.mapper;
 
+import com.inside.ibip.domain.guest.prompt.vo.ElementVO;
 import com.inside.ibip.domain.guest.prompt.vo.ObjectVO;
 import com.inside.ibip.domain.guest.prompt.vo.PromptVO;
 import com.inside.ibip.domain.guest.template.TemplateVO;
@@ -17,6 +18,10 @@ public interface TemplateMapper {
     public int insertPrompts(List<PromptVO> prompt);
 
     public int insertEntity(List<ObjectVO> object);
+
+    public int insertElement(List<ElementVO> element);
+
+    public int insertValue(PromptVO prompt);
 
     public List<TemplateVO> selectTemplate(String reportId, String userId);
 

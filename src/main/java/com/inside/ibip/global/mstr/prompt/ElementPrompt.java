@@ -1,8 +1,8 @@
 package com.inside.ibip.global.mstr.prompt;
 
 import com.inside.ibip.domain.guest.prompt.vo.PromptVO;
-import com.inside.ibip.domain.guest.prompt.vo2.AttributeVO;
-import com.inside.ibip.domain.guest.prompt.vo2.ElementVO;
+import com.inside.ibip.domain.guest.prompt.vo.AttributeVO;
+import com.inside.ibip.domain.guest.prompt.vo.ElementVO;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.exception.code.ResultCode;
 import com.microstrategy.web.objects.*;

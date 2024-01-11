@@ -21,7 +21,7 @@ public class Test2Controller {
 
     @GetMapping("/template")
     public String getTemplate(){
-        return "/template/templateAdd";
+        return "add";
     }
 
 

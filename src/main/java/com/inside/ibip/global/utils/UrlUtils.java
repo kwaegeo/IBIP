@@ -1,16 +1,26 @@
 package com.inside.ibip.global.utils;
 
 import com.inside.ibip.domain.guest.prompt.vo.ObjectVO;
-import com.inside.ibip.domain.guest.prompt.vo2.ElementVO;
+import com.inside.ibip.domain.guest.prompt.vo.ElementVO;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
 
+/**
+ * @FileName     : UrlUtils.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : PromptXML 조합 및 생성, ReportURL 조합 및 생성
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
 @Component
 public class UrlUtils {
 
@@ -23,7 +33,15 @@ public class UrlUtils {
     @Value("${mstrWebPort}")
     private String mstrWebPort;
 
-    public String generateXML(ReportVO reportVO) {
+    /**
+     * 리포트의 PromptXML을 조합하고 생성하는 함수
+     * @Method Name   : generatePromptXML
+     * @Date / Author : 2023.12.01  이도현
+     * @param reportInfo 리포트 정보 및 프롬프트 정보
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public String generatePromptXML(ReportVO reportInfo) {
 
         StringWriter sw = new StringWriter();
         String middleTag = "";
@@ -33,27 +51,27 @@ public class UrlUtils {
 
             xsw.writeStartElement("rsl");
 
-            for(int i=0; i< reportVO.getPrompts().size(); i++){
+            for(int i=0; i< reportInfo.getPrompts().size(); i++){
                 xsw.writeStartElement("pa");
-                xsw.writeAttribute("pt", reportVO.getPrompts().get(i).getPt());
+                xsw.writeAttribute("pt", reportInfo.getPrompts().get(i).getPt());
                 xsw.writeAttribute("pin", "0");
-                xsw.writeAttribute("did", reportVO.getPrompts().get(i).getPromptId());
+                xsw.writeAttribute("did", reportInfo.getPrompts().get(i).getPromptId());
                 xsw.writeAttribute("tp", "10");
 
-                if("value".equals(reportVO.getPrompts().get(i).getPromptType())){
-                    xsw.writeCharacters(reportVO.getPrompts().get(i).getVal());
+                if("value".equals(reportInfo.getPrompts().get(i).getPromptType())){
+                    xsw.writeCharacters(reportInfo.getPrompts().get(i).getVal());
                     xsw.writeEndElement(); // pa
                 }
 
-                else if("element".equals(reportVO.getPrompts().get(i).getPromptType())){
+                else if("element".equals(reportInfo.getPrompts().get(i).getPromptType())){
                     xsw.writeStartElement("mi");
                     xsw.writeStartElement("es");
                     xsw.writeStartElement("at");
 
-                    xsw.writeAttribute("did", reportVO.getPrompts().get(i).getAttr().getAttrId());
+                    xsw.writeAttribute("did", reportInfo.getPrompts().get(i).getAttr().getAttrId());
                     xsw.writeAttribute("tp", "12");
                     xsw.writeEndElement(); // at
-                    for (ElementVO element : reportVO.getPrompts().get(i).getAttr().getElements()) {
+                    for (ElementVO element : reportInfo.getPrompts().get(i).getAttr().getElements()) {
                         xsw.writeStartElement("e");
                         xsw.writeAttribute("emt", "1");
                         xsw.writeAttribute("ei", element.getElementId());
@@ -70,14 +88,14 @@ public class UrlUtils {
                 }
 
 
-                else if("object".equals(reportVO.getPrompts().get(i).getPromptType())){
+                else if("object".equals(reportInfo.getPrompts().get(i).getPromptType())){
                     xsw.writeStartElement("mi");
                     xsw.writeStartElement("fct");
                     xsw.writeAttribute("qsr", "0");
                     xsw.writeAttribute("fcn", "0");
                     xsw.writeAttribute("sto", "1");
                     xsw.writeAttribute("pfc", "0");
-                    for(ObjectVO entity : reportVO.getPrompts().get(i).getEntity()){
+                    for(ObjectVO entity : reportInfo.getPrompts().get(i).getEntity()){
                         if(entity.getEntityType() == 12){
                             middleTag = "at";
                         }else{
@@ -107,13 +125,21 @@ public class UrlUtils {
         return sw.toString();
     }
 
+    /**
+     * 리포트의 최종 URL 조회 하는 함수 (iframe src)
+     * @Method Name   : getReportURL
+     * @Date / Author : 2023.12.01  이도현
+     * @param reportInfo 리포트 정보
+     * @param promptXml PromptXML
+     * @param usrSmgr 사용자 세션 정보
+     * @return 리포트 URL (String)
+     * @History
+     * 2023.12.01	최초생성
+     */
     public String getReportURL(ReportVO reportInfo, String promptXML, String usrSmgr){
 
-        /**
-         *
-         * 이벤트 타입에 따른 옵션 설정
-         *
-         * **/
+        /** 이벤트 타입에 따른 옵션 설정 **/
+
         int evtType = 4001; // 리포트 단순 조회
         String idType = "reportID";
         if("D".equals(reportInfo.getDocumentType())){
@@ -129,11 +155,11 @@ public class UrlUtils {
 
         // Return session
         StringBuilder urlSB = new StringBuilder();
-        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("http").append("://").append(serverName).append(":").append(mstrWebPort); //Web Server name and port
         urlSB.append("/MicroStrategy/servlet/mstrWeb");
-        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        urlSB.append("?server=").append(serverName); //I Server name
          urlSB.append("&port=0");
-        urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
+        urlSB.append("&project=").append(mstrProjectName); // Project name
         urlSB.append("&evt=").append(evtType);
         urlSB.append("&"+idType+"=").append(reportInfo.getReportId()); //Report ID
         urlSB.append("&currentViewMedia=").append(1);
@@ -213,11 +239,11 @@ public class UrlUtils {
 
         // Return session
         StringBuilder urlSB = new StringBuilder();
-        urlSB.append("http").append("://").append("192.168.70.245:8090"); //Web Server name and port
+        urlSB.append("http").append("://").append(serverName).append(":").append(mstrWebPort); //Web Server name and port
         urlSB.append("/MicroStrategy/servlet/mstrWeb");
-        urlSB.append("?server=").append("192.168.70.245"); //I Server name
+        urlSB.append("?server=").append(serverName); //I Server name
         urlSB.append("&port=0");
-        urlSB.append("&project=").append("MicroStrategy+Tutorial"); // Project name
+        urlSB.append("&project=").append(mstrProjectName); // Project name
         urlSB.append("&evt=").append(evtType);
         urlSB.append("&"+idType+"=").append(reportInfo.getReportId()); //Report ID
         urlSB.append("&currentViewMedia=").append(1);

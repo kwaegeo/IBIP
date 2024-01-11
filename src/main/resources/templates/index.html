@@ -11,7 +11,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>인사이드정보</title>
+    <title>InsideInfo BI Portal</title>
 
     <!-- Custom fonts for this template-->
     <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -821,7 +821,7 @@
 
     //최소, 최대 값 유효성 검사
     function validMinMax(prompt){
-        if(prompt.attr("promptType") === 'value'){
+        if(prompt.attr("promptType") === 'value' && prompt.attr("subType")==='date'){
             var parseMin = new Date(prompt.attr("minValue"));
             var parseMax = new Date(prompt.attr("maxValue"));
         }
@@ -833,6 +833,9 @@
         // 각 태그에 맞게 선택 된 갯수로 검증한다.
         var childSize = 0;
         var inputType = prompt.find("input").attr("type");
+        var subType = prompt.attr("subType");
+
+        console.log(subType);
 
         if(inputType === "checkbox"){
             childSize = prompt.find("input[type='checkbox']:checked").length;
@@ -842,6 +845,12 @@
         }
         else if(inputType === "date"){
             childSize = new Date(prompt.find("input[type='date']").val());
+        }
+        else if(inputType === "text" && subType === "double"){
+            childSize = prompt.find("input[type='text']").val();
+        }
+        else if(inputType === "text" && subType === "string") {
+            childSize = prompt.find("input[type='text']").val().length;
         }
         else{
             childSize = prompt.find("select option:selected").length;
@@ -864,21 +873,23 @@
         // 구성요소 리스트 선언
         var entitiesArray = promptInfo.entity;
 
-        //
-        // // radio나 select box는 선택된 목록이 1개 여야함.
-        // if (tagName === "radio" || tagName === "selectbox") {
-        //     // 구성요소 프롬프트에서 defaultAnswerYn 값이 'Y'인 개수를 세기
-        //     var checkedCount = entitiesArray.filter(function(element) {
-        //         return element.defaultAnswerYn === 'Y';
-        //     }).length;
-        //
-        //     var errorMsg = "해당 프롬프트의 설정이 " + tagName + "이지만 기본 값이 2개 이상입니다. 설정 수정 후 재시작하여 주십시오";
-        //     // 만약 checkedCount가 2개 이상인 경우 경고창 표시 후 종료
-        //     if (checkedCount >= 2) {
-        //         alert(errorMsg);
-        //         return;
-        //     }
-        // }
+        console.log(tagName)
+        // radio나 select box는 선택된 목록이 1개 여야함.
+        if (tagName === "radio" || tagName === "select") {
+            // 구성요소 프롬프트에서 defaultAnswerYn 값이 'Y'인 개수를 세기
+            var checkedCount = entitiesArray.filter(function(element) {
+                return element.defaultAnswerYn === 'Y';
+            }).length;
+
+            console.log("선택수 : " + checkedCount)
+
+            var errorMsg = "["+promptInfo.promptId +"] 프롬프트의 설정이 " + tagName + "이지만 기본 값이 2개 이상입니다. 설정 수정 후 재시작하여 주십시오";
+            // 만약 checkedCount가 2개 이상인 경우 경고창 표시 후 종료
+            if (checkedCount >= 2) {
+                alert(errorMsg);
+                return;
+            }
+        }
 
         // 개체 적재 테이블 생성
 
@@ -888,13 +899,13 @@
                                 <div class="popup__body_custom">
                                     <h3 class="font-weight-bold">${promptInfo.title}</h3>
 `;
-        if(tagName === "selectbox"){
-            makeHtml +=`<div className=checkbox-container"><select>`
+        if(tagName === "select"){
+            makeHtml +=`<div className=checkbox-container"><select style="margin-left: 9px;">`
 
             for(var i=0; i<entitiesArray.length; i++){
                 makeHtml += `
-                        <option type="selectbox" name="${promptInfo.promptId}" id="${entitiesArray[i].entityId}" text="${entitiesArray[i].entityNm}" entityType="${entitiesArray[i].entityType}" ${entitiesArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
-                            ${entitiesArray[i].elementNm}
+                        <option type="selectbox" name="${promptInfo.promptId}" id="${entitiesArray[i].entityId}" value="${entitiesArray[i].entityId}" text="${entitiesArray[i].entityNm}" entityType="${entitiesArray[i].entityType}" ${entitiesArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
+                            ${entitiesArray[i].entityNm}
                         </option>
             `
             };
@@ -910,7 +921,7 @@
                     makeHtml += '<div class="row" style="margin: 10px">';
                 }
                 makeHtml +=`
-                        <input type="${tagName}" name="${promptInfo.promptId}" id="${entitiesArray[i].entityId}" text="${entitiesArray[i].entityNm}" entityType="${entitiesArray[i].entityType}" value="${entitiesArray[i].elementId}" ${entitiesArray[i].defaultAnswerYn} === 'Y' ? 'checked' : '';>
+                        <input type="${tagName}" name="${promptInfo.promptId}" id="${entitiesArray[i].entityId}" text="${entitiesArray[i].entityNm}" entityType="${entitiesArray[i].entityType}" value="${entitiesArray[i].entityId}" ${entitiesArray[i].defaultAnswerYn === 'Y' ? 'checked' : ''}>
                         <label style="margin: 5px" for="${entitiesArray[i].entityId}">${entitiesArray[i].entityNm}</label>
             `;
                 if ((i + 1) % 10 === 0 || i === entitiesArray.length - 1) {
@@ -933,13 +944,20 @@
         //1. 값 프롬프트 적재 HTML 생성
         var makeHtml = `
 
-                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value" pt="${promptInfo.pt}">
+                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value" pt="${promptInfo.pt}" subType="${promptInfo.promptSubType}">
                                 <div class="popup__body_custom">
                                     <h3 class="font-weight-bold">${promptInfo.promptNm}</h3>
                                     <div class=checkbox-container">
-                                        <input type="date" name="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" value="${promptInfo.val}">
-                                    </div>
-`;
+                        `;
+        if(promptInfo.promptSubType === "date"){
+            makeHtml += `<input type="date" name="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" value="${promptInfo.val}" subType="${promptInfo.promptSubType}">
+                </div>`;
+        }else{
+            makeHtml += `<input type="text" name="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" value="${promptInfo.val}" subType="${promptInfo.promptSubType}">
+                </div>`;
+        }
+
+;
 
         $("#promptDiv").prepend(makeHtml);
 
@@ -950,14 +968,12 @@
         // 프롬프트의 타입 설정
         var tagName = tagTypeMap[promptInfo.tagType] || "checkbox";
 
-        tagName = "checkbox";
-
         // 구성요소 리스트 선언
         var elementsArray = promptInfo.attr.elements;
 
 
         // radio나 select box는 선택된 목록이 1개 여야함.
-        if (tagName === "radio" || tagName === "selectbox") {
+        if (tagName === "radio" || tagName === "select") {
             // 구성요소 프롬프트에서 defaultAnswerYn 값이 'Y'인 개수를 세기
             var checkedCount = elementsArray.filter(function(element) {
                 return element.defaultAnswerYn === 'Y';
@@ -978,12 +994,12 @@
                                 <div class="popup__body_custom">
                                     <h3 class="font-weight-bold" name="attr", id="${promptInfo.attr.attrId}", attrType="${promptInfo.attr.attrType}">${promptInfo.attr.attrNm}</h3>
 `;
-        if(tagName === "selectbox"){
-            makeHtml +=`<div className=checkbox-container"><select>`
+        if(tagName === "select"){
+            makeHtml +=`<div className=checkbox-container"><select style="margin-left: 9px;">`
 
             for(var i=0; i<elementsArray.length; i++){
                 makeHtml += `
-                        <option type="selectbox" name="${promptInfo.promptId}" id="${elementsArray[i].elementId}" text="${elementsArray[i].elementNm}" value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
+                        <option type="selectbox" name="${promptInfo.promptId}" id="${elementsArray[i].elementId}" value="${elementsArray[i].elementId}"  text="${elementsArray[i].elementNm}" value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn === 'Y' ? 'selected' : ''}>
                             ${elementsArray[i].elementNm}
                         </option>
             `
@@ -999,7 +1015,7 @@
                     makeHtml += '<div class="row" style="margin: 10px">';
                 }
                 makeHtml +=`
-                        <input type="${tagName}" name="${promptInfo.promptId}" id="${elementsArray[i].elementId}" text="${elementsArray[i].elementNm}" value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn} === 'Y' ? 'checked' : '';>
+                        <input type="${tagName}" name="${promptInfo.promptId}" id="${elementsArray[i].elementId}" text="${elementsArray[i].elementNm}" value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn === 'Y' ? 'checked' : ''}>
                         <label style="margin: 5px" for="${elementsArray[i].elementId}">${elementsArray[i].elementNm}</label>
             `;
                 if ((i + 1) % 10 === 0 || i === elementsArray.length - 1) {
@@ -1262,6 +1278,10 @@
             var breakLoop = false;
             var promptInfo = $("[name='prompt']");
 
+            if(promptInfo.length <= 0 ){
+                alert("해당 문서는 프롬프트가 존재하지 않습니다.")
+                return;
+            }
             promptInfo.each(function(index, prompt){
 
                 if(validMinMax($(prompt))==='min'){
@@ -1274,6 +1294,7 @@
                     breakLoop = true;
                     return false;
                 }
+
                 else if(validMinMax($(prompt))==='max'){
                     $(prompt).focus();
                     $(prompt).css("color", "red");
@@ -1284,6 +1305,7 @@
                     breakLoop = true;
                     return false;
                 }
+
                 reportInfo.prompts.push(promptDataParsing($(prompt), index));
                 console.log("Element :" + $(prompt).attr("promptType"));
             })
@@ -1292,9 +1314,9 @@
                 return false;
             }
 
-            var openWin = window.open("", "템플릿 저장","width=907 ,height=473");
+            var openWin = window.open("", "템플릿 저장","width=911 ,height=445");
             $.ajax({
-                url: '/openTemplateAdd',
+                url: '/template/get/create',
                 data: JSON.stringify(reportInfo),
                 contentType: "application/json",
                 method: 'POST',
@@ -1347,7 +1369,7 @@
     }
 
     function getTemplateList(reportId){
-        window.open('/openTemplateList?reportId='+reportId+'&userId='+userId, '', 'width=1000,height=400,location=no,status=no,scrollbars=yes');
+        window.open('/template/get/list?reportId='+reportId+'&userId='+userId, '', 'width=1000,height=400,location=no,status=no,scrollbars=yes');
     }
 
     function getPopup(){
@@ -1390,26 +1412,60 @@
     }
 
     function setTemplateInfo(templateInfo){
-        console.log("확인중");
-        console.log(templateInfo);
+
         // 모든 체크박스 선택 후 체크 해제
         $('input[type="checkbox"]').prop('checked', false);
 
         // 모든 라디오 박스 선택 후 체크 해제
         $('input[type="radio"]').prop('checked', false);
 
+
+        console.log(templateInfo)
         for(var i=0; i<templateInfo.length; i++){
 
-            var $target = $('#' + templateInfo[i].entityId);
 
-            if($target.length === 0){
-                alert("해당 프롬프트에 하위 요소가 존재하지 않습니다. 해당 템플릿을 삭제하거나 다시 생성해주세요.");
+            // 값 프롬프트 템플릿
+            if(templateInfo[i].entityType == 10000){
+                var $target = $('#'+ templateInfo[i].promptId);
+                var $inputElement = $target.find('input');
+                $inputElement.val(templateInfo[i].entityNm);
             }
 
-            // checkbox 또는 radio 여부에 상관없이 checked 설정
-            if ($target.is(':checkbox, :radio')) {
-                $target.prop('checked', true);
+            // 구성요소 프롬프트 템플릿
+            else if(templateInfo[i].entityType == 20000){
+                var $target = $('#'+ templateInfo[i].promptId);
+
+                // $target 안에서 id가 templateInfo[i].entityId인 요소를 찾음
+                var $filteredElements = $target.find('[id="' + templateInfo[i].entityId + '"]');
+
+                // checkbox 또는 radio인 경우
+                if ($filteredElements.is(':checkbox') || $filteredElements.is(':radio')) {
+                    $filteredElements.prop('checked', true);
+                }
+                // selectbox인 경우
+                else if ($filteredElements.is('select')) {
+                    $filteredElements.val(templateInfo[i].entityNm);
+                }
             }
+
+            //개체 프롬프트 템플릿
+            else{
+
+                var $target = $('#'+ templateInfo[i].promptId);
+
+                // $target 안에서 id가 templateInfo[i].entityId인 요소를 찾음
+                var $filteredElements = $target.find('[id="' + templateInfo[i].entityId + '"]');
+
+                // checkbox 또는 radio인 경우
+                if ($filteredElements.is(':checkbox') || $filteredElements.is(':radio')) {
+                    $filteredElements.prop('checked', true);
+                }
+                // selectbox인 경우
+                else if ($filteredElements.is('option')) {
+                    $filteredElements.prop('selected', true);
+                }
+            }
+
         }
 
     }
