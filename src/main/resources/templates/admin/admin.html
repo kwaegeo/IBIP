@@ -20,18 +20,18 @@
             rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
     <!-- 글자크기에 따른 크기 조정 css-->
-    <link href="css/custom.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
 
-    <link href="dist/themes/default/style.min.css" rel="stylesheet"/>
+    <link href="/dist/themes/default/style.min.css" rel="stylesheet"/>
 
     <!-- Custom styles for this page -->
-    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css"/>
-    <link rel="stylesheet" type="text/css" href="assets/js/jqueryui/jquery-ui.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/js/treeview/jquery.treeview.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/js/jqueryui/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/js/treeview/jquery.treeview.css">
 
 
     <!-- Custom styles for this template-->
@@ -151,9 +151,9 @@
 
         <!-- Sidebar Message -->
         <div class="sidebar-card d-none d-lg-flex">
-            <img class="sidebar-card-illustration mb-2" src="img/undraw_rocket.svg" alt="...">
+            <img class="sidebar-card-illustration mb-2" src="/img/undraw_rocket.svg" alt="...">
             <p class="text-center mb-2"><strong>IBIP v1</strong> 해당 포탈이 마음에 든다면 계약&문의는 아래버튼을 클릭</p>
-            <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">관리자에게 연락!</a>
+            <a class="btn btn-success btn-sm" href="#" onclick="toBeDeveloped()">관리자에게 연락!</a>
         </div>
 
     </ul>
@@ -186,7 +186,7 @@
                     </div>
                 </div>
 
-                <a href="/main" class="btn btn-icon-split btn-sm"><span
+                <a href="/main/guest" class="btn btn-icon-split btn-sm"><span
                         class="text btn-text-responsive">사용자</span></a>
 
                 <!-- Topbar Navbar -->
@@ -224,7 +224,7 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 
                             <img class="img-profile rounded-circle"
-                                 src="img/undraw_profile.svg">
+                                 src="/img/undraw_profile.svg">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -319,7 +319,7 @@
 <script src="/js/demo/chart-area-demo.js"></script>
 <script src="/js/demo/chart-pie-demo.js"></script>
 
-<script src="dist/jstree.min.js"></script>
+<script src="/dist/jstree.min.js"></script>
 
 <!--custom js, css-->
 <script src="/js/leedo_custom.js"></script>
@@ -756,6 +756,11 @@
 
     function getNoticeInfo(noticeId){
         window.open("/noticeInfo?noticeId="+noticeId,'','width=1000,height=781,location=no,status=no,scrollbars=yes');
+    }
+
+    function toBeDeveloped(){
+        alert("IBIP v2 개발 예정 기능입니다.");
+        return;
     }
 </script>
 </html>
