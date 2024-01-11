@@ -172,7 +172,7 @@ public class TemplateController {
      * 템플릿 생성
      * @Method Name   : getTemplate
      * @Date / Author : 2023.12.01  이도현
-     * @param template 리포트 Id
+     * @param template 템플릿 Id
      * @param request request 객체
      * @param response response 객체
      * @return 템플릿 정보 객체
@@ -198,6 +198,35 @@ public class TemplateController {
         return entities;
     }
 
+    /**
+     * 템플릿 삭제
+     * @Method Name   : deleteTemplate
+     * @Date / Author : 2023.12.01  이도현
+     * @param template 템플릿 Id
+     * @param request request 객체
+     * @param response response 객체
+     * @return 템플릿 정보 삭제
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @PostMapping("/delete")
+    @ResponseBody
+    public ResVO deleteTemplate(@RequestBody Map<String, String> template,  HttpServletRequest request, HttpServletResponse response){
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
+        //2. 템플릿 정보 조회 후 반환
+        String templateId = template.get("templateId");
+        ResVO result = templateService.deleteTemplate(templateId);
+
+        return result;
+    }
 }
 
 

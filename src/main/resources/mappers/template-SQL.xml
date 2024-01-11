@@ -180,7 +180,16 @@
         WHERE
             tmp_id=#{templateId}
     </select>
-
+    <update id="deleteTemplate" parameterType="string">
+        UPDATE
+            tb_template
+        SET
+            use_yn='N'
+        WHERE
+            tmp_id = #{templateId}
+            AND
+            use_yn='Y'
+    </update>
 
 </mapper>
 

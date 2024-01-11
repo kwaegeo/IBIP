@@ -212,4 +212,36 @@ public class TemplateService {
 
         return entities;
     }
+
+    /**
+     * 템플릿 삭제
+     * @Method Name   : deleteTemplate
+     * @Date / Author : 2023.12.01  이도현
+     * @param templateId 템플릿 Id
+     * @return 템플릿 정보 삭제
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public ResVO deleteTemplate(String templateId){
+
+        int resultCnt = 0;
+        ResVO result = null;
+        try {
+            resultCnt = templateMapper.deleteTemplate(templateId);
+            if(resultCnt == 1){
+                result = new ResVO(ResultCode.SUCCESS);
+            }
+            else{
+                log.error("템플릿 정보 삭제 중 에러 발생 [Error msg]: ");
+                throw new CustomException(ResultCode.ETC_ERROR);
+            }
+        }catch (Exception e){
+            log.error("템플릿 정보 삭제 중 에러 발생 [Error msg]: " + e.getMessage());
+            throw new CustomException(ResultCode.ETC_ERROR);
+        }
+
+        return result;
+    }
 }

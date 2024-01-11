@@ -58,7 +58,7 @@
                     <button type="button" class="btn-ok" th:attr="templateId=${template.tmpId}" onclick="selectTemplate(this.getAttribute('templateId'))" ><span class="hide">선택</span></button>
                   </td>
                   <td>
-                    <button type="button" class="btn-delete"><span class="hide">삭제</span></button>
+                    <button type="button" class="btn-delete" th:attr="templateId=${template.tmpId}" onclick="deleteTemplate(this.getAttribute('templateId'))"><span class="hide">삭제</span></button>
                   </td>
                 </tr>
               </tbody>
@@ -91,5 +91,34 @@
       })
     }
 
+    function deleteTemplate(templateId){
+      if(confirm("해당 템플릿을 정말로 삭제하시겠습니까? \n삭제 후엔 되돌릴 수 없습니다." )) {
+        var requestData = {
+          templateId: templateId
+        }
+
+        $.ajax({
+          url: '/template/delete',
+          data: JSON.stringify(requestData),
+          method: 'POST',
+          contentType: "application/json",
+          dataType: "json",
+          success: function (responseData) {
+            if (responseData.code === "S00") {
+              alert("성공적으로 템플릿이 삭제되었습니다.");
+              location.reload();
+            } else {
+              alert(responseData.msg);
+            }
+          },
+          error: function () {
+            alert("서버에 접속할 수 없습니다.")
+          }
+        })
+      }
+      else{
+        return;
+      }
+    }
   </script>
 </html>

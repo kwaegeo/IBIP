@@ -21,6 +21,8 @@ public interface TemplateMapper {
 
     public int insertElement(List<ElementVO> element);
 
+    public int deleteTemplate(String templateId);
+
     public int insertValue(PromptVO prompt);
 
     public List<TemplateVO> selectTemplate(String reportId, String userId);
