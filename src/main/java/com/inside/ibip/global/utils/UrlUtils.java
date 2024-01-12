@@ -231,8 +231,15 @@ public class UrlUtils {
     }
 
 
+    /**
+     * 대시보드 URL 조회 (로그인 계정)
+     * @Method Name   : getDashboardURL
+     * @Date / Author : 2023.12.01  이도현
+     * @return 대시보드 URL
+     * @History
+     * 2023.12.01	최초생성
+     */
     public String getDashboardURL(ReportVO reportInfo, String usrSmgr){
-
 
         int evtType = 2048001; // 리포트 단순 조회
         String idType = "documentID";

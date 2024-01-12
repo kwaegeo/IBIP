@@ -1,5 +1,6 @@
 package com.inside.ibip.domain.guest.main.controller;
 
+import com.inside.ibip.domain.guest.main.vo.DashBoardVO;
 import com.inside.ibip.domain.guest.main.vo.SearchVO;
 import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.main.service.MainService;
@@ -141,29 +142,44 @@ public class MainController {
         return subscriptionURL;
     }
 
-    @PostMapping("/getDashboardURL")
+    /**
+     * 내 DashBoard URL 조회
+     * @Method Name   : getSubscription
+     * @Date / Author : 2023.12.01  이도현
+     * @param userInfo 사용자 정보 객체
+     * @param request request 객체
+     * @param response response 객체
+     * @return DashBoard 문서 URL
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     *  1. 사용자 세션 (MSTR) 유효성 검사
+     *  2. usrSmgr 조회
+     *  3. subscription 기본 웹 URL 조합 후 반환
+     */
+    @PostMapping("/dashboard")
     @ResponseBody
-    public String getDashboard(@RequestBody Map<String,String> userInfo, HttpServletRequest request, Model model, HttpServletResponse response) throws WebObjectsException {
+    public DashBoardVO getDashboard(@RequestBody Map<String,String> userInfo, HttpServletRequest request, HttpServletResponse response){
 
         //1. 사용자 세션 (MSTR) 유효성 검사
-        //2. 나의 구독물 URL 생성 반환
-
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
-        //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
         String userId = userInfo.get("userId");
 
+        //2. 사용자 세션 정보 추출
         String usrSmgr = comUtils.getUsrSmgr();
+
+        //3. 대시보드 문서 정보 추출
         ReportVO reportInfo = mainService.getDashboardReport(userId);
-        String dashboardURL = mainService.getDashboardURL(reportInfo, usrSmgr);
-        System.out.println(dashboardURL);
-        return dashboardURL;
+
+        //3-1. 문서 정보, 세션 정보로 URL 생성
+        DashBoardVO result = mainService.getDashboardURL(reportInfo, usrSmgr);
+
+        return result;
     }
 
     /**

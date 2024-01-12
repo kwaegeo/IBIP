@@ -1461,42 +1461,54 @@ the individual names of the licensed users*/
         return licenseInfo;
     }
 
+    /**
+     * 대시보드 문서 정보 조회
+     * @Method Name   : getReportInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param userId 사용자 ID
+     * @return 리포트 정보 객체
+     * @History
+     * 2023.12.01	최초생성
+     */
     public ReportVO getDashboardReport(String userId) {
 
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
+        //리포트 정보 조회 할 객체 생성
         ReportVO reportInfo = null;
+
         try {
-            //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+
+            //ObjectSource 플래그에 Comments까지 추출하도록 정보 저장
             objectSource.setFlags(objectSource.getFlags() | EnumDSSXMLObjectFlags.DssXmlObjectComments);
-            WebObjectInfo woi = objectSource.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            WebObjectInfo wUser = objectSource.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
             //채워넣기
-            woi.populate();
+            wUser.populate();
 
-            // 사용자 그룹 객체
-            WebUser user = (WebUser) woi;
+            // 사용자 정보 객체 채워 넣기
+            WebUser user = (WebUser) wUser;
             user.populate();
+
             String reportId = "";
             try {
                  reportId = user.getComments()[0];
             }catch (NullPointerException ne){
-//                throw new CustomException(ResultCode.INVALID_DOCUMENT_ID);
-                reportId="1D85D9E74D3B0C66C2F4D7BF52D252F8";
+                throw new CustomException(ResultCode.NO_DASHBOARD);
             }
-            System.out.println("reportID 확인 :");
-            System.out.println(reportId);
-            WebObjectInfo woi2 = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition);
-            woi2.populate();
+
+            //문서 정보 객체 채워 넣기 (우선 Document, 도씨에만 가능하게 지정)
+            WebObjectInfo wReport = objectSource.getObject(reportId, EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition);
+            wReport.populate();
 
             reportInfo = ReportVO.builder().
-                    reportId(woi2.getID()).
-                    reportNm(woi2.getDisplayName()).
+                    reportId(wReport.getID()).
+                    reportNm(wReport.getDisplayName()).
                     build();
-        }catch (WebObjectsException ex) {
-            System.out.println(ex.getErrorCode());
-            System.out.println(ex.getMessage());
-        }catch (IllegalArgumentException iax){
+
+        }catch (WebObjectsException woe) {
+            log.error("대시보드 불러오는 도중 오류 발생 [Error msg]: "+ woe.getMessage());
+            throw new CustomException(ResultCode.INVALID_DOCUMENT_ID);
+        }catch (IllegalArgumentException iae){
+            log.error("대시보드 불러오는 도중 오류 발생 [Error msg]: "+ iae.getMessage());
             throw new CustomException(ResultCode.INVALID_DOCUMENT_ID);
         }
         return reportInfo;

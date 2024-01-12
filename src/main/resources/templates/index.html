@@ -63,7 +63,7 @@
         <hr class="sidebar-divider my-0">
 
         <li class="nav-item active">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" href="#" onclick="getDashboardURL()">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Dashboard</span></a>
         </li>
@@ -315,9 +315,9 @@
 
     $(document).ready(function () {
 
-        // getPopup();
+        getPopup();
         //
-        // getDashboardURL();
+        getDashboardURL();
 
         $('#jstree').jstree({
             'core': {
@@ -1126,28 +1126,47 @@
     function getDashboardURL() {
 
         $.ajax({
-            url: '/main/getDashboardURL',
+            url: '/main/dashboard',
             data: JSON.stringify({"userId": userId}),
             contentType: "application/json",
             method: 'POST',
-            dataType: "text",
+            dataType: "json",
             success: function (responseData) {
-                console.log(responseData)
-                var makeHtml = `
+                console.log(responseData.code)
+                if(responseData.code === "S00"){
+                    var makeHtml = `
 
                         <div class="container-fluid">
                             <h5 class="text-gray-800 md-18">Dashboard</h5>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
                             </div>
                             <div class="gray-border">
-                                <iframe src="${responseData}", style="height: 720px; width: 100%;">
+                                <iframe src="${responseData.dashboardURL}", style="height: 720px; width: 100%;">
                                 </iframe>
                             </div>
                         </div>
 
 `;
-                $("#main-content").empty();
-                $("#main-content").append(makeHtml);
+                    $("#main-content").empty();
+                    $("#main-content").append(makeHtml);
+                }
+                else{
+                    var makeHtml = `
+
+                        <div class="container-fluid">
+                            <h5 class="text-gray-800 md-18">Dashboard</h5>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                            </div>
+                            <div class="gray-border">
+                                <div style="height: 550px; width: 100%;">
+                                    <h5>현재 대시보드가 선택되어져 있지 않습니다.</h5>
+                                </div>
+                            </div>
+                        </div>
+`;
+                    $("#main-content").empty();
+                    $("#main-content").append(makeHtml);
+                }
             },
             error: function () {
                 alert("서버에 접속할 수 없습니다.")

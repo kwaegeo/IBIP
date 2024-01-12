@@ -1,8 +1,10 @@
 package com.inside.ibip.domain.guest.main.service;
 
+import com.inside.ibip.domain.guest.main.vo.DashBoardVO;
 import com.inside.ibip.domain.guest.main.vo.SearchVO;
 import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
+import com.inside.ibip.global.exception.code.ResultCode;
 import com.inside.ibip.global.mstr.MstrObject;
 import com.inside.ibip.global.utils.UrlUtils;
 import com.microstrategy.web.objects.WebObjectsException;
@@ -43,9 +45,17 @@ public class MainService {
     }
 
 
-    public ReportVO getDashboardReport(String userId) throws WebObjectsException {
-        ReportVO reportInfo = mstrObject.getDashboardReport(userId);
+    /**
+     * DashBoard 문서 정보를 조회하는 함수
+     * @Method Name   : getDashboardReport
+     * @Date / Author : 2023.12.01  이도현
+     * @param userId 사용자 Id
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public ReportVO getDashboardReport(String userId){
 
+        ReportVO reportInfo = mstrObject.getDashboardReport(userId);
 
         return reportInfo;
     }
@@ -67,6 +77,7 @@ public class MainService {
      * 내 사용내역 목록의 URL 조회 (로그인 계정)
      * @Method Name   : getHistoryURL
      * @Date / Author : 2023.12.01  이도현
+     * @param usrSmgr 사용자 세션 정보
      * @return 사용자 정보
      * @History
      * 2023.12.01	최초생성
@@ -82,6 +93,7 @@ public class MainService {
      * 내 구독물 URL 조회 (로그인 계정)
      * @Method Name   : getSubscriptionURL
      * @Date / Author : 2023.12.01  이도현
+     * @param usrSmgr 사용자 세션 정보
      * @return 사용자 정보
      * @History
      * 2023.12.01	최초생성
@@ -93,10 +105,26 @@ public class MainService {
         return subscriptionURL;
     }
 
-    public String getDashboardURL(ReportVO reportInfo, String usrSmgr){
+    /**
+     * 대시보드 URL 조회
+     * @Method Name   : getDashboardURL
+     * @Date / Author : 2023.12.01  이도현
+     * @param reportInfo 문서 정보
+     * @param usrSmgr 사용자 세션 정보
+     * @return 사용자 정보
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public DashBoardVO getDashboardURL(ReportVO reportInfo, String usrSmgr){
+
+        DashBoardVO result = new DashBoardVO();
         String dashboardURL = urlUtils.getDashboardURL(reportInfo, usrSmgr);
 
-        return dashboardURL;
+        result.setCode(ResultCode.SUCCESS.getCode());
+        result.setMsg(ResultCode.SUCCESS.getMsg());
+        result.setDashboardURL(dashboardURL);
+
+        return result;
     }
 
     /**

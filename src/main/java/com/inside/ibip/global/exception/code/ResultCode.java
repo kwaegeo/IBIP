@@ -52,6 +52,8 @@ public enum ResultCode {
 
     INVALID_PROMPT("E18", "프롬프트를 불러오는 도중 오류가 발생하였습니다. 해당 문서의 프롬프트를 확인 후 재시도 해주세요"),
 
+    NO_DASHBOARD("E19", "대시보드가 등록되어져 있지 않습니다."),
+
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다. IntelligenceServer가  정상적으로 동작하는지 확인해주세요.");
 
 
