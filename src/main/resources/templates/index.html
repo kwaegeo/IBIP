@@ -603,6 +603,8 @@
 
         $("#main-content").empty();
 
+        console.log(reportInfo.documentType);
+
         //리포트의 기본정보를 화면에 표시
         // 1. 템플릿 유무에 따른 버튼? (아니면 일단 버튼은 다 나타낼 것)
         var makeReportInfoHtml = `
@@ -613,6 +615,8 @@
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y','', '${reportInfo.documentType}')"> 편집</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
+                                <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="addFavorite()">즐겨찾기 추가</button>
+                                 ${reportInfo.documentType === 'D' ? '<button href="#" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm md-4" onclick="registerDashboard()">대시보드 등록</button>' : ''}
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="templateSave('${reportInfo.reportId}', '${reportInfo.documentType}')"> 템플릿 저장</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="getTemplateList('${reportInfo.reportId}')"> 템플릿 불러오기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
@@ -1487,6 +1491,16 @@
 
         }
 
+    }
+
+    function addFavorite(){
+        alert("어우");
+        return;
+    }
+
+    function registerDashboard(){
+        alert("허우");
+        return;
     }
 
     function validData(data){
