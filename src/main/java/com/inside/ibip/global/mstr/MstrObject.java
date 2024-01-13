@@ -1474,7 +1474,7 @@ the individual names of the licensed users*/
 
         //리포트 정보 조회 할 객체 생성
         ReportVO reportInfo = null;
-
+        String reportId = "";
         try {
 
             //ObjectSource 플래그에 Comments까지 추출하도록 정보 저장
@@ -1488,7 +1488,7 @@ the individual names of the licensed users*/
             WebUser user = (WebUser) wUser;
             user.populate();
 
-            String reportId = "";
+
             try {
                  reportId = user.getComments()[0];
             }catch (NullPointerException ne){
@@ -1511,7 +1511,65 @@ the individual names of the licensed users*/
             log.error("대시보드 불러오는 도중 오류 발생 [Error msg]: "+ iae.getMessage());
             throw new CustomException(ResultCode.INVALID_DOCUMENT_ID);
         }
+
+        // 기본 프롬프트 정보 위한 적용
+        try {
+        //1. WebInstance 객체 생성
+        WebDocumentInstance documentInstance = documentSource.getNewInstance(reportId);
+        //Prompts 객체 (Prompt List) 선언
+        WebPrompts webPrompts = null;
+
+            //1-2. 해당 문서에 프롬프트가 존재하는지 확인 존재하지 않을경우 return
+            if (documentInstance.pollStatus() != EnumDSSXMLStatus.DssXmlStatusPromptXML) {
+                reportInfo.setPromptExist("N");
+            }
+            else {
+                //1-2. 프롬프트 존재 시 변수 설정
+                reportInfo.setPromptExist("Y");
+
+                //1-3. WebPrompts 객체 조회
+                webPrompts = documentInstance.getPrompts();
+                reportInfo.setPromptAnswerXML(webPrompts.getShortAnswerXML());
+            }
+        }catch (WebObjectsException woe){
+            log.error("대시보드의 프롬프트 불러오는 도중 오류 발생 [Error msg]: "+ woe.getMessage());
+            throw new CustomException(ResultCode.INVALID_PROMPT);
+        }
+
         return reportInfo;
+    }
+
+    /**
+     * 대시보드 등록
+     * @Method Name   : getReportInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param userId 사용자 ID
+     * @return 리포트 정보 객체
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public ResVO registerDashboard(String userId, String reportId) {
+        WebObjectInfo woi = null;
+            try {
+                woi = objectSource.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            }catch (WebObjectsException | IllegalArgumentException e){
+                log.error("대시 보드 등록의 사용자 조회 중 에러 발생 [Error msg]: " + e.getMessage());
+                throw new CustomException(ResultCode.INVALID_USER_ID);
+            }
+
+        WebUser user = (WebUser) woi;
+            try {
+                if (user != null) {
+                    String[] comments = {reportId};
+                    user.setComments(comments);
+                    //Save the group object
+                    objectSource.save(user);
+                }
+            }catch (WebObjectsException woe){
+                log.error("대시 보드 등록 중 에러 발생 [Error msg]: " + woe.getMessage());
+                throw new CustomException(ResultCode.INVALID_REGISTER);
+            }
+            return new ResVO(ResultCode.SUCCESS);
     }
 
     public ResVO savePrivileges(PrivilegeAssignVO privilegeList) throws WebObjectsException {

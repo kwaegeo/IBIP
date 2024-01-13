@@ -256,14 +256,14 @@ public class UrlUtils {
         urlSB.append("&currentViewMedia=").append(1);
         urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append(evtType);
         urlSB.append("&usrSmgr=").append(usrSmgr);
-        urlSB.append("&hiddensections=path");
-        if("N".equals(reportInfo.getEditYn())){
-            //조회 모드일 경우에 해당 옵션 추가
-            urlSB.append(",dockTop,dockLeft");
+
+        //프롬프트 유무에 따른 기본 답변 적용
+        if("Y".equals(reportInfo.getPromptExist())){
+            urlSB.append("&promptsAnswerXML=").append(reportInfo.getPromptAnswerXML());
         }
+        urlSB.append("&hiddensections=path,dockTop,dockLeft");
 
         System.out.println(urlSB.toString());
-
         return urlSB.toString();
     }
 }

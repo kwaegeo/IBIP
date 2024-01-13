@@ -616,7 +616,7 @@
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="addFavorite()">즐겨찾기 추가</button>
-                                 ${reportInfo.documentType === 'D' ? '<button href="#" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm md-4" onclick="registerDashboard()">대시보드 등록</button>' : ''}
+                                 ${reportInfo.documentType === 'D' ? `<button href="#" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm md-4" onclick="registerDashboard('${reportInfo.reportId}')">대시보드 등록</button>` : ''}
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="templateSave('${reportInfo.reportId}', '${reportInfo.documentType}')"> 템플릿 저장</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="getTemplateList('${reportInfo.reportId}')"> 템플릿 불러오기</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', 'E', '${reportInfo.documentType}')"><i class="fas fa-download fa-sm text-white-50"></i> 엑셀 내보내기</button>
@@ -1137,6 +1137,7 @@
             dataType: "json",
             success: function (responseData) {
                 console.log(responseData.code)
+                console.log(responseData.dashboardURL)
                 if(responseData.code === "S00"){
                     var makeHtml = `
 
@@ -1144,16 +1145,22 @@
                             <h5 class="text-gray-800 md-18">Dashboard</h5>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
                             </div>
-                            <div class="gray-border">
-                                <iframe src="${responseData.dashboardURL}", style="height: 720px; width: 100%;">
-                                </iframe>
+                            <div class="gray-border" id="gray-border">
                             </div>
                         </div>
 
 `;
                     $("#main-content").empty();
                     $("#main-content").append(makeHtml);
+
+                    var iframe = $("<iframe>", {
+                        "src": responseData.dashboardURL,
+                        "width": "100%",
+                        "height": "720px" // 조절해야 할 크기
+                    });
+                    $("#gray-border").append(iframe);
                 }
+
                 else{
                     var makeHtml = `
 
@@ -1161,8 +1168,8 @@
                             <h5 class="text-gray-800 md-18">Dashboard</h5>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
                             </div>
-                            <div class="gray-border">
-                                <div style="height: 550px; width: 100%;">
+                            <div class="gray-border" id="gray-border">
+                                <div style="height: 550px; width: 100%; display: flex; justify-content: center; align-items: center;">
                                     <h5>현재 대시보드가 선택되어져 있지 않습니다.</h5>
                                 </div>
                             </div>
@@ -1498,9 +1505,35 @@
         return;
     }
 
-    function registerDashboard(){
-        alert("허우");
-        return;
+    function registerDashboard(reportId){
+        if(confirm("현재 문서를 대시보드에 등록 하시겠습니까?")) {
+
+            var data={"reportId": reportId, "userId": userId}
+
+            $.ajax({
+                url: '/main/register/dashboard',
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "json",
+                success: function (responseData) {
+                    if(responseData.code === "S00"){
+                        alert("성공적으로 대시보드가 등록 되었습니다.");
+                        return;
+                    }
+                    else{
+                        alert(responseData.msg);
+                        return;
+                    }
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+        }
+        else{
+            return;
+        }
     }
 
     function validData(data){

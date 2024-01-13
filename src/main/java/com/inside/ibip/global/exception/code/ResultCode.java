@@ -54,6 +54,7 @@ public enum ResultCode {
 
     NO_DASHBOARD("E19", "대시보드가 등록되어져 있지 않습니다."),
 
+    INVALID_REGISTER("E20", "MSTR 등록 연계 중 문제가 발생하였습니다."),
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다. IntelligenceServer가  정상적으로 동작하는지 확인해주세요.");
 
 

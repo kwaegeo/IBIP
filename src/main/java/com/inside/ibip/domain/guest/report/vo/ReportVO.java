@@ -53,4 +53,7 @@ public class ReportVO {
 
     /** 값 프롬프트 전용 tmpId **/
     private String tmpId;
+
+    /** 대시보드 용 기본 PromptAnserXML 추가 **/
+    private String promptAnswerXML;
 }

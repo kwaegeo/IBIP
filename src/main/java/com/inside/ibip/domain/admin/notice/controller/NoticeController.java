@@ -147,11 +147,7 @@ public class NoticeController {
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
         List<String> popupList = noticeService.getNoticePopupList();
 

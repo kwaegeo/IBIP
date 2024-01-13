@@ -7,6 +7,7 @@ import com.inside.ibip.domain.guest.main.service.MainService;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
+import com.inside.ibip.global.vo.ResVO;
 import com.microstrategy.web.objects.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -248,4 +249,36 @@ public class MainController {
         return "/admin/admin";
     }
 
+    /**
+     * DashBoard 등록
+     * @Method Name   : registerDashboard
+     * @Date / Author : 2023.12.01  이도현
+     * @param requestInfo 사용자Id, 리포트Id를 담은 Map
+     * @return ResVO 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     *  1. 사용자 세션 (MSTR) 유효성 검사
+     *  2. usrSmgr 조회
+     *  3. subscription 기본 웹 URL 조합 후 반환
+     */
+    @PostMapping("/register/dashboard")
+    @ResponseBody
+    public ResVO registerDashboard(@RequestBody Map<String,String> requestInfo, HttpServletRequest request, HttpServletResponse response){
+
+        //1. 사용자 세션 (MSTR) 유효성 검사
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
+        String userId = requestInfo.get("userId");
+        String reportId = requestInfo.get("reportId");
+
+        //2. 대시보드 문서 정보 추출
+        ResVO result = mainService.registerDashboard(userId, reportId);
+
+        return result;
+    }
 }

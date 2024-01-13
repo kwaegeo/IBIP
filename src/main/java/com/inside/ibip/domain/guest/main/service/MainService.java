@@ -7,6 +7,7 @@ import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.exception.code.ResultCode;
 import com.inside.ibip.global.mstr.MstrObject;
 import com.inside.ibip.global.utils.UrlUtils;
+import com.inside.ibip.global.vo.ResVO;
 import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -143,5 +144,21 @@ public class MainService {
         return search;
     }
 
+    /**
+     * 대시보드 등록
+     * @Method Name   : registerDashboard
+     * @Date / Author : 2023.12.01  이도현
+     * @param userId 사용자 Id
+     * @param reportId 문서 Id
+     * @return ResVO 성공유무
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public ResVO registerDashboard(String userId, String reportId){
+
+        ResVO result = mstrObject.registerDashboard(userId, reportId);
+
+        return result;
+    }
 
 }
