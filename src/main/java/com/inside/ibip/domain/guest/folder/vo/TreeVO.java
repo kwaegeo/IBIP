@@ -1,9 +1,6 @@
 package com.inside.ibip.domain.guest.folder.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * @FileName     : TreeVO.java
@@ -21,6 +18,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class TreeVO {
 
     /** 요소 ID **/

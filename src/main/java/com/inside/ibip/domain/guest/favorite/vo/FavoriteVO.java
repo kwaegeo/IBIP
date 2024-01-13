@@ -15,7 +15,9 @@ public class FavoriteVO {
 
     private String favoriteId;
 
-    private String documentId;
+    private String reportId;
 
-    private String docType;
+    private int docType;
+
+
 }

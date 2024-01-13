@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inside.ibip.domain.guest.favorite.mapper.FavoriteMapper">
+
+    <select id="checkFavorite" parameterType="com.inside.ibip.domain.guest.favorite.vo.FavoriteVO" resultType="integer">
+        SELECT
+            count(*)
+        FROM
+            tb_favorite
+        WHERE
+            user_id = #{userId}
+          AND
+            report_id = #{reportId};
+    </select>
+
+    <insert id="insertFavorite" parameterType="com.inside.ibip.domain.guest.favorite.vo.FavoriteVO">
+        INSERT INTO
+            tb_favorite
+            (
+             fav_id,
+             report_id,
+             user_id,
+             reg_ts,
+             doc_type,
+             use_yn
+             )
+        VALUES
+            (
+            'FA' || TO_CHAR(CURRENT_TIMESTAMP, 'YYMMDDHH24MISS') || LPAD(nextval('seq_tb_template')::text, 6, '0'),
+             #{reportId},
+             #{userId},
+             CURRENT_TIMESTAMP,
+             #{docType},
+             'Y'
+             )
+    </insert>
+
+    <select id="getFavorite" resultType="com.inside.ibip.domain.guest.favorite.vo.FavoriteVO">
+        SELECT
+            fav_id as favoriteId,
+            report_id as reportId,
+            doc_type as docType
+        FROM
+            tb_favorite
+        WHERE
+            user_id=#{userId}
+                AND
+            use_yn = 'Y'
+    </select>
+
+    <select id="selectFavorite" parameterType="string" resultType="integer">
+        SELECT
+            count(*)
+        FROM
+            tb_favorite
+        WHERE
+            user_id = #{userId}
+          AND
+            report_id = #{reportId}
+          AND
+            use_yn='Y';
+    </select>
+
+    <update id="deleteFavorite" parameterType="com.inside.ibip.domain.guest.favorite.vo.FavoriteVO">
+        UPDATE
+            tb_favorite
+        SET
+            use_yn='N'
+        WHERE
+            report_id = #{reportId}
+              AND
+            user_id = #{userId}
+              AND
+            use_yn='Y'
+    </update>
+</mapper>
+

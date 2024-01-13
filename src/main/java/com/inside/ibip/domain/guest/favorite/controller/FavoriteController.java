@@ -19,6 +19,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ * @FileName     : FavoriteController.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : 즐겨찾기 Controller, 즐겨찾기를 관리
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
 @Controller
 @RequestMapping("/favorite")
 public class FavoriteController {
@@ -29,6 +41,19 @@ public class FavoriteController {
     @Autowired
     private ComUtils comUtils;
 
+    /**
+     * 즐겨찾기 추가
+     * @Method Name   : addFavorite
+     * @Date / Author : 2023.12.01  이도현
+     * @param favoriteInfo 즐겨찾기 정보 객체
+     * @param request request 객체
+     * @param response response 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     @PostMapping("/add")
     @ResponseBody
     public ResVO addFavorite(@RequestBody FavoriteVO favoriteInfo, HttpServletRequest request, HttpServletResponse response){
@@ -39,11 +64,40 @@ public class FavoriteController {
         //1. 세션 체크
         comUtils.sessionCheck(mstrSessionId, request, response);
 
-        favoriteService.addFavorite(favoriteInfo);
-
+        //2. 즐겨찾기에 추가
+        ResVO result = favoriteService.addFavorite(favoriteInfo);
 
         //3. 응답
-        return new ResVO(ResultCode.SUCCESS);
+        return result;
     }
 
+    /**
+     * 즐겨찾기 삭제
+     * @Method Name   : deleteFavorite
+     * @Date / Author : 2023.12.01  이도현
+     * @param favoriteInfo 즐겨찾기 정보 객체
+     * @param request request 객체
+     * @param response response 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @PostMapping("/delete")
+    @ResponseBody
+    public ResVO deleteFavorite(@RequestBody FavoriteVO favoriteInfo, HttpServletRequest request, HttpServletResponse response){
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
+        //2. 즐겨찾기에 추가
+        ResVO result = favoriteService.deleteFavorite(favoriteInfo);
+
+        //3. 응답
+        return result;
+    }
 }

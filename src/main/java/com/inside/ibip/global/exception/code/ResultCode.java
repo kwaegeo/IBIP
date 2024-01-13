@@ -55,6 +55,15 @@ public enum ResultCode {
     NO_DASHBOARD("E19", "대시보드가 등록되어져 있지 않습니다."),
 
     INVALID_REGISTER("E20", "MSTR 등록 연계 중 문제가 발생하였습니다."),
+
+    DB_ETC_ERROR("E21", "DataBase 연계 중 문제가 발생하였습니다. DB가 정상적으로 동작하는지 확인해주세요."),
+
+    DUPLICATE_FAVORITE("E22", "해당 문서는 이미 즐겨찾기에 등록되어져 있습니다."),
+
+    INVALID_FAVORITE_LIST("E23", "즐겨찾기 목록을 불러오는 중 에러가 발생하였습니다."),
+
+    INVALID_FAVORITE("E24", "해당 문서는 이미 즐겨찾기에서 삭제되었거나 존재하지 않습니다. 문서 상태를 확인해주세요."),
+
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다. IntelligenceServer가  정상적으로 동작하는지 확인해주세요.");
 
 

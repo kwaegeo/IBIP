@@ -1,4 +1,4 @@
-package com.inside.ibip.domain.guest.template;
+package com.inside.ibip.domain.guest.template.vo;
 
 import lombok.*;
 

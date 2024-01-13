@@ -2,6 +2,7 @@ package com.inside.ibip.domain.guest.folder.controller;
 
 import com.inside.ibip.domain.guest.folder.service.FolderService;
 import com.inside.ibip.domain.guest.folder.vo.TreeVO;
+import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
 import com.microstrategy.web.objects.*;
@@ -67,8 +68,12 @@ public class FolderController {
         } catch (CustomException ex) {
             throw ex;
         }
+
+        //3. 사용자 정보 가져오기
+        UserInfoVO userInfo = folderService.getUserInfo();
+
         //전달 받은 폴더의 하위 목록 조회
-        List<TreeVO> subList = folderService.getSubList(folderId);
+        List<TreeVO> subList = folderService.getSubList(folderId, userInfo.getUserId());
         return subList;
     }
 

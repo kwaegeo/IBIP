@@ -56,4 +56,7 @@ public class ReportVO {
 
     /** 대시보드 용 기본 PromptAnserXML 추가 **/
     private String promptAnswerXML;
+
+    /** 즐겨찾기 유무 추가 **/
+    private boolean favorite = false;
 }

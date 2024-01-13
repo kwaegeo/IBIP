@@ -9,10 +9,12 @@
         FROM
             tb_template
         WHERE
-            tmp_nm = #{templateName};
+            tmp_nm = #{tmpNm}
+                AND
+            report_id = #{reportId};
     </select>
 
-    <insert id="insertTemplate" parameterType="com.inside.ibip.domain.guest.template.TemplateVO">
+    <insert id="insertTemplate" parameterType="com.inside.ibip.domain.guest.template.vo.TemplateVO">
         INSERT INTO
             tb_template
             (
@@ -45,6 +47,8 @@
                 tb_template
             WHERE
                 tmp_nm = #{tmpNm}
+                    AND
+                report_id = #{reportId}
         </selectKey>
     </insert>
     <insert id="insertPrompts" parameterType="java.util.List">
@@ -149,7 +153,7 @@
         )
     </insert>
 
-    <select id="selectTemplate" resultType="com.inside.ibip.domain.guest.template.TemplateVO">
+    <select id="selectTemplate" resultType="com.inside.ibip.domain.guest.template.vo.TemplateVO">
         SELECT
             tmp_id as tmpId,
             report_id as reportId,

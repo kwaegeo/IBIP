@@ -1,8 +1,8 @@
 package com.inside.ibip.domain.guest.template.service;
 
 import com.inside.ibip.domain.guest.prompt.vo.ObjectVO;
-import com.inside.ibip.domain.guest.template.ReqTemplateVO;
-import com.inside.ibip.domain.guest.template.TemplateVO;
+import com.inside.ibip.domain.guest.template.vo.ReqTemplateVO;
+import com.inside.ibip.domain.guest.template.vo.TemplateVO;
 import com.inside.ibip.domain.guest.template.mapper.TemplateMapper;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.exception.code.ResultCode;
@@ -45,7 +45,7 @@ public class TemplateService {
      *
      * @Description
      */
-    public ResVO checkTemplate(String templateName){
+    public ResVO checkTemplate(String templateName, String reportId){
 
         //1. Null 체크
         if(isNullOrEmpty(templateName)){
@@ -57,7 +57,7 @@ public class TemplateService {
             //2. DB를 통한 해당 템플릿명이 있는지 조회
             int templateCnt = 0;
             try {
-                 templateCnt = templateMapper.checkTemplate(templateName);
+                 templateCnt = templateMapper.checkTemplate(templateName, reportId);
             }catch (Exception e){
                 log.error("템플릿 중복 조회 중 에러 발생 [Error msg]: " + e.getMessage());
                 throw new CustomException(ResultCode.ETC_ERROR);
@@ -85,7 +85,7 @@ public class TemplateService {
     public void createTemplate(ReqTemplateVO templateInfo) {
 
         //1. 생성과정에서 1번 더 Check 함수 호출 (유효성 검사)
-        ResVO result = this.checkTemplate(templateInfo.getTemplateName());
+        ResVO result = this.checkTemplate(templateInfo.getTemplateName(), templateInfo.getReportInfo().getReportId());
         if ("S00".equals(result.getCode())) {
             if (templateInfo.getRemark().length() > 200) {
                 throw new CustomException(ResultCode.INVALID_REMARK);

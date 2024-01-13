@@ -615,7 +615,10 @@
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y','', '${reportInfo.documentType}')"> 편집</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
-                                <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="addFavorite()">즐겨찾기 추가</button>
+                                ${reportInfo.favorite
+                                ? `<button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="delFavorite('${reportInfo.reportId}')">즐겨찾기 삭제</button>`
+                                : `<button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="addFavorite('${reportInfo.reportId}', '${reportInfo.documentType}')">즐겨찾기 추가</button>`
+                                }
                                  ${reportInfo.documentType === 'D' ? `<button href="#" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm md-4" onclick="registerDashboard('${reportInfo.reportId}')">대시보드 등록</button>` : ''}
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="templateSave('${reportInfo.reportId}', '${reportInfo.documentType}')"> 템플릿 저장</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm md-4" onclick="getTemplateList('${reportInfo.reportId}')"> 템플릿 불러오기</button>
@@ -1500,9 +1503,69 @@
 
     }
 
-    function addFavorite(){
-        alert("어우");
-        return;
+    function addFavorite(reportId, docType){
+        if(confirm("현재 문서를 즐겨찾기에 추가 하시겠습니까?")) {
+            console.log(docType)
+            var convertDocType = 3
+            if(docType == "D"){
+                convertDocType = 55
+            }
+            var data={"reportId": reportId, "userId": userId, "docType": convertDocType}
+
+            $.ajax({
+                url: '/favorite/add',
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "json",
+                success: function (responseData) {
+                    if(responseData.code === "S00"){
+                        alert("성공적으로 즐겨찾기에 추가 되었습니다.");
+                        return;
+                    }
+                    else{
+                        alert(responseData.msg);
+                        return;
+                    }
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+        }
+        else{
+            return;
+        }
+    }
+
+    function delFavorite(reportId){
+        if(confirm("현재 문서를 즐겨찾기에서 삭제 하시겠습니까?")) {
+            var data={"reportId": reportId, "userId": userId}
+
+            $.ajax({
+                url: '/favorite/delete',
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                method: 'POST',
+                dataType: "json",
+                success: function (responseData) {
+                    if(responseData.code === "S00"){
+                        alert("성공적으로 즐겨찾기에서 삭제 되었습니다.");
+                        return;
+                    }
+                    else{
+                        alert(responseData.msg);
+                        return;
+                    }
+                },
+                error: function () {
+                    alert("서버에 접속할 수 없습니다.")
+                }
+            })
+        }
+        else{
+            return;
+        }
     }
 
     function registerDashboard(reportId){

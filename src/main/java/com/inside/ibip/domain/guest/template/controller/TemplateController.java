@@ -3,13 +3,12 @@ package com.inside.ibip.domain.guest.template.controller;
 import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.prompt.vo.ObjectVO;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
-import com.inside.ibip.domain.guest.template.TemplateVO;
+import com.inside.ibip.domain.guest.template.vo.TemplateVO;
 import com.inside.ibip.domain.guest.template.service.TemplateService;
-import com.inside.ibip.domain.guest.template.ReqTemplateVO;
+import com.inside.ibip.domain.guest.template.vo.ReqTemplateVO;
 import com.inside.ibip.global.exception.code.ResultCode;
 import com.inside.ibip.global.utils.ComUtils;
 import com.inside.ibip.global.vo.ResVO;
-import com.microstrategy.web.objects.WebObjectsException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -68,8 +67,9 @@ public class TemplateController {
         comUtils.sessionCheck(mstrSessionId, request, response);
 
         String templateName = template.get("templateName");
+        String reportId = template.get("reportId");
 
-        ResVO result = templateService.checkTemplate(templateName);
+        ResVO result = templateService.checkTemplate(templateName, reportId);
 
         return result;
     }
@@ -131,6 +131,7 @@ public class TemplateController {
         //1. 세션 체크
         comUtils.sessionCheck(mstrSessionId, request, response);
 
+        //2. 즐겨찾기에 추가
         templateService.createTemplate(templateInfo);
 
         return new ResVO(ResultCode.SUCCESS);

@@ -3,15 +3,16 @@ package com.inside.ibip.domain.guest.template.mapper;
 import com.inside.ibip.domain.guest.prompt.vo.ElementVO;
 import com.inside.ibip.domain.guest.prompt.vo.ObjectVO;
 import com.inside.ibip.domain.guest.prompt.vo.PromptVO;
-import com.inside.ibip.domain.guest.template.TemplateVO;
+import com.inside.ibip.domain.guest.template.vo.TemplateVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
 public interface TemplateMapper {
 
-    public int checkTemplate(String templateName);
+    public int checkTemplate(@Param("tmpNm")String templateName, @Param("reportId")String reportId);
 
     public int insertTemplate(TemplateVO template);
 

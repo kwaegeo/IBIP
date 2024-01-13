@@ -141,7 +141,7 @@
       }
 
       //2. 중복확인 요청
-      const data = {"templateName": templateNameVal};
+      const data = {"reportId":reportInfo.reportId, "templateName": templateNameVal};
 
       $.ajax({
         url: "/template/check",

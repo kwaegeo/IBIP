@@ -3,6 +3,7 @@ package com.inside.ibip.global.mstr;
 import com.inside.ibip.domain.admin.license.vo.LicenseVO;
 import com.inside.ibip.domain.admin.role.vo.*;
 import com.inside.ibip.domain.admin.user.vo.UserVO;
+import com.inside.ibip.domain.guest.favorite.vo.FavoriteVO;
 import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.admin.group.vo.GroupVO;
 import com.inside.ibip.domain.guest.folder.vo.FolderVO;
@@ -244,7 +245,33 @@ public class MstrObject extends MstrSession{
         return subList;
     }
 
+    /**
+     * 즐겨찾기 목록 조회 (트리구조 파싱)
+     * @Method Name   : getFavorite
+     * @Date / Author : 2023.12.01  이도현
+     * @param favorites 즐겨찾기에 등록 된 문서 모음
+     * @param folderId 부모로 칭할 폴더 Id
+     * @return 즐겨찾기 목록 리스트
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public List<TreeVO> getFavorite(List<FavoriteVO> favorites, String folderId){
+        List<TreeVO> favoriteList = new ArrayList<>();
+        try{
+            for(int i=0; i<favorites.size(); i++){
+                WebObjectInfo woi = objectSource.getObject(favorites.get(i).getReportId(), favorites.get(i).getDocType());
+                woi.populate();
 
+                favoriteList.add(TreeVO.builder().id(woi.getID()).parent(folderId).children(false).text(woi.getName()).type(woi.getType()).build());
+            }
+        }catch (WebObjectsException woe){
+            log.error("즐겨찾기 데이터 불러오는 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.INVALID_FAVORITE_LIST);
+        }
+        return favoriteList;
+    }
 
     public String getUsrSmgr(){
         String usrSmgr = serverSession.saveState(0);

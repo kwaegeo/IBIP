@@ -1,7 +1,10 @@
 package com.inside.ibip.domain.guest.folder.service;
 
+import com.inside.ibip.domain.guest.favorite.mapper.FavoriteMapper;
+import com.inside.ibip.domain.guest.favorite.vo.FavoriteVO;
 import com.inside.ibip.domain.guest.folder.vo.TreeVO;
 import com.inside.ibip.domain.guest.folder.vo.FolderVO;
+import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.global.mstr.MstrObject;
 import com.inside.ibip.global.vo.EnumFolderNamesKR;
 import com.microstrategy.webapi.EnumDSSXMLFolderNames;
@@ -27,6 +30,9 @@ import java.util.List;
 public class FolderService {
 
     @Autowired
+    private FavoriteMapper favoriteMapper;
+
+    @Autowired
     private MstrObject mstrObject;
 
     /**
@@ -40,12 +46,20 @@ public class FolderService {
      *
      * @Description
      */
-    public List<TreeVO> getSubList(String folderId){
-        //세션 정보 삽입
+    public List<TreeVO> getSubList(String folderId, String userId){
 
         List<TreeVO> subList = new ArrayList<>();
-        subList = mstrObject.getSubList(folderId, "", subList);
 
+        //2024-01-14 즐겨찾기 인 경우의 분기 추가
+        if(folderId.equals("8D67909A11D3E4981000E787EC6DE8A4")){
+            List<FavoriteVO> favorites = favoriteMapper.getFavorite(userId);
+            if(favorites.size() > 0) {
+                subList = mstrObject.getFavorite(favorites, folderId);
+            }
+        }
+        else{
+            subList = mstrObject.getSubList(folderId, "", subList);
+        }
         return subList;
     }
 
@@ -103,4 +117,17 @@ public class FolderService {
         return myData;
     }
 
+
+    /**
+     * 로그인 한 MSTR 세션의 사용자 정보를 가져온다.
+     * @Method Name   : getUserInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @return 사용자 정보
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public UserInfoVO getUserInfo(){
+        UserInfoVO userInfo = mstrObject.getUserInfo();
+        return userInfo;
+    }
 }

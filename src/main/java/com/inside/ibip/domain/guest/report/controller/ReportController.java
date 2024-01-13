@@ -1,5 +1,6 @@
 package com.inside.ibip.domain.guest.report.controller;
 
+import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.report.service.ReportService;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.utils.ComUtils;
@@ -59,8 +60,10 @@ public class ReportController {
         //1. 세션 체크
         comUtils.sessionCheck(mstrSessionId, request, response);
 
+        UserInfoVO userInfo = reportService.getUserInfo();
+
         //2. 리포트 정보 조회
-        ReportVO reportInfo = reportService.getReportInfo(reportId, documentType);
+        ReportVO reportInfo = reportService.getReportInfo(reportId, documentType, userInfo);
 
         return reportInfo;
     }

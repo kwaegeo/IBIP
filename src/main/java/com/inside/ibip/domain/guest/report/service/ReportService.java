@@ -1,5 +1,7 @@
 package com.inside.ibip.domain.guest.report.service;
 
+import com.inside.ibip.domain.guest.favorite.mapper.FavoriteMapper;
+import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.mstr.MstrObject;
 import com.inside.ibip.global.utils.UrlUtils;
@@ -28,6 +30,8 @@ public class ReportService {
     @Autowired
     private UrlUtils urlUtils;
 
+    @Autowired
+    private FavoriteMapper favoriteMapper;
 
     /**
      * Mstr 리포트 정보 조회 함수
@@ -39,10 +43,16 @@ public class ReportService {
      * @History
      * 2023.12.01	최초생성
      */
-    public ReportVO getReportInfo(String reportId, String documentType){
+    public ReportVO getReportInfo(String reportId, String documentType, UserInfoVO userInfo){
+
 
         //1. 리포트 정보 조회
         ReportVO reportInfo = mstrObject.getReportInfo(reportId, documentType);
+
+        int favoriteCnt = favoriteMapper.selectFavorite(reportId, userInfo.getUserId());
+        if(favoriteCnt > 0) {
+            reportInfo.setFavorite(true);
+        }
 
         //2. 리포트 데이터, 프롬프트 조회
         reportInfo = mstrObject.getReportDataInfo(reportId, reportInfo);
@@ -94,4 +104,16 @@ public class ReportService {
         return reportURL;
     }
 
+    /**
+     * 로그인 한 MSTR 세션의 사용자 정보를 가져온다.
+     * @Method Name   : getUserInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @return 사용자 정보
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public UserInfoVO getUserInfo(){
+        UserInfoVO userInfo = mstrObject.getUserInfo();
+        return userInfo;
+    }
 }
