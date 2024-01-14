@@ -14,22 +14,18 @@
     <link rel="stylesheet" type="text/css" href="assets/js/treeview/jquery.treeview.css">
 
 
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
 
-    <!-- Custom styles for this template -->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <!-- 글자크기에 따른 크기 조정 css-->
-    <link href="css/custom.css" rel="stylesheet">
+    <link href="/css/custom.css" rel="stylesheet">
 
-    <link href="dist/themes/default/style.min.css" rel="stylesheet"/>
+    <link href="/dist/themes/default/style.min.css" rel="stylesheet"/>
 
     <!-- Custom styles for this page -->
-    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css"/>
-    <link rel="stylesheet" type="text/css" href="assets/js/jqueryui/jquery-ui.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/js/treeview/jquery.treeview.css">
+    <link rel="stylesheet" type="text/css" href="/assets/js/jqueryui/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/js/treeview/jquery.treeview.css">
 
   </head>
 
@@ -57,7 +53,7 @@
                     </div>
                     <div class="input-area">
                       <label for="description">설명</label>
-                      <input type="text"  id="description" th:value="${roleInfo.description}" disabled/>
+                      <input type="text" name="roleInfo" id="description" th:value="${roleInfo.description}" disabled/>
                     </div>
                   </li>
                   <li>
@@ -79,8 +75,8 @@
           <div class="tbl-top">
             <div class="left"></div>
             <div class="right">
-              <button type="button" id="btnModify" class="btn-edit btn-yellow" onclick="modifyUser(this)" checkResult="wait"><span>수정</span></button>
-              <button type="button" id="btn-delete" class="btn-danger btn-delete" onclick="deleteUser()"><span>삭제</span></button>
+              <button type="button" id="btnModify" class="btn-edit btn-yellow" onclick="modifyRole(this)" checkResult="wait"><span>수정</span></button>
+              <button type="button" id="btn-delete" class="btn-danger btn-delete" onclick="deleteRole()"><span>삭제</span></button>
             </div>
           </div>
         </section>
@@ -95,8 +91,7 @@
             </div>
             <div class="tbl-bottom">
               <div class="left">
-                <button type="button" onclick="assignment('assign')"><span>할당</span></button>
-                <button type="button" onclick="assignment('unassign')"><span>회수</span></button>
+                <button type="button" onclick="assignment()"><span>권한 저장</span></button>
               </div>
             </div>
           </div>
@@ -111,6 +106,7 @@
   <script src="dist/jstree.min.js"></script>
   <script src="/js/leedo_custom.js"></script>
   <script th:inline="javascript">
+    var roleNm = [[${roleInfo.roleNm}]]
     var categoryList = [[${roleInfo.categories}]]
 
 
@@ -139,74 +135,8 @@
       });
     })
 
-    // 체크박스 전체 선택
-    function selectAll(chkAll){
 
-      $('input:checkbox[name="chk"]').each(function() {
-        this.checked = chkAll.checked
-      });
-
-    }
-    //전체 선택, 해제 비교
-    $("input[name=chk]").click(function() {
-      var total = $("input[name=chk]").length;
-      var checked = $("input[name=chk]:checked").length;
-
-      if(total != checked) $("#chkAll").prop("checked", false);
-      else $("#chkAll").prop("checked", true);
-    });
-
-    function validCheck(type){
-
-      //할당정보 YN
-      var checkAssign = true;
-      var checkmsg = "";
-
-      var type = type
-
-      if($('input[name=chk]:checked').length === 0){
-        checkmsg ="선택된 항목이 없습니다.";
-        checkAssign = false;
-      }
-
-      else {
-        // 체크 된 ID중 할당정보에 따른 검사
-        $('input[name=chk]:checked').each(function (index) {
-          //선택된 체크박스의 tr
-          var selectedTr = $(this).parent().parent();
-          //선택된 체크박스의 td
-          var selectedTd = selectedTr.children();
-          //선택된 체크박스의 할당 정보
-          var selectedAssign = selectedTd.eq(1).text();
-
-          if (type === "assign") {
-            if (selectedAssign == "Y") {
-              checkmsg = "할당되지 않은 그룹만 할당 가능합니다.";
-              checkAssign = false;
-              return false;
-            }
-          } else if (type === "unassign") {
-
-            if (selectedAssign == "N") {
-              checkmsg = "할당 된 그룹만 회수 가능합니다.";
-              checkAssign = false;
-              return false;
-            }
-          }
-        })
-      }
-      if(!checkAssign) {
-        alert(checkmsg);
-        return false;
-      }
-      else {
-        return true;
-      }
-    }
-
-
-
-    function assignment(assignmentType) {
+    function assignment() {
       var arrSelected = $('#jstree').jstree(true).get_selected('full', true);
 
       var selectedChildren = categoryList.reduce((result, category) => {
@@ -272,8 +202,8 @@
       });
     }
 
-  function modifyUser(button){
-    const  userReg = RegExp(/^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\s-]+$/); //한글, 영어,숫자만 입력 가능
+  function modifyRole(button){
+    const  roleReg = RegExp(/^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\s-]+$/); //한글, 영어,숫자만 입력 가능
     if($('#btnModify').attr("checkResult") === "wait") {
       var spanElement = button.querySelector('span');
       button.classList.remove("btn-yellow")
@@ -284,31 +214,19 @@
     }
     else{
 
-      var newLoginId= $('#loginID').val();
-      var userId = $('#userId').val();
-      var userNm = $('#userNm').val();
+      var newroleNm = $('#roleNm').val();
+      var roleId = $('#roleId').val();
       var description = $('#description').val();
 
-      if (validData(newLoginId)) {
-        alert("로그인 ID를 작성해주세요");
-        $('#loginID').focus();
-        return false;
-      }
-      else if (validData(userNm)) {
-        alert("사용자명을 작성해주세요");
-        $('#userNm').focus();
+      if (validData(newroleNm)) {
+        alert("보안역할 명을 작성해주세요");
+        $('#roleNm').focus();
         return false;
       }
       //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
-      else if (!userReg.test(newLoginId) || newLoginId.length > 64) {
+      else if (!roleReg.test(newroleNm) || newroleNm.length > 64) {
         alert("로그인 ID를 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
-        $('#loginID').focus();
-        return false;
-      }
-      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
-      else if (!userReg.test(userNm) || userNm.length > 64) {
-        alert("사용자 명을 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
-        $('#userNm').focus();
+        $('#roleNm').focus();
         return false;
       }
       else if(description.length > 200){
@@ -316,16 +234,16 @@
         $('#description').focus();
         return false;
       }
-      const data = {"userId":userId, "loginID": newLoginId, "userNm": userNm, "description": description};
+      const data = {"roleId":roleId, "roleNm": newroleNm, "description": description};
       $.ajax({
-        url: "/userModifyProc",
+        url: "/roleModifyProc",
         data: JSON.stringify(data),
         method: "POST",
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
           if (data.code == "S00") {
-            alert("성공적으로 사용자가 수정 되었습니다.")
+            alert("성공적으로 보안역할이 수정 되었습니다.")
             location.reload();
           } else {
             alert(data.msg);
@@ -341,21 +259,21 @@
     }
   }
 
-  function deleteUser(){
-    var userId = $('#userId').val();
-    if(confirm("("+userNm+") 사용자를 정말로 삭제하시겠습니까? \n삭제 후엔 되돌릴 수 없습니다.")) {
+  function deleteRole(){
+    var roleId = $('#roleId').val();
+    if(confirm("("+roleNm+") 보안역할을 정말로 삭제하시겠습니까? \n삭제 후엔 되돌릴 수 없습니다.")) {
       //2.1 사용자 할당 요청
       $.ajax({
-        url: "/userDelProc",
-        data: JSON.stringify({"userId": userId}),
+        url: "/roleDelProc",
+        data: JSON.stringify({"roleId": roleId}),
         contentType: "application/json",
         method: "POST",
         dataType: "json",
         success: function (responseData) {
           if(responseData.code === "S00"){
-            alert("성공적으로 사용자가 삭제되었습니다.")
+            alert("성공적으로 보안역할이 삭제되었습니다.")
             window.close();
-            opener.getUserList();
+            opener.getRoleList();
           }
           else{
             alert(responseData.msg);

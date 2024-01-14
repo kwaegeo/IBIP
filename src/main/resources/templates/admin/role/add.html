@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>사용자 생성</title>
+    <title>보안역할 생성</title>
     <!-- CSS -->
     <link rel="stylesheet" href="assets/css/style2.css" />
 
@@ -18,7 +18,7 @@
     <div class="popup-window">
       <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
       <div class="popup__head">
-        <h1>사용자 생성</h1>
+        <h1>보안역할 생성</h1>
         <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
       </div>
       <div class="popup__body">
@@ -26,10 +26,10 @@
           <ul class="form-input">
 
             <li>
-              <label for="loginID" class="star">로그인 ID</label>
+              <label for="roleNm" class="star">보안역할 명</label>
               <div class="input-area">
                 <div class="row">
-                  <input type="text" id="loginID" value="" class="flex3" check_result="fail"/>
+                  <input type="text" id="roleNm" value="" class="flex3" check_result="fail"/>
                 </div>
                 <p class="input-info">영문자, 한글, 숫자, 특수문자(- _ .)조합의 64자 이하 문자열</p>
               </div>
@@ -37,32 +37,6 @@
               <div class="input-area">
                 <input type="text" id="userId" value="" />
               </div>-->
-            </li>
-            <li>
-              <label for="userNm" class="star">사용자명</label>
-              <div class="input-area">
-                <div class="row">
-                  <input type="text" id="userNm" value="" class="flex3" check_result="fail"/>
-                </div>
-                <p class="input-info">영문자, 한글, 숫자, 특수문자(- _ .)조합의 64자 이하 문자열</p>
-              </div>
-            </li>
-            <li>
-              <label for="password1" class="star">비밀번호</label>
-              <div class="input-area">
-                <div class="row">
-                  <input type="text" id="password1" value="" class="flex3" check_result="fail"/>
-                </div>
-                <p class="input-info">8자이상, 20자 이내, 2자이상의 사용자명을 포함할 수 없음.</p>
-              </div>
-            </li>
-            <li>
-              <label for="password2" class="star">비밀번호 확인</label>
-              <div class="input-area">
-                <div class="row">
-                  <input type="text" id="password2" value="" class="flex3" check_result="fail"/>
-                </div>
-              </div>
             </li>
             <li>
               <label for="description">설명</label>
@@ -78,106 +52,46 @@
       </div>
       <div class="popup__footer">
         <button type="button" class="pop-close bg-gray" onclick="confirmExit()"><span>취소</span></button>
-        <button type="button" onclick="createUser()"><span>생성</span></button>
+        <button type="button" onclick="createRole()"><span>생성</span></button>
       </div>
     </div>
   </body>
   <script th:inline="javascript">
 
-    function isPasswordValid(password, userNm) {
-      return !hasConsecutiveCharacters(password, 2) &&
-              !password.includes(userNm.substring(0, Math.min(2, userNm.length))) &&
-              !password.includes(userNm.substring(Math.max(0, userNm.length - 2), userNm.length)) &&
-              password.length >= 8 && password.length <= 20;
-    }
-
-    function hasConsecutiveCharacters(input, consecutiveCount) {
-      const pattern = new RegExp("(.)\\1{" + (consecutiveCount - 1) + ",}");
-      return pattern.test(input);
-    }
-
-
-    function createUser(){
-      const userReg = RegExp(/^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\s-]+$/); //한글, 영어,숫자만 입력 가능
-      const loginID = $('#loginID').val();
-      const userNm = $('#userNm').val();
-      const password1 = $('#password1').val();
-      const password2 = $('#password2').val();
+    function createRole(){
+      const roleReg = RegExp(/^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\s-]+$/); //한글, 영어,숫자만 입력 가능
+      const roleNm = $('#roleNm').val();
       const description = $('#description').val();
-
-      //1. 로그인 아이디 유효성 체크
-      if (validData(loginID)) {
-        alert("로그인 ID를 작성해주세요");
-        $('#loginID').focus();
-        return false;
-      }
-      //2. 사용자명 유효성 체크
-      else if (validData(userNm)) {
-        alert("사용자명을 작성해주세요");
-        $('#userNm').focus();
-        return false;
-      }
-      //3. 비밀번호1 유효성 체크
-      else if (validData(password1)) {
-        alert("비밀번호를 작성해주세요");
-        $('#password1').focus();
-        return false;
-      }
-      //4. 비밀번호2 유효성 체크
-      else if (validData(password2)) {
-        alert("비밀번호 확인을 작성해주세요");
-        $('#password2').focus();
-        return false;
-      }
-      //5. 사용자명 유효성 체크
-      else if (!password1 == password2) {
-        alert("비밀번호와 비밀번호 확인이 맞지 않습니다.");
-        $('#password2').focus();
+      //1. 아이디 유효성 체크
+      if (validData(roleNm)) {
+        alert("보안역할 명을 작성해주세요");
+        $('#roleNm').focus();
         return false;
       }
       //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
-      else if (!userReg.test(loginID) || loginID.length > 64) {
-        alert("로그인 ID를 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
-        $('#loginID').focus();
+      else if (!roleReg.test(roleNm) || roleNm.length > 64) {
+        alert("보안역할 명을 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
+        $('#roleNm').focus();
         return false;
       }
-      //1.2 유효성 (영어, 숫자, -,., _ 만 가능 )
-      else if (!userReg.test(userNm) || userNm.length > 64) {
-        alert("사용자명을 형식에 맞게 입력해주세요.\n(영어,숫자,한글 ._-만 포함)\n64자 이내")
-        $('#userNm').focus();
-        return false;
-      }
-
-      else if(!isPasswordValid(password1, userNm)){
-        alert("비밀번호를 형식에 맞게 입력 해주세요. \n(사용자명이 비밀번호에 2글자 이상 포함 X)")
-        return false;
-      }
-
       else if(description.length > 200){
         alert("설명을 형식에 맞게 입력해주세요. \n200자 이내");
         $('#description').focus();
         return false;
       }
 
-      const data = {
-        "loginID": loginID,
-        "userNm": userNm,
-        "password1": password1,
-        "password2": password2,
-        "description": description,
-      };
-
+      const data = {"roleNm": roleNm, "description": description};
       $.ajax({
-        url: "/userAddProc",
+        url: "/roleAddProc",
         data: JSON.stringify(data),
         method: "POST",
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
           if (data.code == "S00") {
-            alert("성공적으로 사용자가 생성되었습니다.")
+            alert("성공적으로 보안역할이 생성되었습니다.")
             window.close();
-            opener.getUserList();
+            opener.getRoleList();
           } else {
             alert(data.msg);
             return;
@@ -196,6 +110,5 @@
       else
         return false;
     }
-
   </script>
 </html>

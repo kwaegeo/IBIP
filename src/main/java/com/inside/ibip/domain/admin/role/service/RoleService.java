@@ -1,5 +1,6 @@
 package com.inside.ibip.domain.admin.role.service;
 
+import com.inside.ibip.domain.admin.group.vo.GroupVO;
 import com.inside.ibip.domain.admin.role.vo.PrivilegeAssignVO;
 import com.inside.ibip.domain.admin.role.vo.RoleVO;
 import com.inside.ibip.global.mstr.MstrObject;
@@ -22,6 +23,20 @@ public class RoleService {
         return roleList;
     }
 
+    public ResVO addRole(RoleVO roleInfo){
+        ResVO result = mstrObject.addRole(roleInfo);
+        return result;
+    }
+
+    public ResVO modifyRole(RoleVO roleInfo){
+        ResVO result = mstrObject.modifyRole(roleInfo);
+        return result;
+    }
+
+    public ResVO delRole(String roleId) throws WebObjectsException {
+        ResVO result = mstrObject.delRole(roleId);
+        return result;
+    }
 
     public RoleVO getRoleInfo(String roleId) throws WebObjectsException {
         /**

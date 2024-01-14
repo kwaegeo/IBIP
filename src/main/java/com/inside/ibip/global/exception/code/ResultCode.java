@@ -64,6 +64,13 @@ public enum ResultCode {
 
     INVALID_FAVORITE("E24", "해당 문서는 이미 즐겨찾기에서 삭제되었거나 존재하지 않습니다. 문서 상태를 확인해주세요."),
 
+    DUPLICATE_ROLE("E25", "중복된 보안역할 명 입니다."),
+
+    INVALID_ROLE_NAME("E26", "보안역할명 형식에 맞게 작성해주세요."),
+
+    INVALID_ROLE_ID("E27", "해당 보안역할이 이미 삭제되었거나 존재하지 않습니다."),
+
+
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다. IntelligenceServer가  정상적으로 동작하는지 확인해주세요.");
 
 

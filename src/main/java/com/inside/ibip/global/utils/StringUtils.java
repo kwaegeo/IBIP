@@ -12,6 +12,9 @@ public class StringUtils {
         return Pattern.matches("^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\\s-]*$", userNm);
     }
 
+    public static boolean isRoleNm(String roleNm){
+        return Pattern.matches("^[ㄱ-ㅎ|가-힣|0-9|a-z|A-Z|._\\s-]*$", roleNm);
+    }
 
     public static boolean isPasswordValid(String password, String userNm) {
         return !hasConsecutiveCharacters(password, 2) &&

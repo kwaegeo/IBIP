@@ -18,10 +18,7 @@ import com.inside.ibip.global.mstr.prompt.ConstantPrompt;
 import com.inside.ibip.global.mstr.prompt.ElementPrompt;
 import com.inside.ibip.global.mstr.prompt.ObjectPrompt;
 import com.inside.ibip.global.vo.ResVO;
-import com.microstrategy.web.beans.BeanFactory;
-import com.microstrategy.web.beans.UserBean;
-import com.microstrategy.web.beans.UserGroupBean;
-import com.microstrategy.web.beans.WebBeanException;
+import com.microstrategy.web.beans.*;
 import com.microstrategy.web.objects.*;
 import com.microstrategy.web.objects.admin.licensing.*;
 import com.microstrategy.web.objects.admin.users.*;
@@ -702,7 +699,6 @@ public class MstrObject extends MstrSession{
             throw new CustomException(ResultCode.INVALID_REMARK);
         }
 
-        WebObjectSource wos = factory.getObjectSource();
         UserGroupBean group = null;
 
         try {
@@ -726,6 +722,37 @@ public class MstrObject extends MstrSession{
         }
         return new ResVO(ResultCode.SUCCESS);
     }
+
+    public ResVO addRole(RoleVO roleInfo){
+        /** 유효성검사 부분 **/
+        if(!isRoleNm(roleInfo.getRoleNm()) ||roleInfo.getRoleNm().length() > 64){
+            throw new CustomException(ResultCode.INVALID_LOGIN_ID);
+        }
+        else if(roleInfo.getDescription().length() > 200){
+            throw new CustomException(ResultCode.INVALID_REMARK);
+        }
+        SecurityRoleBean role = null;
+
+        try{
+            role = (SecurityRoleBean) BeanFactory.getInstance().newBean("SecurityRoleBean");
+            role.setSessionInfo(serverSession);
+            role.InitAsNew();
+            role.getSecurityRole().setName(roleInfo.getRoleNm());
+            role.getSecurityRole().setDescription(roleInfo.getDescription());
+            role.save();
+
+        }catch (WebBeanException wbe){
+            if(wbe.getErrorCode() == -2147217373){
+                throw new CustomException(ResultCode.DUPLICATE_ROLE);
+            }
+            else if(wbe.getErrorCode() == -2147213718){
+                throw new CustomException(ResultCode.INVALID_ROLE_NAME);
+            }
+        }
+
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
 
     public ResVO addUser(UserVO userInfo){
         /** 유효성검사 부분 **/
@@ -830,6 +857,35 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    public ResVO modifyRole(RoleVO roleInfo){
+
+        if(!isRoleNm(roleInfo.getRoleNm()) || roleInfo.getRoleNm().length() > 64){
+            throw new CustomException(ResultCode.INVALID_GROUP_NAME);
+        }
+        else if(roleInfo.getDescription().length() > 200){
+            throw new CustomException(ResultCode.INVALID_REMARK);
+        }
+
+        WebObjectSource wos = factory.getObjectSource();
+
+        try {
+            // Getting the User Group Object
+            WebSecurityRole role = (WebSecurityRole) wos.getObject(roleInfo.getRoleId(), EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
+            role.populate();
+            role.setName(roleInfo.getRoleNm());
+            role.setDisplayName(roleInfo.getRoleNm());
+            role.setDescription(roleInfo.getDescription());
+
+            wos.save(role);
+
+        }catch (WebObjectsException ex){
+            throw new CustomException(ResultCode.DUPLICATE_ROLE);
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.DUPLICATE_ROLE);
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
     public ResVO delGroup(String groupId){
         System.out.println(groupId);
         WebObjectSource wos = factory.getObjectSource();
@@ -865,6 +921,26 @@ public class MstrObject extends MstrSession{
         }
         return new ResVO(ResultCode.SUCCESS);
     }
+
+    public ResVO delRole(String roleId){
+        System.out.println(roleId);
+        WebObjectSource wos = factory.getObjectSource();
+
+        try {
+            // Getting the User Group Object
+            WebSecurityRole role = (WebSecurityRole) wos.getObject(roleId, EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
+            // Deleting the User Group Object
+            wos.deleteObject(role);
+
+        }catch (WebObjectsException ex){
+            throw new CustomException(ResultCode.INVALID_ROLE_ID);
+        }catch (IllegalArgumentException iax){
+            throw new CustomException(ResultCode.INVALID_ROLE_ID);
+        }
+        return new ResVO(ResultCode.SUCCESS);
+    }
+
+
     //그룹 정보
     public GroupVO getGroupInfo(String groupId) throws WebObjectsException {
         //ObjectSourcec 객체 생성
@@ -1403,6 +1479,7 @@ the individual names of the licensed users*/
         LicenseSource licenseSource = factory.getLicenseSource();
 
         NamedUserLicense[] namedUserLicenses = licenseSource.getNamedUserCompliance();
+        System.out.println(namedUserLicenses.length);
 
         //Everyone 그룹으로 모든 사용자 검색
         WebUserEntity everyone = (WebUserEntity)objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F",34,true);
