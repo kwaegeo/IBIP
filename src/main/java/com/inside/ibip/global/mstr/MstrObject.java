@@ -43,8 +43,9 @@ public class MstrObject extends MstrSession{
      */
     private WebObjectSource objectSource = factory.getObjectSource();
     private WebDocumentSource documentSource = factory.getDocumentSource();
-
     private WebReportSource reportSource = factory.getReportSource();
+
+    private LicenseSource licenseSource = factory.getLicenseSource();
 
     /**
      * Mstr 세션 적용 함수
@@ -1820,20 +1821,42 @@ the individual names of the licensed users*/
         System.out.println( message);
     }
 
-    public List<LicenseVO> getLicenseList() throws WebObjectsException {
-        //라이센스 이름 (타입), Max 수, 총 유저 수, 활성화 된 수, 비활성화 된 수
-        WebObjectSource objectSource = factory.getObjectSource();
-        LicenseSource licenseSource = factory.getLicenseSource();
+    /**
+     * 라이센스 리스트를 조회한다.
+     * @Method Name   : getLicenseList
+     * @Date / Author : 2023.12.01  이도현
+     * @return 라이센스 객체 리스트
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public List<LicenseVO> getLicenseList(){
 
-        NamedUserLicense[] namedUserLicenses = licenseSource.getNamedUserCompliance();
-        System.out.println(namedUserLicenses.length);
+        //1. named 라이센스 객체, 감사 객체 생성
+        NamedUserLicense[] namedUserLicenses = null;
+        UserLicenseAudit audit = null;
 
-        //Everyone 그룹으로 모든 사용자 검색
-        WebUserEntity everyone = (WebUserEntity)objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F",34,true);
-        UserLicenseAudit audit = licenseSource.auditUsers(everyone);
+        try {
+            //2. 라이센스 객체 초기화
+            namedUserLicenses = licenseSource.getNamedUserCompliance();
 
+            //3. Everyone 그룹으로 모든 사용자 검색
+            WebUserEntity everyone = (WebUserEntity) objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F", 34, true);
+            audit = licenseSource.auditUsers(everyone);
+
+        }catch (WebObjectsException woe){
+            log.error("라이센스 리스트 조회 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("라이센스 리스트 조회 중 그룹 조회 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_GROUP_ID);
+        }
+
+        //4. 응답 라이센스 리스트 객체 생성
         List<LicenseVO> licenseList = new ArrayList<>();
+
         for(int i=0; i< namedUserLicenses.length; i++){
+
+            //5. 총 사용자, 활성화 사용자, 비활성화 사용자 수 조회
             int totalUsage = audit.getLicensedUsers(namedUserLicenses[i].getLicenseType(), EnumDSSXMLAuditUserFilter.DssXmlAuditIgnoreEnabledFlag).size();
             int enableUsage =  audit.getLicensedUsers(namedUserLicenses[i].getLicenseType(), EnumDSSXMLAuditUserFilter.DssXmlAuditEnabledUsers).size();
             int disableUsage =  audit.getLicensedUsers(namedUserLicenses[i].getLicenseType(), EnumDSSXMLAuditUserFilter.DssXmlAuditDisabledUsers).size();
@@ -1849,55 +1872,91 @@ the individual names of the licensed users*/
 
             licenseList.add(license);
         }
+        //6. 응답
         return licenseList;
     }
 
-    public LicenseVO getLicenseInfo(int licenseType) throws WebObjectsException {
-        //라이센스 이름 (타입), Max 수, 총 유저 수, 활성화 된 수, 비활성화 된 수
-        WebObjectSource objectSource = factory.getObjectSource();
-        LicenseSource licenseSource = factory.getLicenseSource();
-        NamedUserLicense[] namedUserLicenses = licenseSource.getNamedUserCompliance();
+    /**
+     * 라이센스 정보 조회
+     * @Method Name   : getLicenseList
+     * @Date / Author : 2023.12.01  이도현
+     * @param licenseType 라이센스 타입
+     * @return 라이센스 객체 리스트
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public LicenseVO getLicenseInfo(int licenseType){
 
-        //Everyone 그룹으로 모든 사용자 검색
-        WebUserEntity everyone = (WebUserEntity)objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F",34,true);
+        //1. named 라이센스 객체, 감사 객체 생성
+        NamedUserLicense[] namedUserLicenses = null;
+        UserLicenseAudit audit = null;
 
-        UserLicenseAudit audit = licenseSource.auditUsers(everyone);
+        try {
+            //2. 라이센스 객체 초기화
+            namedUserLicenses = licenseSource.getNamedUserCompliance();
+
+            //3. Everyone 그룹으로 모든 사용자 검색
+            WebUserEntity everyone = (WebUserEntity) objectSource.getObject("C82C6B1011D2894CC0009D9F29718E4F", 34, true);
+            audit = licenseSource.auditUsers(everyone);
+        }catch (WebObjectsException woe){
+            log.error("라이센스 정보 조회 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("라이센스 정보 조회 중 그룹 조회 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_GROUP_ID);
+        }
+
+        //4. 활성화 라이센스 유저, 비활성화 라이센스 유저 객체 생성
         LicensedUsers enableLicensedUsers = audit.getLicensedUsers(licenseType, EnumDSSXMLAuditUserFilter.DssXmlAuditEnabledUsers);
         LicensedUsers disableLicensedUsers = audit.getLicensedUsers(licenseType, EnumDSSXMLAuditUserFilter.DssXmlAuditDisabledUsers);
 
+        //5. 파싱 객체 생성
         List<UserVO> enableUsers = new ArrayList<>();
         List<UserVO> disableUsers = new ArrayList<>();
 
+        //6. 활성화 사용자 파싱
         for(int i=0; i<enableLicensedUsers.size(); i++){
-            WebUser webUser = (WebUser) enableLicensedUsers.get(i);
-            webUser.populate();
-            UserVO user = UserVO.builder().
-                    userId(webUser.getID()).
-                    loginID(webUser.getLoginName()).
-                    userNm(webUser.getDisplayName()).
-                    owner(webUser.getOwner().getDisplayName()).
-                    modification(webUser.getModificationTime()).
-                    description(webUser.getDescription()).
-                    enableStatus(webUser.isEnabled()).
-                    build();
-            enableUsers.add(user);
+            try {
+                WebUser webUser = (WebUser) enableLicensedUsers.get(i);
+                webUser.populate();
+                UserVO user = UserVO.builder().
+                        userId(webUser.getID()).
+                        loginID(webUser.getLoginName()).
+                        userNm(webUser.getDisplayName()).
+                        owner(webUser.getOwner().getDisplayName()).
+                        modification(webUser.getModificationTime()).
+                        description(webUser.getDescription()).
+                        enableStatus(webUser.isEnabled()).
+                        build();
+                enableUsers.add(user);
+            }catch (WebObjectsException woe){
+                log.error("라이센스 리스트 조회 중 에러 발생 [Error msg] :" + woe.getMessage());
+                throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+            }
         }
 
+        //7. 비활성화 사용자 파싱
         for(int i=0; i<disableLicensedUsers.size(); i++){
-            WebUser webUser = (WebUser) disableLicensedUsers.get(i);
-            webUser.populate();
-            UserVO user = UserVO.builder().
-                    userId(webUser.getID()).
-                    loginID(webUser.getLoginName()).
-                    userNm(webUser.getDisplayName()).
-                    owner(webUser.getOwner().getDisplayName()).
-                    modification(webUser.getModificationTime()).
-                    description(webUser.getDescription()).
-                    enableStatus(webUser.isEnabled()).
-                    build();
-            disableUsers.add(user);
+            try{
+                WebUser webUser = (WebUser) disableLicensedUsers.get(i);
+                webUser.populate();
+                UserVO user = UserVO.builder().
+                        userId(webUser.getID()).
+                        loginID(webUser.getLoginName()).
+                        userNm(webUser.getDisplayName()).
+                        owner(webUser.getOwner().getDisplayName()).
+                        modification(webUser.getModificationTime()).
+                        description(webUser.getDescription()).
+                        enableStatus(webUser.isEnabled()).
+                        build();
+                disableUsers.add(user);
+             }catch (WebObjectsException woe){
+                log.error("라이센스 리스트 조회 중 에러 발생 [Error msg] :" + woe.getMessage());
+                throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+             }
         }
 
+        //8. 라이센스 권한(파싱)
         LicenseVO licenseInfo = new LicenseVO();
         for(int i=0; i<namedUserLicenses.length; i++){
             if(licenseType == namedUserLicenses[i].getLicenseType()){
@@ -1906,6 +1965,7 @@ the individual names of the licensed users*/
             }
         }
 
+        //9. 응답 값 설정
         licenseInfo.setEnableUsers(enableUsers);
         licenseInfo.setDisableUsers(disableUsers);
 

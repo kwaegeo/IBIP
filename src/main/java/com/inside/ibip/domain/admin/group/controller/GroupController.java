@@ -76,7 +76,7 @@ public class GroupController {
      * @param request request 객체
      * @param response response 객체
      * @param model model 객체
-     * @return 그룹 객체
+     * @return 정보 페이지
      * @History
      * 2023.12.01	최초생성
      *

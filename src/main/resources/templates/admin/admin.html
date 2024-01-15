@@ -655,7 +655,7 @@
 
     function getLicenseList(){
         $.ajax({
-            url: '/getLicenseList',
+            url: '/license/get/list',
             method: 'POST',
             dataType: "json",
             success: function (responseData) {
@@ -746,7 +746,7 @@
     }
 
     function getLicenseInfo(licenseType){
-        window.open("/licenseInfo?licenseType="+licenseType,'','width=995,height=813,location=no,status=no,scrollbars=yes');
+        window.open("/license/get/info?licenseType="+licenseType,'','width=995,height=813,location=no,status=no,scrollbars=yes');
     }
 
     function getNoticeInfo(noticeId){
