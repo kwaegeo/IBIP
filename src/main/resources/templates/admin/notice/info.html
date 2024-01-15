@@ -7,15 +7,15 @@
         <title>공지사항</title>
 
 
-        <link rel="stylesheet" href="assets/css/style2.css" />
+        <link rel="stylesheet" href="/assets/css/style2.css" />
 
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
         <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
 
 
         <!-- JS -->
-        <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
-        <script type="text/javascript" src="assets/js/common.js" defer></script>
+        <script type="text/javascript" src="/assets/js/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript" src="/assets/js/common.js" defer></script>
 
 
         <link rel="stylesheet" href="/css/summernote/summernote-lite.css" />
@@ -138,7 +138,7 @@
                 const data = {"noticeId": noticeId, "title": title, "content": content, "popupYn": popupYn};
 
                 $.ajax({
-                    url: "/noticeModifyProc",
+                    url: "/notice/modify",
                     data: JSON.stringify(data),
                     method: "POST",
                     dataType: "json",
@@ -164,7 +164,7 @@
             if(confirm("해당 공지사항을 정말로 삭제하시겠습니까? \n삭제 후엔 되돌릴 수 없습니다." )) {
                 //2.1 사용자 할당 요청
                 $.ajax({
-                    url: "/noticeDelProc",
+                    url: "/notice/delete",
                     data: JSON.stringify({"noticeId": noticeId}),
                     contentType: "application/json",
                     method: "POST",

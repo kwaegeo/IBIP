@@ -214,19 +214,6 @@
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                내정보
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                환경설정
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                접속 이력
-                            </a>
-                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 로그아웃
@@ -1407,7 +1394,7 @@
 
     function getPopup(){
         $.ajax({
-            url: '/getNoticePopupList',
+            url: '/notice/get/popup/list',
             method: 'GET',
             dataType: "json",
             success: function (responseData) {
@@ -1417,7 +1404,7 @@
                         var cookieVal = getCookie(responseData[i]);
                         console.log(cookieVal);
                         if(cookieVal !== 'done') {
-                            window.open('/getNoticePopup?noticeId=' + responseData[i], '', 'width=560,height=580,location=no,status=no,scrollbars=yes');
+                            window.open('/notice/get/popup?noticeId=' + responseData[i], '', 'width=560,height=580,location=no,status=no,scrollbars=yes');
                         }
                     }
                 }
