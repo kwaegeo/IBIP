@@ -611,50 +611,72 @@ public class MstrObject extends MstrSession{
         return groupList;
     }
 
-    public List<UserVO> getUserList() throws WebObjectsException {
+    /**
+     * 사용자 리스트를 조회한다.
+     * @Method Name   : getUserList
+     * @Date / Author : 2023.12.01  이도현
+     * @return 사용자 객체 리스트
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public List<UserVO> getUserList(){
 
-        WebObjectSource wos = factory.getObjectSource();
-
-        WebSearch search = wos.getNewSearchObject();
-
-        search.setNamePattern("*" + "" + "*");
-        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
-        search.setAsync(false);
-        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser);
-        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-
-        search.submit();
-        WebFolder f = search.getResults();
-
-        System.out.println("사용자 총 갯수: " + f.size());
-
+        //1. 결과 객체 생성
         List<UserVO> userList = new ArrayList<>();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //1-1. WebSearch 객체 생성
+        try{
+            WebSearch search = objectSource.getNewSearchObject();
 
-        if (f.size() > 0) {
-            for (int i = 0; i < f.size(); i++) {
-                WebUser user= (WebUser) f.get(i);
-                user.populate();
-                SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
-                Date modification = null;
-                try {
-                    modification = originalFormat.parse(user.getModificationTime());
-                }catch (Exception e){}
-                if(!user.isGroup()){
-                    userList.add(UserVO.builder().
-                            enableStatus(user.isEnabled()).
-                            userId(user.getID()).
-                            loginID(user.getLoginName()).
-                            userNm(user.getDisplayName()).
-                            owner(user.getOwner().getDisplayName()).
-                            modification(sdf.format(modification)).
-                            description(user.getDescription()).
-                            build()
-                    );
+            //2. 검색 설정 (패턴, 타입, 도메인)
+            search.setNamePattern("*" + "" + "*");
+            search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+            search.setAsync(false);
+            search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser);
+            search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+            //3. 검색
+            search.submit();
+            //4. 결과 값 파싱
+            WebFolder f = search.getResults();
+
+            //5. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date modification = null;
+
+            //6. 결과 만큼 반복하여 사용자 정보 파싱
+            if (f.size() > 0) {
+                for (int i = 0; i < f.size(); i++) {
+                    WebUser user = (WebUser) f.get(i);
+
+                    /**populate로 인한 속도 저하 문제 (해결 가능한지 확인) **/
+                    user.populate();
+                    try {
+                        modification = originalParser.parse(user.getModificationTime());
+                    } catch (Exception e) {
+                        log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                        throw new CustomException(ResultCode.INVALID_CREATION_TIME);
+                    }
+                    if (!user.isGroup()) {
+                        UserVO userResult = UserVO.builder().
+                                enableStatus(user.isEnabled()).
+                                userId(user.getID()).
+                                loginID(user.getLoginName()).
+                                userNm(user.getDisplayName()).
+                                owner(user.getOwner().getDisplayName()).
+                                modification(normalParser.format(modification)).
+                                description(user.getDescription()).
+                                build();
+                        userList.add(userResult);
+                    }
                 }
             }
+        }catch(WebObjectsException woe){
+            log.error("사용자 리스트 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
+        //7. 반환
         return userList;
     }
 
@@ -796,26 +818,48 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
-
+    /**
+     * 사용자 생성
+     * @Method Name   : addUser
+     * @Date / Author : 2023.12.01  이도현
+     * @param userInfo group 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO addUser(UserVO userInfo){
-        /** 유효성검사 부분 **/
+
+        //1. 사용자 로그인 ID 유효성 검사
         if(!isUserNm(userInfo.getLoginID()) ||userInfo.getLoginID().length() > 64){
             throw new CustomException(ResultCode.INVALID_LOGIN_ID);
         }
+
+        //1-1. 사용자 명 유효성 검사
         else if(!isUserNm(userInfo.getUserNm()) || userInfo.getUserNm().length() > 64){
             throw new CustomException(ResultCode.INVALID_USER_NAME);
         }
+
+        //1-2. 사용자 패스워드 유효성 검사
         else if(!userInfo.getPassword1().equals(userInfo.getPassword2())){
             throw new CustomException(ResultCode.INVALID_PASSWORD);
         }
+
+        //1-3. 사용자 패스워드 유효성 검사
         else if(!isPasswordValid(userInfo.getPassword1(),userInfo.getUserNm())){
             throw new CustomException(ResultCode.INVALID_PASSWORD_POLICY);
         }
+
+        //1-4. 설명 유효성 검사
         else if(userInfo.getDescription().length() > 200){
             throw new CustomException(ResultCode.INVALID_REMARK);
         }
 
+        //3. 사용자 객체 생성
         UserBean user = null;
+
+        //4. 생성
         try {
             user = (UserBean)BeanFactory.getInstance().newBean("UserBean");
             user.setSessionInfo(serverSession);
@@ -830,12 +874,14 @@ public class MstrObject extends MstrSession{
             loginInfo.setPassword(userInfo.getPassword1());
             user.save();
 
-        } catch (WebBeanException ex) {
-            if(ex.getErrorCode() == -2147213795){
+        } catch (WebBeanException wbe) {
+            if(wbe.getErrorCode() == -2147213795){
+                log.error("사용자 생성 중 중복 로그인 ID 에러 발생 [Error msg] :" + wbe.getMessage());
                 throw new CustomException(ResultCode.EXIST_LOGIN_ID);
             }
-            System.out.println(ex.getErrorCode());
-            System.out.println(ex.getMessage());
+            else{
+                throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+            }
         }
         return new ResVO(ResultCode.SUCCESS);
     }
@@ -879,40 +925,56 @@ public class MstrObject extends MstrSession{
             log.error("그룹 생성 중 중복 그룹명 에러 발생 [Error msg] :" + woe.getMessage());
             throw new CustomException(ResultCode.DUPLICATE_GROUP);
         }catch (IllegalArgumentException iae){
-            log.error("그룹 생성 중 유효성 에러 발생 [Error msg] :" + iae.getMessage());
+            log.error("그룹 생성 중 그룹 조회 에러 발생 [Error msg] :" + iae.getMessage());
             throw new CustomException(ResultCode.INVALID_GROUP_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    /**
+     * 사용자 수정
+     * @Method Name   : modifyUser
+     * @Date / Author : 2023.12.01  이도현
+     * @param userInfo user 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO modifyUser(UserVO userInfo){
 
+        //1. 사용자 로그인ID 유효성 검사
         if(!isUserNm(userInfo.getLoginID()) ||userInfo.getLoginID().length() > 64){
             throw new CustomException(ResultCode.INVALID_LOGIN_ID);
         }
+        //2. 사용자명 유효성 검사
         else if(!isUserNm(userInfo.getUserNm()) || userInfo.getUserNm().length() > 64){
             throw new CustomException(ResultCode.INVALID_USER_NAME);
         }
+        //3. 설명 유효성 검사
         else if(userInfo.getDescription().length() > 200){
             throw new CustomException(ResultCode.INVALID_REMARK);
         }
 
-        WebObjectSource wos = factory.getObjectSource();
-
         try {
-            // Getting the User Group Object
-            WebUser user = (WebUser) wos.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            //4. 사용자 객체 생성
+            WebUser user = (WebUser) objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
+            //5. 정보 삽입 (사용자명, 설명, 로그인ID)
             user.setFullName(userInfo.getUserNm());
             user.setDescription(userInfo.getDescription());
             user.setLoginName(userInfo.getLoginID());
 
-            wos.save(user);
+            //6. 저장
+            objectSource.save(user);
 
-        }catch (WebObjectsException ex){
+        }catch (WebObjectsException woe){
+            log.error("사용자 생성 중 중복 로그인ID 에러 발생 [Error msg] :" + woe.getMessage());
             throw new CustomException(ResultCode.EXIST_LOGIN_ID);
-        }catch (IllegalArgumentException iax){
-            throw new CustomException(ResultCode.EXIST_LOGIN_ID);
+        }catch (IllegalArgumentException iae){
+            log.error("사용자 생성 중성 사용자 조회 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_USER_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
     }
@@ -975,19 +1037,30 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
-    public ResVO delUser(String userId){
-        System.out.println(userId);
-        WebObjectSource wos = factory.getObjectSource();
+    /**
+     * 사용자 삭제
+     * @Method Name   : deleteUser
+     * @Date / Author : 2023.12.01  이도현
+     * @param userId 삭제할 사용자 정보
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public ResVO deleteUser(String userId){
 
         try {
-            // Getting the User Group Object
-            WebUser user = (WebUser) wos.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
-            // Deleting the User Group Object
-            wos.deleteObject(user);
+            //1. 사용자 객체 조회
+            WebUser user = (WebUser) objectSource.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            //2. 사용자 객체 삭제
+            objectSource.deleteObject(user);
 
-        }catch (WebObjectsException ex){
-            throw new CustomException(ResultCode.INVALID_USER_ID);
-        }catch (IllegalArgumentException iax){
+        }catch (WebObjectsException woe){
+            log.error("사용자 삭제 중 MSTR 연계 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("사용자 삭제 중 그룹 조회 에러 발생 [Error msg] :" + iae.getMessage());
             throw new CustomException(ResultCode.INVALID_USER_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
@@ -1029,20 +1102,32 @@ public class MstrObject extends MstrSession{
         GroupVO groupInfo = null;
 
         try {
-            //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+            //2. MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
             WebObjectInfo woi = objectSource.getObject(groupId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
-            //채워넣기
+            //2-1. 채워넣기
             woi.populate();
 
-            // 사용자 그룹 객체
+            //2-2. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date creationTime = null;
+
+            try {
+                creationTime = originalParser.parse(woi.getCreationTime());
+            } catch (Exception e) {
+                log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                throw new CustomException(ResultCode.INVALID_CREATION_TIME);
+            }
+
+            //3. 사용자 그룹 객체 세팅
             WebUserGroup group = (WebUserGroup) woi;
             group.populate();
              groupInfo =GroupVO.builder().
                         groupId(group.getID()).
                         groupNm(group.getDisplayName()).
                         childCnt(group.getTotalChildCount()).
-                        creationTime(group.getCreationTime()).
+                        creationTime(normalParser.format(creationTime)).
                         description(group.getDescription()).
                         owner(group.getOwner().getDisplayName()).
                         build();
@@ -1054,47 +1139,58 @@ public class MstrObject extends MstrSession{
         return groupInfo;
     }
 
-    public UserVO getUserInfoById(String userId) throws WebObjectsException {
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
+    /**
+     * 사용자 정보 조회 (ID)
+     * @Method Name   : getUserInfoById
+     * @Date / Author : 2023.12.01  이도현
+     * @param userId 조회할 사용자의 Id
+     * @return 사용자 정보 객체
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public UserVO getUserInfoById(String userId){
 
-        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
-        objectSource.setFlags(objectSource.getFlags()|EnumDSSXMLObjectFlags.DssXmlObjectComments);
-        WebObjectInfo woi = objectSource.getObject(userId ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+        //1. 응답할 객체 생성
+        UserVO userInfo = null;
 
-        //채워넣기
-        woi.populate();
+        try{
+            //2. MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+            WebObjectInfo woi = objectSource.getObject(userId ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
-        // 사용자 그룹 객체
-        WebUser user = (WebUser) woi;
-        user.populate();
-        UserVO userInfo = UserVO.builder().
-                userId(user.getID()).
-                loginID(user.getLoginName()).
-                userNm(user.getDisplayName()).
-                owner(user.getOwner().getDisplayName()).
-                modification(user.getModificationTime()).
-                description(user.getDescription()).
-                enableStatus(user.isEnabled()).
-                build();
-        WebUserList wul = user.getParents();
+            //2-1. 채워넣기
+            woi.populate();
 
-        System.out.println(wul.size());
-        System.out.println(user.getAbbreviation());
-        Enumeration  enumeration = wul.elements();
-        WebObjectInfo enumWoi = null;
-        // 객체 수 만큼 반복
-        while(enumeration.hasMoreElements()) {
+            //2-2. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date modification = null;
 
-            //그룹 채워넣기
-            enumWoi = (WebObjectInfo) enumeration.nextElement();
+            try {
+                modification = originalParser.parse(woi.getModificationTime());
+            } catch (Exception e) {
+                log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                throw new CustomException(ResultCode.INVALID_CREATION_TIME);
+            }
 
-            //WEBUSER로 캐스팅 불가능 한 것은 try catch로 묶던가 하자
-            enumWoi.populate();
-            System.out.println(enumWoi.getDisplayName());
-            System.out.println(enumWoi.getID());
+            //3. 사용자 객체 세팅
+            WebUser user = (WebUser) woi;
+            user.populate();
+            userInfo = UserVO.builder().
+                    userId(user.getID()).
+                    loginID(user.getLoginName()).
+                    userNm(user.getDisplayName()).
+                    owner(user.getOwner().getDisplayName()).
+                    modification(normalParser.format(modification)).
+                    description(user.getDescription()).
+                    enableStatus(user.isEnabled()).
+                    build();
+
+        }catch (WebObjectsException woe){
+            log.error("사용자 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
-
         return userInfo;
     }
 
@@ -1272,29 +1368,44 @@ public class MstrObject extends MstrSession{
             search.submit();
             WebFolder f = search.getResults();
 
+            //3-3. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date modification = null;
+
             if (f.size() > 0) {
                 for (int i = 0; i < f.size(); i++) {
                     WebUser user = (WebUser) f.get(i);
                     user.populate();
+
+                    //할당되어진 ID와 비교하여 포함되어져있으면 표시
                     if (!user.isGroup()) {
                         String assignYn = "N";
 
-                        // Check if the user ID is in assignIds
+
                         if (assignIds.contains(user.getID())) {
                             assignYn = "Y";
                         }
 
-                        users.add(UserVO.builder().
+                        try {
+                            modification = originalParser.parse(user.getModificationTime());
+                        } catch (Exception e) {
+                            log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                            throw new CustomException(ResultCode.INVALID_CREATION_TIME);
+                        }
+
+                        UserVO userResult = UserVO.builder().
                                 userId(user.getID()).
                                 loginID(user.getLoginName()).
                                 userNm(user.getDisplayName()).
                                 owner(user.getOwner().getDisplayName()).
-                                modification(user.getModificationTime()).
+                                modification(normalParser.format(modification)).
                                 description(user.getDescription()).
                                 assignYn(assignYn).
                                 enableStatus(user.isEnabled()).
-                                build()
-                        );
+                                build();
+
+                        users.add(userResult);
                     }
                 }
             }
@@ -1305,74 +1416,119 @@ public class MstrObject extends MstrSession{
         return groupInfo;
     }
 
-    public UserVO getUserGroupList(UserVO userInfo) throws WebObjectsException {
+    /**
+     * 사용자에 부모(그룹) 정보 조회
+     * @Method Name   : getUserGroupList
+     * @Date / Author : 2023.12.01  이도현
+     * @param userInfo 사용자 정보 객체
+     * @return 사용자 정보 객체
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public UserVO getUserGroupList(UserVO userInfo){
 
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
+        WebObjectInfo woi = null;
 
-        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
-        WebObjectInfo woi = objectSource.getObject(userInfo.getUserId() ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+        try {
 
-        //채워넣기
-        woi.populate();
+            //1. 사용자 Id로 정보 조회
+            woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
-        // 사용자 그룹 객체
+            //1-1. 사용자 정보 채워넣기
+            woi.populate();
+        }catch (WebObjectsException woe){
+            log.error("사용자 정보의 그룹 리스트 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.INVALID_USER_ID);
+        }
+
+        //1-2. 사용자 그룹 객체로 캐스팅
         WebUser user = (WebUser) woi;
-        user.populate();
+        try {
+            user.populate();
+        }catch (WebObjectsException woe){
+            log.error("사용자 정보의 그룹 리스트 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }
+
+        //1-3. 사용자에 할당 된 부모(그룹) 파싱
         WebUserList wul = user.getParents();
         Enumeration  enumeration = wul.elements();
-
         WebObjectInfo enumWoi = null;
+
+        //1-3.1 할당된 그룹 ID를 저장할 리스트 생성
         List<String> assignIds = new ArrayList<>();
 
-        // 객체 수 만큼 반복
+        //1-4. 그룹 수 만큼 반복
         while(enumeration.hasMoreElements()) {
 
-            //그룹 채워넣기
+            //1-4.1 그룹 채워넣기 및 리스트에 저장
             enumWoi = (WebObjectInfo) enumeration.nextElement();
-
-            //WEBUSER로 캐스팅 불가능 한 것은 try catch로 묶던가 하자
             assignIds.add(enumWoi.getID());
         }
 
+        //2. 모든 그룹 검색을 위한 검색 객체 생성
         WebSearch search = objectSource.getNewSearchObject();
 
+        //2-1. 검색 조건 설정
         search.setNamePattern("*" + "" + "*");
         search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
         search.setAsync(false);
         search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
         search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-        search.submit();
-        WebFolder f = search.getResults();
 
-        List<GroupVO> groups = new ArrayList<>();
-        System.out.println("그룹 총 갯수: " + f.size());
-        System.out.println(assignIds);
-        userInfo.setParentsGroups(groups);
+        try {
 
-        if (f.size() > 0) {
-            for (int i = 0; i < f.size(); i++) {
-                WebUserGroup group= (WebUserGroup) f.get(i);
-                group.populate();
-                if(group.isGroup()){
-                    String assignYn = "N";
+            //2-2. 검색 및 결과 전달
+            search.submit();
+            WebFolder f = search.getResults();
 
-                    // Check if the user ID is in assignIds
-                    if (assignIds.contains(group.getID())) {
-                        assignYn = "Y";
+            List<GroupVO> groups = new ArrayList<>();
+            userInfo.setParentsGroups(groups);
+
+            //2-3. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date creationTime = null;
+
+            if (f.size() > 0) {
+                for (int i = 0; i < f.size(); i++) {
+                    WebUserGroup group = (WebUserGroup) f.get(i);
+                    group.populate();
+
+                    //할당되어진 ID와 비교하여 포함되어져있으면 표시
+                    if (group.isGroup()) {
+                        String assignYn = "N";
+
+                        if (assignIds.contains(group.getID())) {
+                            assignYn = "Y";
+                        }
+
+                        try {
+                            creationTime = originalParser.parse(group.getCreationTime());
+                        } catch (Exception e) {
+                            log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                            throw new CustomException(ResultCode.INVALID_CREATION_TIME);
+                        }
+
+                        GroupVO groupResult = GroupVO.builder().
+                                groupId(group.getID()).
+                                groupNm(group.getName()).
+                                childCnt(group.getTotalChildCount()).
+                                description(group.getDescription()).
+                                creationTime(normalParser.format(creationTime)).
+                                owner(group.getOwner().getName()).
+                                assignYn(assignYn).
+                                build();
+
+                        groups.add(groupResult);
                     }
-                    GroupVO groupEn = GroupVO.builder().
-                            groupId(group.getID()).
-                            groupNm(group.getName()).
-                            childCnt(group.getTotalChildCount()).
-                            description(group.getDescription()).
-                            creationTime(group.getCreationTime()).
-                            owner(group.getOwner().getName()).
-                            assignYn(assignYn).
-                            build();
-                    groups.add(groupEn);
                 }
             }
+        }catch (WebObjectsException woe){
+            log.error("사용자 정보의 그룹 리스트 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
         return userInfo;
     }
@@ -1466,19 +1622,41 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    /**
+     * 사용자 그룹 할당
+     * @Method Name   : assignUser
+     * @Date / Author : 2023.12.01  이도현
+     * @param userInfo user 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO assignUser(UserVO userInfo) {
 
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
-
+        WebObjectInfo woi = null;
         try {
-            WebObjectInfo woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            //1. 사용자 조회
+            woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+        }catch (WebObjectsException woe){
+            log.error("사용자 그룹 할당 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("사용자 그룹 할당 중 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_USER_ID);
+        }
 
             WebUser user = (WebUser) woi;
+
+        try{
             if(user!=null){
                 for(int i=0; i<userInfo.getParentsGroups().size(); i++){
+
+                    //2. 할당, 회수할 그룹 조회
                     WebUserGroup groups = (WebUserGroup) objectSource.getObject(userInfo.getParentsGroups().get(i).getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
-                    //Add user to group
+
+                    //3. 분기에 맞게 할당 혹은 회수 처리
                     if(groups!=null){
                         if("assign".equals(userInfo.getAssignmentType())){
                             groups.getMembers().add(user);
@@ -1487,57 +1665,94 @@ public class MstrObject extends MstrSession{
                             groups.getMembers().remove(user);
                         }
                     }
-                    //Save the group object
+                    //4. 저장
                     objectSource.save(groups);
                 }
             }
-
-        } catch (WebObjectsException e) {
-            return new ResVO(ResultCode.ERROR_ADD_USER);
+        }catch (WebObjectsException woe){
+            log.error("사용자 그룹 할당 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.ERROR_ADD_USER);
+        }catch (IllegalArgumentException iae){
+            log.error("사용자 그룹 할당 중 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_GROUP_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    /**
+     * 사용자 계정 활성화/비활성화
+     * @Method Name   : enableAccount
+     * @Date / Author : 2023.12.01  이도현
+     * @param userInfo 조회할 사용자 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO enableAccount(UserVO userInfo) {
 
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
-        System.out.println(userInfo.isEnableStatus());
         try {
-            WebObjectInfo woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
+            //1. 사용자 Id로 객체 조회
+            WebObjectInfo woi = objectSource.getObject(userInfo.getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
             WebUser user = (WebUser) woi;
             user.populate();
+
+            //2. 계정 활성화
             user.setEnabled(userInfo.isEnableStatus());
-            String[] name=new String[1];
-            name[0]="kim";
-            user.setComments(name);
+
+            //3. 저장
             objectSource.save(user);
 
-        } catch (WebObjectsException e) {
-            return new ResVO(ResultCode.INVALID_USER_ID);
-        } catch(IllegalArgumentException iax){
+        } catch (WebObjectsException woe) {
+            log.error("사용자계정 활성화 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        } catch(IllegalArgumentException iae){
+            log.error("사용자 계정 활성화 중 사용자 조회 에러 발생 [Error msg] :" + iae.getMessage());
             return new ResVO(ResultCode.INVALID_USER_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    /**
+     * 사용자 비밀번호 초기화
+     * @Method Name   : resetPassword
+     * @Date / Author : 2023.12.01  이도현
+     * @param userId 조회할 사용자의 Id
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO resetPassword(String userId){
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
 
         try {
-            WebObjectInfo woi = objectSource.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
+            //1. 사용자 Id로 객체 조회
+            WebObjectInfo woi = objectSource.getObject(userId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
             WebUser user = (WebUser) woi;
+
+            //2. 사용자 로그인 객체 조회
             WebStandardLoginInfo loginInfo = user.getStandardLoginInfo();
+
+            //3. 비밀번호 설정
             loginInfo.setPassword("12345678");
+
+            //4. 저장
             objectSource.save(user);
-        } catch (WebObjectsException ex) {
-            if(ex.getErrorCode() == -2147180957){
+        } catch (WebObjectsException woe) {
+            if(woe.getErrorCode() == -2147180957){
+                log.error("사용자 비밀번호 초기화 중 (비밀번호 정책) 에러 발생 [Error msg] :" + woe.getMessage());
                 throw new CustomException(ResultCode.INVALID_PASSWORD_POLICY);
             }
-        }catch (IllegalArgumentException iax){
+            else{
+                log.error("사용자 비밀번호 초기화 중 에러 발생 [Error msg] :" + woe.getMessage());
+                throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+            }
+        }catch (IllegalArgumentException iae){
+            log.error("사용자 비밀번호 초기화 중 사용자 조회 에러 발생 [Error msg] :" + iae.getMessage());
             throw new CustomException(ResultCode.INVALID_USER_ID);
         }
         return new ResVO(ResultCode.SUCCESS);

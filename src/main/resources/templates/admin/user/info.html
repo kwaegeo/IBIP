@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>사용자 정보</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/style2.css" />
+    <link rel="stylesheet" href="/assets/css/style2.css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
     <!-- JS -->
-    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="assets/js/common.js" defer></script>
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <script type="text/javascript" src="/assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="/assets/js/common.js" defer></script>
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
   </head>
 
@@ -241,7 +241,7 @@
 
         //2.1 사용자 할당 요청
         $.ajax({
-          url: "/userManageAssignment",
+          url: "/user/assign",
           data: JSON.stringify(data),
           contentType: "application/json",
           method: "POST",
@@ -315,7 +315,7 @@
       }
       const data = {"userId":userId, "loginID": newLoginId, "userNm": userNm, "description": description};
       $.ajax({
-        url: "/userModifyProc",
+        url: "/user/modify",
         data: JSON.stringify(data),
         method: "POST",
         dataType: "json",
@@ -342,7 +342,7 @@
     if(confirm("해당 사용자의 비밀번호를 정말로 초기화 하시겠습니까? \n초기화 후엔 되돌릴 수 없습니다." )) {
       //2.1 사용자 할당 요청
       $.ajax({
-        url: "/resetPassword",
+        url: "/user/reset/password",
         data: JSON.stringify({"userId": userId}),
         contentType: "application/json",
         method: "POST",
@@ -380,7 +380,7 @@
 
       //2.1 사용자 할당 요청
       $.ajax({
-        url: "/enableAccount",
+        url: "/user/enable/status",
         data: JSON.stringify({"userId": userId, "enableStatus": enable}),
         contentType: "application/json",
         method: "POST",
@@ -410,7 +410,7 @@
     if(confirm("("+userNm+") 사용자를 정말로 삭제하시겠습니까? \n삭제 후엔 되돌릴 수 없습니다.")) {
       //2.1 사용자 할당 요청
       $.ajax({
-        url: "/userDelProc",
+        url: "/user/delete",
         data: JSON.stringify({"userId": userId}),
         contentType: "application/json",
         method: "POST",

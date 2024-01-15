@@ -2,10 +2,8 @@ package com.inside.ibip.domain.admin.group.controller;
 
 import com.inside.ibip.domain.admin.group.service.GroupService;
 import com.inside.ibip.domain.admin.group.vo.GroupVO;
-import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
 import com.inside.ibip.global.vo.ResVO;
-import com.microstrategy.web.objects.WebObjectsException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -105,8 +103,8 @@ public class GroupController {
     }
 
     /**
-     * 그룹 생성
-     * @Method Name   : getGroupInfo
+     * 그룹 생성 페이지 조회
+     * @Method Name   : groupAdd
      * @Date / Author : 2023.12.01  이도현
      * @param request request 객체
      * @param response response 객체

@@ -70,6 +70,7 @@ public enum ResultCode {
 
     INVALID_ROLE_ID("E27", "해당 보안역할이 이미 삭제되었거나 존재하지 않습니다."),
 
+    INVALID_POLICY("E28", "MSTR 리소스 엑세스에 대한 권한이 없습니다. 관리자에게 문의하여 필요한 권한이 부여되었는지 확인하세요."),
 
     MSTR_ETC_ERROR("M99","MSTR 연계 중 문제가 발생하였습니다. IntelligenceServer가  정상적으로 동작하는지 확인해주세요.");
 

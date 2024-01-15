@@ -497,7 +497,7 @@
 
     function getUserList(){
         $.ajax({
-            url: '/getUserList',
+            url: '/user/get/list',
             method: 'POST',
             dataType: "json",
             success: function (responseData) {
@@ -507,7 +507,7 @@
                 <div class="container-fluid" name="">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h5 class="text-gray-800 md-18">사용자 관리 총 <strong style="color: #007ca5">${responseData.length}</strong>건</h5>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-dg shadow-sm" onclick="window.open('/userAdd', '', 'width=1000,height=540,location=no,status=no,scrollbars=yes')">사용자 생성</a>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-dg shadow-sm" onclick="window.open('/user/add', '', 'width=1000,height=540,location=no,status=no,scrollbars=yes')">사용자 생성</a>
                     </div>
 
                     <div class="rows">
@@ -745,7 +745,7 @@
     }
 
     function getUserInfo(userId){
-        window.open("/userInfo?userId="+userId,'', 'width=995,height=813,location=no,status=no,scrollbars=yes');
+        window.open("/user/get/info?userId="+userId,'', 'width=995,height=813,location=no,status=no,scrollbars=yes');
     }
 
     function getRoleInfo(roleId){

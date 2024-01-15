@@ -3,11 +3,9 @@ package com.inside.ibip.domain.admin.group.service;
 import com.inside.ibip.domain.admin.group.vo.GroupVO;
 import com.inside.ibip.global.mstr.MstrObject;
 import com.inside.ibip.global.vo.ResVO;
-import com.microstrategy.web.objects.WebObjectsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 
@@ -61,7 +59,7 @@ public class GroupService {
 
     /**
      * 그룹 수정
-     * @Method Name   : groupModifyProc
+     * @Method Name   : modifyGroup
      * @Date / Author : 2023.12.01  이도현
      * @param groupInfo group 정보 객체
      * @return 성공 유무

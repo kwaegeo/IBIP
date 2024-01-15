@@ -65,7 +65,13 @@ public class MstrSession {
                 log.info("프로젝트 명이 잘못되었습니다.");
                 throw new CustomException(ResultCode.UNREGISTERED_PROJECT);
             }
+            else if(ex.getErrorCode() == -2147479445){
+                log.info("MSTR 리소스 엑세스에 대한 권한이 없습니다.");
+                throw new CustomException(ResultCode.INVALID_POLICY);
+            }
             else {
+                System.out.println(ex.getErrorCode());
+                System.out.println(ex.getMessage());
                 ex.printStackTrace();
                 log.info("MSTR 세션을 생성하는 도중 문제가 발생하였습니다. ");
                 throw new CustomException(ResultCode.MSTR_ETC_ERROR);
