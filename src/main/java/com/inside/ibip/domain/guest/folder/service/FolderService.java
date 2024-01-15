@@ -50,8 +50,11 @@ public class FolderService {
 
         List<TreeVO> subList = new ArrayList<>();
 
+
+        String myFavoriteId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileFavorites);
+
         //2024-01-14 즐겨찾기 인 경우의 분기 추가
-        if(folderId.equals("8D67909A11D3E4981000E787EC6DE8A4")){
+        if(folderId.equals(myFavoriteId)){
             List<FavoriteVO> favorites = favoriteMapper.getFavorite(userId);
             if(favorites.size() > 0) {
                 subList = mstrObject.getFavorite(favorites, folderId);
