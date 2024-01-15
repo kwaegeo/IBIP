@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>보안역할 정보</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/style2.css" />
+    <link rel="stylesheet" href="/assets/css/style2.css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
     <!-- JS -->
-    <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="assets/js/common.js" defer></script>
-    <link rel="stylesheet" type="text/css" href="assets/js/treeview/jquery.treeview.css">
+    <script type="text/javascript" src="/assets/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="/assets/js/common.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="/assets/js/treeview/jquery.treeview.css">
 
 
     <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
@@ -22,7 +22,7 @@
     <link href="/dist/themes/default/style.min.css" rel="stylesheet"/>
 
     <!-- Custom styles for this page -->
-    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+<!--    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">-->
 
     <link rel="stylesheet" type="text/css" href="/assets/js/jqueryui/jquery-ui.min.css">
     <link rel="stylesheet" type="text/css" href="/assets/js/treeview/jquery.treeview.css">
@@ -103,7 +103,7 @@
       </div>
     </div>
   </body>
-  <script src="dist/jstree.min.js"></script>
+  <script src="/dist/jstree.min.js"></script>
   <script src="/js/leedo_custom.js"></script>
   <script th:inline="javascript">
     var roleNm = [[${roleInfo.roleNm}]]
@@ -133,8 +133,7 @@
         },
         'plugins' : ["checkbox", "types"],
       });
-    })
-
+    });
 
     function assignment() {
       var arrSelected = $('#jstree').jstree(true).get_selected('full', true);
@@ -182,7 +181,7 @@
       };
 
       $.ajax({
-        url: "/savePrivileges",
+        url: "/role/save/privileges",
         data: JSON.stringify(data),
         method: "POST",
         dataType: "json",
@@ -236,7 +235,7 @@
       }
       const data = {"roleId":roleId, "roleNm": newroleNm, "description": description};
       $.ajax({
-        url: "/roleModifyProc",
+        url: "/role/modify",
         data: JSON.stringify(data),
         method: "POST",
         dataType: "json",
@@ -264,7 +263,7 @@
     if(confirm("("+roleNm+") 보안역할을 정말로 삭제하시겠습니까? \n삭제 후엔 되돌릴 수 없습니다.")) {
       //2.1 사용자 할당 요청
       $.ajax({
-        url: "/roleDelProc",
+        url: "/role/delete",
         data: JSON.stringify({"roleId": roleId}),
         contentType: "application/json",
         method: "POST",

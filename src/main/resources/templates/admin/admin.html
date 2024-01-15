@@ -126,8 +126,8 @@
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">환경설정:</h6>
-                    <a class="collapse-item" href="#" onclick="getPersonalSync()">인사 정보 DB 동기화</a>
-                    <a class="collapse-item" href="#" onclick="">리포팅 섹션 관리</a>
+                    <a class="collapse-item" href="#" onclick="toBeDeveloped()">인사 정보 DB 동기화</a>
+                    <a class="collapse-item" href="#" onclick="toBeDeveloped()">리포팅 섹션 관리</a>
                 </div>
             </div>
         </li>
@@ -404,15 +404,9 @@
         })
     }
 
-
-
-    function getPersonalSync(){
-
-    }
-
     function getRoleList(){
         $.ajax({
-            url: '/getRoleList',
+            url: '/role/get/list',
             method: 'POST',
             dataType: "json",
             success: function (responseData) {
@@ -421,7 +415,7 @@
                 <div class="container-fluid" name="">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h5 class="text-gray-800 md-18">보안역할 관리 총 <strong style="color: #007ca5">${responseData.length}</strong>건</h5>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-dg shadow-sm" onclick="window.open('/roleAdd', '', 'width=1000,height=400,location=no,status=no,scrollbars=yes')">보안역할 생성</a>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-dg shadow-sm" onclick="window.open('/role/add', '', 'width=1000,height=400,location=no,status=no,scrollbars=yes')">보안역할 생성</a>
                     </div>
 
                     <div class="rows">
@@ -742,7 +736,7 @@
     }
 
     function getRoleInfo(roleId){
-        window.open("/roleInfo?roleId="+roleId,'', 'width=1041,height=906,location=no,status=no,scrollbars=yes');
+        window.open("/role/get/info?roleId="+roleId,'', 'width=1041,height=906,location=no,status=no,scrollbars=yes');
     }
 
     function getLicenseInfo(licenseType){

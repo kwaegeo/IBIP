@@ -21,7 +21,6 @@ import java.util.List;
  *   2023.12.01     이도현         최초작성
  *
  */
-@Slf4j
 @Service
 public class GroupService {
 
@@ -29,7 +28,7 @@ public class GroupService {
     private MstrObject mstrObject;
 
     /**
-     * 그룹 리스트를 조회한다.
+     * 그룹 리스트를 조회
      * @Method Name   : getGroupList
      * @Date / Author : 2023.12.01  이도현
      * @return 그룹 객체 리스트

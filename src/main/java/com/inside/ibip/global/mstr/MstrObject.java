@@ -681,56 +681,69 @@ public class MstrObject extends MstrSession{
         return userList;
     }
 
-    public List<RoleVO> getRoleList() throws WebObjectsException {
+    /**
+     * 보안역할 리스트를 조회
+     * @Method Name   : getRoleList
+     * @Date / Author : 2023.12.01  이도현
+     * @return 보안역할 객체 리스트
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public List<RoleVO> getRoleList(){
 
-        WebObjectSource wos = factory.getObjectSource();
-
-        WebSearch search = wos.getNewSearchObject();
-
-        search.setNamePattern("*" + "" + "*");
-        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
-        search.setAsync(false);
-        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeSecurityRole);
-        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-
-        search.submit();
-        WebFolder f = search.getResults();
-//        WebPrivilegeCategories webPrivilegeCategories = factory.getObjectSource().getObject();
-        System.out.println("보안역할 총 갯수: " + f.size());
-
+        //1. 결곽 객체 생성
         List<RoleVO> roleList = new ArrayList<>();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //1-1. WebSearch 객체 생성
+        try {
+            WebSearch search = objectSource.getNewSearchObject();
 
-        if (f.size() > 0) {
-            for (int i = 0; i < f.size(); i++) {
-                WebSecurityRole role= (WebSecurityRole) f.get(i);
-                role.populate();
-                System.out.println(role.getType());
-                System.out.println(role.getSubType());
-                SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
-                Date modification = null;
-                try {
-                    modification = originalFormat.parse(role.getModificationTime());
-                }catch (Exception e){}
+            //2. 검색 설정 (패턴, 타입. 도메인)
+            search.setNamePattern("*" + "" + "*");
+            search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+            search.setAsync(false);
+            search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeSecurityRole);
+            search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
 
-                WebEditablePrivileges privileges = role.getPrivileges();
-                System.out.println("해당 보안 역할 : "+ role.getName());
-                for(int j=0; j<privileges.size(); j++){
-                    System.out.println(privileges.get(j).getName());
-                    System.out.println(privileges.get(j).getType());
-//                    System.out.println(privileges.get(j).);
-                    System.out.println(privileges.get(j).getDescription());
+            //3. 검색
+            search.submit();
+
+            //4. 결과 값 파싱
+            WebFolder f = search.getResults();
+
+            //5. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date modification = null;
+
+            //6. 결과 만큼 반복하여 보안역할 정보 파싱
+            if (f.size() > 0) {
+                for (int i = 0; i < f.size(); i++) {
+                    WebSecurityRole role = (WebSecurityRole) f.get(i);
+
+                    /**populate로 인한 속도 저하 문제 (해결 가능한지 확인) **/
+                    role.populate();
+
+                    try {
+                        modification = originalParser.parse(role.getModificationTime());
+                    } catch (Exception e) {
+                        log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                        throw new CustomException(ResultCode.INVALID_CREATION_TIME);
+                    }
+                    RoleVO roleResult = RoleVO.builder().
+                            roleId(role.getID()).
+                            roleNm(role.getDisplayName()).
+                            owner(role.getOwner().getDisplayName()).
+                            modification(normalParser.format(modification)).
+                            description(role.getDescription()).
+                            build();
+
+                    roleList.add(roleResult);
                 }
-                roleList.add(RoleVO.builder().
-                        roleId(role.getID()).
-                        roleNm(role.getDisplayName()).
-                        owner(role.getOwner().getDisplayName()).
-                        modification(sdf.format(modification)).
-                        description(role.getDescription()).
-                        build()
-                );
             }
+        }catch(WebObjectsException woe){
+            log.error("보안역할 리스트 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
         return roleList;
     }
@@ -789,16 +802,32 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    /**
+     * 보안역할 생성
+     * @Method Name   : addRole
+     * @Date / Author : 2023.12.01  이도현
+     * @param roleInfo role 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO addRole(RoleVO roleInfo){
-        /** 유효성검사 부분 **/
+
+        //1. 보안역할명 유효성 검사
         if(!isRoleNm(roleInfo.getRoleNm()) ||roleInfo.getRoleNm().length() > 64){
-            throw new CustomException(ResultCode.INVALID_LOGIN_ID);
+            throw new CustomException(ResultCode.INVALID_ROLE_NAME);
         }
+        //1-1. 설명 유효성 검사
         else if(roleInfo.getDescription().length() > 200){
             throw new CustomException(ResultCode.INVALID_REMARK);
         }
+
+        //2. 보안역할 객체 생성
         SecurityRoleBean role = null;
 
+        //3. 생성
         try{
             role = (SecurityRoleBean) BeanFactory.getInstance().newBean("SecurityRoleBean");
             role.setSessionInfo(serverSession);
@@ -808,14 +837,17 @@ public class MstrObject extends MstrSession{
             role.save();
 
         }catch (WebBeanException wbe){
+            //4. 이미 존재하는 보안역할명 예외 처리
             if(wbe.getErrorCode() == -2147217373){
                 throw new CustomException(ResultCode.DUPLICATE_ROLE);
             }
+            //4-1. 보안역할명 유효성 미통과 예외 처리
             else if(wbe.getErrorCode() == -2147213718){
                 throw new CustomException(ResultCode.INVALID_ROLE_NAME);
             }
         }
 
+        //5. 응답
         return new ResVO(ResultCode.SUCCESS);
     }
 
@@ -980,31 +1012,49 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    /**
+     * 보안역할 수정
+     * @Method Name   : modifyRole
+     * @Date / Author : 2023.12.01  이도현
+     * @param roleInfo role 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO modifyRole(RoleVO roleInfo){
 
+        //1. 보안역할명 유효성 검사
         if(!isRoleNm(roleInfo.getRoleNm()) || roleInfo.getRoleNm().length() > 64){
-            throw new CustomException(ResultCode.INVALID_GROUP_NAME);
+            log.error("그룹 생성 중 그룹명 유효성 검사 에러 발생 [Error msg]");
+            throw new CustomException(ResultCode.INVALID_ROLE_NAME);
         }
+        //2. 설명 유효성 검사
         else if(roleInfo.getDescription().length() > 200){
+            log.error("그룹 생성 중 설명 유효성 검사 에러 발생 [Error msg]");
             throw new CustomException(ResultCode.INVALID_REMARK);
         }
 
-        WebObjectSource wos = factory.getObjectSource();
-
         try {
-            // Getting the User Group Object
-            WebSecurityRole role = (WebSecurityRole) wos.getObject(roleInfo.getRoleId(), EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
+            //3. 보안역할 객체 생성
+            WebSecurityRole role = (WebSecurityRole) objectSource.getObject(roleInfo.getRoleId(), EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
             role.populate();
+
+            //4. 정보 삽입 (보안역할명, 설명)
             role.setName(roleInfo.getRoleNm());
             role.setDisplayName(roleInfo.getRoleNm());
             role.setDescription(roleInfo.getDescription());
 
-            wos.save(role);
+            //5. 저장
+            objectSource.save(role);
 
-        }catch (WebObjectsException ex){
+        }catch (WebObjectsException woe){
+            log.error("보안역할 수정 중 중복 에러 발생 [Error msg] :" + woe.getMessage());
             throw new CustomException(ResultCode.DUPLICATE_ROLE);
-        }catch (IllegalArgumentException iax){
-            throw new CustomException(ResultCode.DUPLICATE_ROLE);
+        }catch (IllegalArgumentException iae){
+            log.error("보안역할 수정 중 중복 보안역할 조회 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_ROLE_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
     }
@@ -1067,19 +1117,30 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    /**
+     * 보안역할 삭제
+     * @Method Name   : deleteRole
+     * @Date / Author : 2023.12.01  이도현
+     * @param roleId 삭제할 보안역할 정보
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO delRole(String roleId){
-        System.out.println(roleId);
-        WebObjectSource wos = factory.getObjectSource();
 
         try {
-            // Getting the User Group Object
-            WebSecurityRole role = (WebSecurityRole) wos.getObject(roleId, EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
-            // Deleting the User Group Object
-            wos.deleteObject(role);
+            //1. 보안역할 객체 조회
+            WebSecurityRole role = (WebSecurityRole) objectSource.getObject(roleId, EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
+            //2. 보안역할 객체 삭제
+            objectSource.deleteObject(role);
 
-        }catch (WebObjectsException ex){
-            throw new CustomException(ResultCode.INVALID_ROLE_ID);
-        }catch (IllegalArgumentException iax){
+        }catch (WebObjectsException woe){
+            log.error("보안역할 삭제 중 MSTR 연계 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("보안역할 삭제 중 보안역할 조회 에러 발생 [Error msg] :" + iae.getMessage());
             throw new CustomException(ResultCode.INVALID_ROLE_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
@@ -1195,49 +1256,84 @@ public class MstrObject extends MstrSession{
         return userInfo;
     }
 
-    public RoleVO getRoleInfo(String roleId) throws WebObjectsException {
+    /**
+     * 보안역할 정보 조회
+     * @Method Name   : getRoleInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param roleId 조회할 보안역할의 Id
+     * @return 보안역할 정보 객체
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public RoleVO getRoleInfo(String roleId){
 
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
-
-        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
-        WebObjectInfo woi = objectSource.getObject(roleId ,EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
-
-        //채워넣기
-        woi.populate();
-
-        // 사용자 그룹 객체
-        WebSecurityRole role = (WebSecurityRole) woi;
-        role.populate();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
-
-        Date modification = null;
+        //1. 응답할 객체 생성
+        RoleVO roleInfo = null;
+        WebSecurityRole role = null;
         try {
-            modification = originalFormat.parse(role.getModificationTime());
-        }catch (Exception e){}
-        role.populate();
+            //2. MicroStrategy role의 ID를 가지고 User WebObjectInfo로 변경
+            WebObjectInfo woi = objectSource.getObject(roleId, EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
 
-        RoleVO roleInfo = RoleVO.builder().
-                roleId(role.getID()).
-                roleNm(role.getDisplayName()).
-                owner(role.getOwner().getDisplayName()).
-                modification(sdf.format(modification)).
-                description(role.getDescription()).
-                build();
+            //2-1. 채워넣기
+            woi.populate();
 
+            //2-2. 보안역할 객체로 캐스팅
+            role = (WebSecurityRole) woi;
+            role.populate();
+
+            //2-2. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date modification = null;
+
+            try {
+                modification = originalParser.parse(role.getModificationTime());
+            } catch (Exception e) {
+                log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                throw new CustomException(ResultCode.INVALID_CREATION_TIME);
+            }
+
+            //3. 보안역할 정보 파싱
+            roleInfo = RoleVO.builder().
+                    roleId(role.getID()).
+                    roleNm(role.getDisplayName()).
+                    owner(role.getOwner().getDisplayName()).
+                    modification(normalParser.format(modification)).
+                    description(role.getDescription()).
+                    build();
+
+        }catch (WebObjectsException woe){
+            log.error("보안역할 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }
+
+        //4. 보안역할의 권한 리스트 객체 생성
         List<CategoryVO> categoryList = new ArrayList<>();
 
+        //5. 할당된 권한에 대한 리스트 객체 생성
         List<Integer> assignIds = new ArrayList<>();
+
+        //5-1. 기본 값 상태 정보 값 초기화
         String assignYn = "N";
         StateVO state = null;
+
+        //5-2. 해당 보안역할의 할당 된 권한 추출
         for(int i=0; i<role.getPrivileges().size(); i++){
             assignIds.add(role.getPrivileges().get(i).getType());
         }
-        System.out.println(assignIds);
 
-        // 배당 보안역할의 권한을 뽑아내기 위해 권한목록 객체 생성
-        WebPrivilegeCategories categories = objectSource.getUserServicesSource().getPrivilegeCategories(role);
+        //5-3. 현재 라이센스에서 사용중인 모든 카테고리 (권한모음) 을 추출함.
+        WebPrivilegeCategories categories = null;
+        try {
+            categories = objectSource.getUserServicesSource().getPrivilegeCategories(role);
+        }catch (WebObjectsException woe){
+            log.error("보안역할 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }
+
+        //5-4. 카테고리 수만큼 반복하여 파싱
         for(int i=0; i< categories.size(); i++){
             CategoryVO category = CategoryVO.builder().
                     categoryNm(categories.get(i).getName()).
@@ -1246,10 +1342,13 @@ public class MstrObject extends MstrSession{
                     text(categories.get(i).getName()).
                     build();
 
+            //6. 권한 리스트 객체 생성
             List<PrivilegeVO> privilegeList = new ArrayList<>();
 
+            //7. 카테고리의 권한 수만큼 파싱
             for(int j=0; j < categories.get(i).size(); j++){
-                System.out.println(categories.get(i).get(j).getType());
+
+                //7-1. 할당 유무에 따라 분기 처리
                 if(assignIds.contains(categories.get(i).get(j).getType())){
                     assignYn = "Y";
                     state = new StateVO(true);
@@ -1272,6 +1371,7 @@ public class MstrObject extends MstrSession{
             category.setChildren(privilegeList);
             categoryList.add(category);
         }
+        //8. 응답
         roleInfo.setCategories(categoryList);
 
         return roleInfo;
@@ -2083,35 +2183,65 @@ the individual names of the licensed users*/
             return new ResVO(ResultCode.SUCCESS);
     }
 
-    public ResVO savePrivileges(PrivilegeAssignVO privilegeList) throws WebObjectsException {
+    /**
+     * 보안역할 권한 할당
+     * @Method Name   : savePrivileges
+     * @Date / Author : 2023.12.01  이도현
+     * @param privilegeList 권한 객체 리스트
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public ResVO savePrivileges(PrivilegeAssignVO privilegeList){
 
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
+        WebObjectInfo woi = null;
+        WebSecurityRole role = null;
+        WebPrivilegeCategories categories = null;
+        try {
+            //1. 보안역할 조회
+            woi = objectSource.getObject(privilegeList.getRoleId(), EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
 
-        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
-        WebObjectInfo woi = objectSource.getObject(privilegeList.getRoleId() ,EnumDSSXMLObjectTypes.DssXmlTypeSecurityRole);
+            //1-1. 채워넣기
+            woi.populate();
 
-        //채워넣기
-        woi.populate();
+            //1-2. 보안역할 객체로 파싱
+            role = (WebSecurityRole) woi;
+            role.populate();
 
-        // 사용자 그룹 객체
-        WebSecurityRole role = (WebSecurityRole) woi;
-        role.populate();
-
-
-        // 배당 보안역할의 권한을 뽑아내기 위해 권한목록 객체 생성
-        WebPrivilegeCategories categories = objectSource.getUserServicesSource().getPrivilegeCategories(role);
-        for(int i=0; i<privilegeList.getAddedPrivileges().size(); i++){
-            categories.getItemByType(privilegeList.getAddedPrivileges().get(i).getCategoryType()).
-                    getItemByPrivilegeType(privilegeList.getAddedPrivileges().get(i).getPrivilegeType()).grant();
+        }catch (WebObjectsException woe){
+            log.error("보안역할 권한 할당 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("보안역할 권한 할당 중 보안역할 조회 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_ROLE_ID);
         }
 
-        for(int i=0; i<privilegeList.getRemovedPrivileges().size(); i++){
-            categories.getItemByType(privilegeList.getRemovedPrivileges().get(i).getCategoryType()).
-                    getItemByPrivilegeType(privilegeList.getRemovedPrivileges().get(i).getPrivilegeType()).revoke();
-        }
+        //2. 해당 보안역할의 권한을 뽑아내기 위해 권한목록 객체 생성
+        try {
+            categories = objectSource.getUserServicesSource().getPrivilegeCategories(role);
 
-        objectSource.save(role);
+
+            //3. 할당해야할 권한 리스트만큼 반복하여 권한 할당
+            for(int i=0; i<privilegeList.getAddedPrivileges().size(); i++){
+                categories.getItemByType(privilegeList.getAddedPrivileges().get(i).getCategoryType()).
+                        getItemByPrivilegeType(privilegeList.getAddedPrivileges().get(i).getPrivilegeType()).grant();
+            }
+
+            //4. 회수해야할 권한 리스트만큼 반복하여 권한 회수
+            for(int i=0; i<privilegeList.getRemovedPrivileges().size(); i++){
+                categories.getItemByType(privilegeList.getRemovedPrivileges().get(i).getCategoryType()).
+                        getItemByPrivilegeType(privilegeList.getRemovedPrivileges().get(i).getPrivilegeType()).revoke();
+            }
+
+            //5. 저장
+            objectSource.save(role);
+
+        }catch (WebObjectsException woe){
+            log.error("보안역할 권한 할당, 회수 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }
 
         return new ResVO(ResultCode.SUCCESS);
     }
