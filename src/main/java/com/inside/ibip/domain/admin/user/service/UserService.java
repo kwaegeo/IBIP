@@ -3,7 +3,6 @@ package com.inside.ibip.domain.admin.user.service;
 import com.inside.ibip.domain.admin.user.vo.UserVO;
 import com.inside.ibip.global.mstr.MstrObject;
 import com.inside.ibip.global.vo.ResVO;
-import com.microstrategy.web.objects.WebObjectsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;

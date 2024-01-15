@@ -31,7 +31,11 @@
     border-color: #e7b252;
 }
 
+.btn-primary{color:#fff;background-color:#4e73df;border-color:#4e73df}
+
 .btn-danger{color:#fff;background-color:#e74a3b;border-color:#e74a3b;}
+
+.btn-secondary{color:#fff;background-color:#858796;border-color:#858796;}
 
 .btn-brown {
 .   color: #fff;
