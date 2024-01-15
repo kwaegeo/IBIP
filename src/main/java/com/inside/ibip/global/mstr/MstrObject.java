@@ -362,7 +362,6 @@ public class MstrObject extends MstrSession{
         //4. 반환
         search.setSearchList(searchList);
         return search;
-
     }
 
 
@@ -541,50 +540,74 @@ public class MstrObject extends MstrSession{
         return new ArrayList<>();
     }
 
+    /**
+     * 그룹 리스트를 조회
+     * @Method Name   : getGroupList
+     * @Date / Author : 2023.12.01  이도현
+     * @return 그룹 객체 리스트
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public List<GroupVO> getGroupList() {
 
-    public List<GroupVO> getGroupList() throws WebObjectsException {
-
-        WebObjectSource wos = factory.getObjectSource();
-
-        WebSearch search = wos.getNewSearchObject();
-
-        search.setNamePattern("*" + "" + "*");
-        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
-        search.setAsync(false);
-        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
-        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-
-        search.submit();
-        WebFolder f = search.getResults();
-
-        System.out.println("그룹 총 갯수: " + f.size());
-
+        //1. 결과 객체 생성
         List<GroupVO> groupList = new ArrayList<>();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //1-1. WebSearch 객체 생성
+        try {
+            WebSearch search = objectSource.getNewSearchObject();
 
-        if (f.size() > 0) {
-            for (int i = 0; i < f.size(); i++) {
-                WebUserGroup group= (WebUserGroup) f.get(i);
-                group.populate();
-                SimpleDateFormat originalFormat = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
-                Date creationTime = null;
-                try {
-                    creationTime = originalFormat.parse(group.getCreationTime());
-                }catch (Exception e){}
-                if(group.isGroup()){
-                    groupList.add(GroupVO.builder().
-                            groupId(group.getID()).
-                            groupNm(group.getName()).
-                            childCnt(group.getTotalChildCount()).
-                            description(group.getDescription()).
-                            creationTime(sdf.format(creationTime)).
-                            owner(group.getOwner().getName()).
-                            build()
-                    );
+            //2. 검색 설정 (패턴, 타입, 도메인)
+            search.setNamePattern("*" + "" + "*");
+            search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
+            search.setAsync(false);
+            search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
+            search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
+
+            //3. 검색
+            search.submit();
+
+            //4. 결과 값 파싱
+            WebFolder f = search.getResults();
+
+            //5. 생성일자를 위한 Date Format 지정
+            SimpleDateFormat normalParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat originalParser = new SimpleDateFormat("yy-MM-dd a hh:mm:ss");
+            Date creationTime = null;
+
+            //6. 결과 만큼 반복하여 그룹 정보 파싱
+            if (f.size() > 0) {
+                for (int i = 0; i < f.size(); i++) {
+                    WebUserGroup group = (WebUserGroup) f.get(i);
+
+                    /**populate로 인한 속도 저하 문제 (해결 가능한지 확인) **/
+                    group.populate();
+                    try {
+                        creationTime = originalParser.parse(group.getCreationTime());
+                    } catch (Exception e) {
+                        log.error("생성일자 포맷 변경 중 에러 발생 [Error msg]: " + e.getMessage());
+                        throw new CustomException(ResultCode.INVALID_CREATION_TIME);
+                    }
+                    if (group.isGroup()) {
+                        GroupVO groupResult = GroupVO.builder().
+                                groupId(group.getID()).
+                                groupNm(group.getName()).
+                                childCnt(group.getTotalChildCount()).
+                                description(group.getDescription()).
+                                creationTime(normalParser.format(creationTime)).
+                                owner(group.getOwner().getName()).
+                                build();
+
+                        groupList.add(groupResult);
+                    }
                 }
             }
+        }catch(WebObjectsException woe){
+            log.error("그룹 리스트 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
+
+        //7. 반환
         return groupList;
     }
 
@@ -689,18 +712,34 @@ public class MstrObject extends MstrSession{
         return roleList;
     }
 
-
+    /**
+     * 그룹 생성
+     * @Method Name   : addGroup
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupInfo group 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO addGroup(GroupVO groupInfo){
 
+        //1. 그룹명 유효성 검사
         if(!isGroupNm(groupInfo.getGroupNm()) || groupInfo.getGroupNm().length() > 64){
+            log.error("그룹 생성 중 그룹명 유효성 검사 에러 발생 [Error msg]");
             throw new CustomException(ResultCode.INVALID_GROUP_NAME);
         }
+        //1-1. 설명 유효성 검사
         else if(groupInfo.getDescription().length() > 200){
+            log.error("그룹 생성 중 설명 유효성 검사 에러 발생 [Error msg]");
             throw new CustomException(ResultCode.INVALID_REMARK);
         }
 
+        //2. 사용자 그룹 객체 생성
         UserGroupBean group = null;
 
+        //3. 생성
         try {
             group = (UserGroupBean) BeanFactory.getInstance().newBean("UserGroupBean");
             group.setSessionInfo(serverSession);
@@ -709,17 +748,21 @@ public class MstrObject extends MstrSession{
             group.getUserEntityObject().setDescription(groupInfo.getDescription());
             group.save();
 
-        } catch (WebBeanException ex) {
-            System.out.println(ex.getErrorCode());
-            System.out.println(ex.getMessage());
-            if(ex.getErrorCode() == -2147217373){
+        } catch (WebBeanException wbe) {
+            //4. 이미 존재하는 그룹명 예외처리
+            if(wbe.getErrorCode() == -2147217373){
+                log.error("그룹 생성 중 중복 그룹명 에러 발생 [Error msg] :" + wbe.getMessage());
                 throw new CustomException(ResultCode.DUPLICATE_GROUP);
             }
-            else if(ex.getErrorCode() == -2147213718){
+
+            //4-1. 그룹명의 유효성 미통과 예외처리
+            else if(wbe.getErrorCode() == -2147213718){
+                log.error("그룹 생성 중 유효성 에러 발생 [Error msg] :" + wbe.getMessage());
                 throw new CustomException(ResultCode.INVALID_GROUP_NAME);
             }
 
         }
+        //5. 응답
         return new ResVO(ResultCode.SUCCESS);
     }
 
@@ -797,30 +840,47 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
+    /**
+     * 그룹 수정
+     * @Method Name   : groupModifyProc
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupInfo group 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO modifyGroup(GroupVO groupInfo){
 
+        //1. 그룹명 유효성 검사
         if(!isGroupNm(groupInfo.getGroupNm()) || groupInfo.getGroupNm().length() > 64){
+            log.error("그룹 생성 중 그룹명 유효성 검사 에러 발생 [Error msg]");
             throw new CustomException(ResultCode.INVALID_GROUP_NAME);
         }
+        //2. 설명 유효성 검사
         else if(groupInfo.getDescription().length() > 200){
+            log.error("그룹 생성 중 설명 유효성 검사 에러 발생 [Error msg]");
             throw new CustomException(ResultCode.INVALID_REMARK);
         }
 
-        WebObjectSource wos = factory.getObjectSource();
-
         try {
-            // Getting the User Group Object
-            WebUserGroup group = (WebUserGroup) wos.getObject(groupInfo.getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            //3. 그룹 객체 생성
+            WebUserGroup group = (WebUserGroup) objectSource.getObject(groupInfo.getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
+            //4. 정보 삽입 (그룹명, 설명)
             group.setFullName(groupInfo.getGroupNm());
             group.setDescription(groupInfo.getDescription());
 
-            wos.save(group);
+            //5. 저장
+            objectSource.save(group);
 
-        }catch (WebObjectsException ex){
+        }catch (WebObjectsException woe){
+            log.error("그룹 생성 중 중복 그룹명 에러 발생 [Error msg] :" + woe.getMessage());
             throw new CustomException(ResultCode.DUPLICATE_GROUP);
-        }catch (IllegalArgumentException iax){
-            throw new CustomException(ResultCode.DUPLICATE_GROUP);
+        }catch (IllegalArgumentException iae){
+            log.error("그룹 생성 중 유효성 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_GROUP_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
     }
@@ -886,19 +946,30 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
-    public ResVO delGroup(String groupId){
-        System.out.println(groupId);
-        WebObjectSource wos = factory.getObjectSource();
+    /**
+     * 그룹 삭제
+     * @Method Name   : deleteGroup
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupId 삭제할 그룹 정보
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public ResVO deleteGroup(String groupId){
 
         try {
-            // Getting the User Group Object
-            WebUserGroup group = (WebUserGroup) wos.getObject(groupId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
-            // Deleting the User Group Object
-            wos.deleteObject(group);
+            //1. 그룹 객체 조회
+            WebUserGroup group = (WebUserGroup) objectSource.getObject(groupId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            //2. 그룹 객체 삭제
+            objectSource.deleteObject(group);
 
-        }catch (WebObjectsException ex){
-            throw new CustomException(ResultCode.INVALID_GROUP_ID);
-        }catch (IllegalArgumentException iax){
+        }catch (WebObjectsException woe){
+            log.error("그룹 삭제 중 MSTR 연계 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("그룹 삭제 중 그룹 조회 에러 발생 [Error msg] :" + iae.getMessage());
             throw new CustomException(ResultCode.INVALID_GROUP_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
@@ -940,29 +1011,46 @@ public class MstrObject extends MstrSession{
         return new ResVO(ResultCode.SUCCESS);
     }
 
-
+    /**
+     * 그룹 정보 조회
+     * @Method Name   : getGroupInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupId 조회할 그룹의 Id
+     * @return 그룹 정보 객체
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     //그룹 정보
-    public GroupVO getGroupInfo(String groupId) throws WebObjectsException {
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
+    public GroupVO getGroupInfo(String groupId){
 
-        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
-        WebObjectInfo woi = objectSource.getObject(groupId ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+        //1. 응답할 객체 생성
+        GroupVO groupInfo = null;
 
-        //채워넣기
-        woi.populate();
+        try {
+            //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
+            WebObjectInfo woi = objectSource.getObject(groupId, EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
-        // 사용자 그룹 객체
-        WebUserGroup group = (WebUserGroup) woi;
-        group.populate();
-        GroupVO groupInfo = GroupVO.builder().
-                groupId(group.getID()).
-                groupNm(group.getDisplayName()).
-                childCnt(group.getTotalChildCount()).
-                creationTime(group.getCreationTime()).
-                description(group.getDescription()).
-                owner(group.getOwner().getDisplayName()).
-                build();
+            //채워넣기
+            woi.populate();
+
+            // 사용자 그룹 객체
+            WebUserGroup group = (WebUserGroup) woi;
+            group.populate();
+             groupInfo =GroupVO.builder().
+                        groupId(group.getID()).
+                        groupNm(group.getDisplayName()).
+                        childCnt(group.getTotalChildCount()).
+                        creationTime(group.getCreationTime()).
+                        description(group.getDescription()).
+                        owner(group.getOwner().getDisplayName()).
+                        build();
+
+        }catch (WebObjectsException woe){
+            log.error("그룹 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }
         return groupInfo;
     }
 
@@ -1092,51 +1180,65 @@ public class MstrObject extends MstrSession{
         return roleInfo;
     }
 
+    /**
+     * 그룹에 포함된 사용자 정보 조회
+     * @Method Name   : getGroupUserList
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupInfo 그룹 정보 객체
+     * @return 그룹 정보 객체
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public GroupVO getGroupUserList(GroupVO groupInfo){
 
-    //그룹에 포함된 사용자 정보
-    public GroupVO getGroupUserList(GroupVO groupInfo) throws WebObjectsException {
+        WebObjectInfo woi = null;
 
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
+        try {
+            //1. 그룹 Id로 정보 조회
+             woi = objectSource.getObject(groupInfo.getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
 
-        //MicroStrategy Groups의 ID를 가지고 User WebObjectInfo로 변경
-        WebObjectInfo woi = objectSource.getObject(groupInfo.getGroupId() ,EnumDSSXMLObjectTypes.DssXmlTypeUser);
+            //1-1. 그룹 정보 채워넣기
+            woi.populate();
+        }catch (WebObjectsException woe){
+            log.error("그룹 정보의 사용자 리스트 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.INVALID_GROUP_ID);
+        }
 
-        //채워넣기
-        woi.populate();
-
-        // 사용자 그룹 객체
+        //1-2. 사용자 그룹 객체로 캐스팅
         WebUserGroup groups = (WebUserGroup) woi;
 
-        //MicroStrategy Groups하위의 모든 그룹 가져오기위한 UserList 객체 초기화
+        //2. Group하위의 모든 사용자 가져오기위한 UserList 객체 초기화
         WebUserList members = groups.getMembers();
 
-        System.out.println(members.size());
-
-        //하위 요소들을 Enumeration으로 치환
+        //2-1. 하위 요소들을 Enumeration으로 치환
         Enumeration  enumeration = members.elements();
+
 
         List<UserVO> users = new ArrayList<>();
         List<GroupVO> childGroups = new ArrayList<>();
-        WebObjectInfo enumWoi = null;
         List<String> assignIds = new ArrayList<>();
+        WebObjectInfo enumWoi = null;
 
-        // 객체 수 만큼 반복
+        //2-2. 하위 요소 수 만큼 반복
         while(enumeration.hasMoreElements()){
 
-            //그룹 채워넣기
-            enumWoi = (WebObjectInfo) enumeration.nextElement();
+            try {
+                enumWoi = (WebObjectInfo) enumeration.nextElement();
+                enumWoi.populate();
+            }catch (WebObjectsException woe){
+                log.error("그룹 정보의 사용자 리스트 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+                throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+            }
 
-            //WEBUSER로 캐스팅 불가능 한 것은 try catch로 묶던가 하자
-            enumWoi.populate();
-            System.out.println(enumWoi.getSubType());
+            //2-3. 하위 요소의 서브타입이 8704(사용자인 것) 파싱
             if(enumWoi.getSubType() == 8704) {
                 WebUser user = (WebUser) enumWoi;
                     assignIds.add(enumWoi.getID());
             }
-            /**
-             * 그룹할당의 경우를 생각
-             * **/
+
+            /** 그룹 할당의 경우 추가 가능 **/
 //            else if(enumWoi.getSubType() == 8705){
 //                WebUserGroup group = (WebUserGroup) enumWoi;
 //                childGroups.add(GroupVO.builder().
@@ -1149,49 +1251,56 @@ public class MstrObject extends MstrSession{
 //                        build()
 //                );
 //            }
+
         }
         groupInfo.setUsers(users);
         groupInfo.setChildGroups(childGroups);
 
+        //3. 모든 사용자 검색을 위한 검색 객체 생성
         WebSearch search = objectSource.getNewSearchObject();
 
+        //3-1. 검색 조건 설정
         search.setNamePattern("*" + "" + "*");
         search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
         search.setAsync(false);
         search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser);
         search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
 
-        search.submit();
-        WebFolder f = search.getResults();
+        try {
 
-        System.out.println("사용자 총 갯수: " + f.size());
-        System.out.println(assignIds);
+            //3-2. 검색 및 결과 전달
+            search.submit();
+            WebFolder f = search.getResults();
 
-        if (f.size() > 0) {
-            for (int i = 0; i < f.size(); i++) {
-                WebUser user= (WebUser) f.get(i);
-                user.populate();
-                if(!user.isGroup()){
-                    String assignYn = "N";
+            if (f.size() > 0) {
+                for (int i = 0; i < f.size(); i++) {
+                    WebUser user = (WebUser) f.get(i);
+                    user.populate();
+                    if (!user.isGroup()) {
+                        String assignYn = "N";
 
-                    // Check if the user ID is in assignIds
-                    if (assignIds.contains(user.getID())) {
-                        assignYn = "Y";
+                        // Check if the user ID is in assignIds
+                        if (assignIds.contains(user.getID())) {
+                            assignYn = "Y";
+                        }
+
+                        users.add(UserVO.builder().
+                                userId(user.getID()).
+                                loginID(user.getLoginName()).
+                                userNm(user.getDisplayName()).
+                                owner(user.getOwner().getDisplayName()).
+                                modification(user.getModificationTime()).
+                                description(user.getDescription()).
+                                assignYn(assignYn).
+                                enableStatus(user.isEnabled()).
+                                build()
+                        );
                     }
-
-                    users.add(UserVO.builder().
-                            userId(user.getID()).
-                            loginID(user.getLoginName()).
-                            userNm(user.getDisplayName()).
-                            owner(user.getOwner().getDisplayName()).
-                            modification(user.getModificationTime()).
-                            description(user.getDescription()).
-                            assignYn(assignYn).
-                            enableStatus(user.isEnabled()).
-                            build()
-                    );
                 }
             }
+        }catch (WebObjectsException woe){
+            log.error("그룹 정보의 사용자 리스트 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
         }
         return groupInfo;
     }
@@ -1302,20 +1411,39 @@ public class MstrObject extends MstrSession{
 
     }
 
-
+    /**
+     * 그룹 사용자 할당
+     * @Method Name   : groupAssign
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupInfo group 정보 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
     public ResVO assignGroup(GroupVO groupInfo) {
 
-        //ObjectSourcec 객체 생성
-        WebObjectSource objectSource = factory.getObjectSource();
-
+        WebObjectInfo woi = null;
         try {
-            WebObjectInfo woi = objectSource.getObject(groupInfo.getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
-
+            //1. 사용자 그룹 조회
+             woi = objectSource.getObject(groupInfo.getGroupId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
+        }catch (WebObjectsException woe){
+            log.error("그룹 사용자 할당 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.MSTR_ETC_ERROR);
+        }catch (IllegalArgumentException iae){
+            log.error("그룹 사용자 할당 중 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_GROUP_ID);
+        }
             WebUserGroup group = (WebUserGroup) woi;
+
+        try{
             if(group!=null){
                 for(int i=0; i<groupInfo.getUsers().size(); i++){
+                    //2. 할당, 회수 요청 사용자 조회
                     WebUser webUser = (WebUser) objectSource.getObject(groupInfo.getUsers().get(i).getUserId(), EnumDSSXMLObjectTypes.DssXmlTypeUser);
-                    //Add user to group
+
+                    //3. 분기에 맞게 할당 혹은 회수 처리
                     if(webUser!=null){
                         if("assign".equals(groupInfo.getAssignmentType())){
                             group.getMembers().add(webUser);
@@ -1326,10 +1454,14 @@ public class MstrObject extends MstrSession{
                     }
                 }
             }
-            //Save the group object
+            //4. 저장
             objectSource.save(group);
-        } catch (WebObjectsException e) {
-            return new ResVO(ResultCode.ERROR_ADD_USER);
+        }catch (WebObjectsException woe){
+            log.error("그룹 사용자 할당 중 에러 발생 [Error msg] :" + woe.getMessage());
+            throw new CustomException(ResultCode.ERROR_ADD_USER);
+        }catch (IllegalArgumentException iae){
+            log.error("그룹 사용자 할당 중 에러 발생 [Error msg] :" + iae.getMessage());
+            throw new CustomException(ResultCode.INVALID_USER_ID);
         }
         return new ResVO(ResultCode.SUCCESS);
     }

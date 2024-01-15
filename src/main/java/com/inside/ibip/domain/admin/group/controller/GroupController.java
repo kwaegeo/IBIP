@@ -6,18 +6,32 @@ import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.utils.ComUtils;
 import com.inside.ibip.global.vo.ResVO;
 import com.microstrategy.web.objects.WebObjectsException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @FileName     : GroupController.java
+ * @Date         : 2023.12.01
+ * @Author       : 이도현
+ * @Description  : 그룹 Controller, 그룹 리스트 조회, 정보 조회 등
+ * @History
+ * =======================================================
+ *   DATE			AUTHOR			NOTE
+ * =======================================================
+ *   2023.12.01     이도현         최초작성
+ *
+ */
+@Log4j2
 @Controller
+@RequestMapping("/group")
 public class GroupController {
 
     @Autowired
@@ -26,9 +40,21 @@ public class GroupController {
     @Autowired
     private ComUtils comUtils;
 
-    @PostMapping("/getGroupList")
+    /**
+     * 그룹 리스트 조회
+     * @Method Name   : getGroupList
+     * @Date / Author : 2023.12.01  이도현
+     * @param request request 객체
+     * @param response response 객체
+     * @return 그룹 리스트 객체
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @PostMapping("/get/list")
     @ResponseBody
-    public List<GroupVO> getGroupList(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+    public List<GroupVO> getGroupList(HttpServletRequest request, HttpServletResponse response){
 
         //1. 사용자 세션 (MSTR) 유효성 검사
 
@@ -36,65 +62,114 @@ public class GroupController {
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
+        //2. 그룹 리스트 조회
         List<GroupVO> groupList = groupService.getGroupList();
 
         return groupList;
     }
 
-    @GetMapping("/groupInfo")
-    public String groupInfo(@RequestParam String groupId, HttpServletRequest request, HttpServletResponse response, Model model) throws WebObjectsException {
-        System.out.println(groupId);
+    /**
+     * 그룹 정보 조회
+     * @Method Name   : getGroupInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupId 조회할 그룹의 Id
+     * @param request request 객체
+     * @param response response 객체
+     * @param model model 객체
+     * @return 그룹 객체
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @GetMapping("/get/info")
+    public String getGroupInfo(@RequestParam String groupId, HttpServletRequest request, HttpServletResponse response, Model model){
+
         //1. 사용자 세션 (MSTR) 유효성 검사
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
+        //2. 그룹 정보 조회
+        GroupVO groupInfo = groupService.getGroupInfo(groupId);
+
+        //3. model 객체에 삽입
+        model.addAttribute("groupInfo", groupInfo);
+
+        //4. 응답
+        return "/admin/group/info";
+    }
+
+    /**
+     * 그룹 생성
+     * @Method Name   : getGroupInfo
+     * @Date / Author : 2023.12.01  이도현
+     * @param request request 객체
+     * @param response response 객체
+     * @return 그룹 생성 페이지
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @GetMapping("/add")
+    public String groupAdd(HttpServletRequest request, HttpServletResponse response){
 
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
-
-        GroupVO groupInfo = groupService.getGroupInfo(groupId);
-
-        model.addAttribute("groupInfo", groupInfo);
-        return "/admin/group/info";
-    }
-
-    @GetMapping("/groupAdd")
-    public String groupAdd(HttpServletRequest request, HttpServletResponse response, Model model){
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
         return "/admin/group/add";
     }
 
-    @PostMapping("/groupAddProc")
+    /**
+     * 그룹 생성
+     * @Method Name   : groupAddProc
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupInfo group 정보 객체
+     * @param request request 객체
+     * @param response response 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @PostMapping("/add")
     @ResponseBody
     public ResVO groupAddProc(@RequestBody GroupVO groupInfo, HttpServletRequest request, HttpServletResponse response){
 
         //1. 사용자 세션 (MSTR) 유효성 검사
-
         HttpSession httpSession = request.getSession(true);
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
         ResVO result = groupService.addGroup(groupInfo);
         return result;
     }
 
-    @PostMapping("/groupModifyProc")
+    /**
+     * 그룹 수정
+     * @Method Name   : groupModifyProc
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupInfo group 정보 객체
+     * @param request request 객체
+     * @param response response 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @PostMapping("/modify")
     @ResponseBody
     public ResVO groupModifyProc(@RequestBody GroupVO groupInfo, HttpServletRequest request, HttpServletResponse response){
 
@@ -104,19 +179,28 @@ public class GroupController {
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
         ResVO result = groupService.modifyGroup(groupInfo);
         return result;
     }
 
-    @PostMapping("/groupDelProc")
+    /**
+     * 그룹 삭제
+     * @Method Name   : groupDelProc
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupInfo group 정보 객체
+     * @param request request 객체
+     * @param response response 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @PostMapping("/delete")
     @ResponseBody
-    public ResVO groupDelProc(@RequestBody Map<String,String> groupInfo, HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+    public ResVO groupDelProc(@RequestBody Map<String,String> groupInfo, HttpServletRequest request, HttpServletResponse response){
         //1. 사용자 세션 (MSTR) 유효성 검사
         String groupId = groupInfo.get("groupId");
 
@@ -124,25 +208,26 @@ public class GroupController {
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
-        ResVO result = groupService.delGroup(groupId);
+        ResVO result = groupService.deleteGroup(groupId);
         return result;
     }
 
-
-    @GetMapping("/testGroup")
-    @ResponseBody
-    public String getTestGroup() throws WebObjectsException {
-        groupService.getGroupTest();
-        return "일단 확인";
-    }
-
-    @PostMapping("/groupManageAssignment")
+    /**
+     * 그룹 사용자 할당
+     * @Method Name   : groupAssign
+     * @Date / Author : 2023.12.01  이도현
+     * @param groupInfo group 정보 객체
+     * @param request request 객체
+     * @param response response 객체
+     * @return 성공 유무
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @PostMapping("/assign")
     @ResponseBody
     public ResVO groupAssign(@RequestBody GroupVO groupInfo, HttpServletRequest request, HttpServletResponse response){
         //1. 사용자 세션 (MSTR) 유효성 검사
@@ -151,13 +236,8 @@ public class GroupController {
         String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
 
         //1. 세션 체크
-        try{
-            comUtils.sessionCheck(mstrSessionId, request, response);
-        }catch(CustomException ex){
-            throw ex;
-        }
+        comUtils.sessionCheck(mstrSessionId, request, response);
 
-        System.out.println(groupInfo);
         ResVO result = groupService.assign(groupInfo);
         return result;
     }
