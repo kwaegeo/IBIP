@@ -735,6 +735,26 @@
         window.open("/notice/get/info?noticeId="+noticeId,'','width=1000,height=781,location=no,status=no,scrollbars=yes');
     }
 
+    function logout() {
+        $.ajax({
+            url: '/auth/logout',
+            method: 'POST',
+            dataType: "json",
+            success: function (responseData) {
+                console.log(responseData)
+                if (responseData.code === 'S00') {
+                    location.href = "/auth/login"
+                } else {
+                    alert(responseData.msg)
+                }
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        })
+
+    }
+
     function toBeDeveloped(){
         alert("IBIP v2 개발 예정 기능입니다.");
         return;
