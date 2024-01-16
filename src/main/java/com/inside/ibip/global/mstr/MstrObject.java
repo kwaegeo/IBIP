@@ -233,7 +233,9 @@ public class MstrObject extends MstrSession{
                         getSubList(folder.get(i).getID(), folder.get(i).getParent().getID(), subList);
                     }
                 }
-                subList.add(new TreeVO(folder.get(i).getID(), folder.get(i).getName(), folder.get(i).getParent().getID(), folder.get(i).getType(), false));
+                if(folder.get(i).getType() == EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition || folder.get(i).getType() == EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition || folder.get(i).getType() == EnumDSSXMLObjectTypes.DssXmlTypeFolder) {
+                    subList.add(new TreeVO(folder.get(i).getID(), folder.get(i).getName(), folder.get(i).getParent().getID(), folder.get(i).getType(), false));
+                }
             }
         } catch (WebObjectsException e) {
             throw new CustomException(ResultCode.MSTR_ETC_ERROR);

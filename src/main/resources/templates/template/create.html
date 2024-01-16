@@ -96,8 +96,8 @@
     var userInfo = [[${userInfo}]]
 
     console.log("현재 접속한 사용자의 리포트 정보:" + reportInfo);
-    console.log("현재 접속한 사용자의 사용자 정보:" + userInfo);
-
+    console.log("현재 접속한 사용자의 사용자 정보:" + userInfo.userNm);
+    console.log("현재 접속한 사용자의 사용자 정보:" + userInfo.userId);
     // 템플릿 명 실시간 유효성 검사
     $('#templateName').on('keyup', function () {
       const getReg = RegExp(/^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9._-]*$/);
