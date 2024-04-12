@@ -99,7 +99,6 @@ public class FolderController {
         //1. 세션 체크
         comUtils.sessionCheck(mstrSessionId, request, response);
 
-        //전달 받은 폴더의 하위 목록 조회
         List<TreeVO> subList = folderService.getShareReport();
         return subList;
     }

@@ -69,6 +69,10 @@ public class MstrSession {
                 log.info("MSTR 리소스 엑세스에 대한 권한이 없습니다.");
                 throw new CustomException(ResultCode.INVALID_POLICY);
             }
+            else if(ex.getErrorCode() == -2147216965){
+                log.info("해당 계정은 비활성화 되어져 있습니다.");
+                throw new CustomException(ResultCode.INVALID_USER_ID);
+            }
             else {
                 System.out.println(ex.getErrorCode());
                 System.out.println(ex.getMessage());

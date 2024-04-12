@@ -8,6 +8,8 @@ import com.microstrategy.web.objects.*;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -60,6 +62,7 @@ public class ObjectPrompt {
         WebFolder webFolder = objectPrompt.getSuggestedAnswers(true);
         List<ObjectVO> entities = new ArrayList<>();
 
+
         //2-1. 개체 수만큼 반복하여 파싱
         for(int i=0; i<webFolder.size(); i++){
             WebObjectInfo webObjectInfo = webFolder.get(i);
@@ -70,6 +73,8 @@ public class ObjectPrompt {
             entity.setEntityType(webObjectInfo.getType());
             entities.add(entity);
         }
+
+        System.out.println(entities);
 
         //3. 개체 프롬프트의 기본 값 세팅
         if(objectPrompt.hasDefaultAnswer()){
@@ -82,6 +87,8 @@ public class ObjectPrompt {
                 }
             }
         }
+
+
 
         //4. 프롬프트 객체에 개체 저장 후 응답
         prompt.setEntity(entities);

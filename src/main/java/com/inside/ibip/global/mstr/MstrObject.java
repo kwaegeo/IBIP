@@ -11,6 +11,7 @@ import com.inside.ibip.domain.guest.main.vo.SearchResultVO;
 import com.inside.ibip.domain.guest.main.vo.SearchVO;
 import com.inside.ibip.domain.guest.main.vo.UserInfoVO;
 import com.inside.ibip.domain.guest.prompt.vo.PromptVO;
+import com.inside.ibip.domain.guest.report.vo.AclVO;
 import com.inside.ibip.domain.guest.report.vo.ReportVO;
 import com.inside.ibip.global.exception.CustomException;
 import com.inside.ibip.global.exception.code.ResultCode;
@@ -44,7 +45,6 @@ public class MstrObject extends MstrSession{
     private WebObjectSource objectSource = factory.getObjectSource();
     private WebDocumentSource documentSource = factory.getDocumentSource();
     private WebReportSource reportSource = factory.getReportSource();
-
     private LicenseSource licenseSource = factory.getLicenseSource();
 
     /**
@@ -417,6 +417,26 @@ public class MstrObject extends MstrSession{
             reportPath += " > " + reportName;
             reportInfo.setReportPath(reportPath);
 
+            /**
+             * 2024-04-12 영득부장님 확인의 건 ACL 조회
+             * **/
+            WebObjectSecurity wos = report.getSecurity();
+            WebAccessControlList acl = wos.getACL();
+            List<AclVO> aclList = new ArrayList<>();
+            for(int k=0; k<acl.size(); k++){
+                System.out.println("ACL 권한 사용자" + acl.get(k).getTrustee().getDisplayName());
+                System.out.println("ACL 권한" + acl.get(k).getRights());
+                System.out.println("타입" + acl.get(k).getType());
+                AclVO aclInfo = AclVO.builder().
+                        userId(acl.get(k).getTrustee().getID()).
+                        userNm(acl.get(k).getTrustee().getDisplayName()).
+                        aclNum(acl.get(k).getRights()).
+                        aclNm(decodeAccessRights(acl.get(k).getRights())).
+                        build();
+                aclList.add(aclInfo);
+            }
+            reportInfo.setAclList(aclList);
+
         }catch (WebObjectsException woe){
             log.error("리포트 정보 조회 중 에러 발생 [Error msg]: " + woe.getMessage());
             throw new CustomException(ResultCode.MSTR_ETC_ERROR);
@@ -428,7 +448,33 @@ public class MstrObject extends MstrSession{
         return reportInfo;
     }
 
+    public static String decodeAccessRights(int rights) {
+        StringBuilder result = new StringBuilder();
 
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightBrowse) != 0)
+            result.append("DssXmlAccessRightBrowse+");
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightUseExecute) != 0)
+            result.append("DssXmlAccessRightUseExecute+");
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightRead) != 0)
+            result.append("DssXmlAccessRightRead+");
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightWrite) != 0)
+            result.append("DssXmlAccessRightWrite+");
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightDelete) != 0)
+            result.append("DssXmlAccessRightDelete+");
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightControl) != 0)
+            result.append("DssXmlAccessRightControl+");
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightUse) != 0)
+            result.append("DssXmlAccessRightUse+");
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightExecute) != 0)
+            result.append("DssXmlAccessRightExecute+");
+        if ((rights & EnumDSSXMLAccessRightFlags.DssXmlAccessRightFullControl) == EnumDSSXMLAccessRightFlags.DssXmlAccessRightFullControl)
+            return "DssXmlAccessRightFullControl"; // Returns immediately if all rights are granted
+
+        if (result.length() > 0)
+            result.setLength(result.length() - 1); // Remove the last "+"
+
+        return result.toString();
+    }
 
     /**
      * 리포트 정보 조회

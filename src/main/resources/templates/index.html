@@ -632,6 +632,8 @@
 
         //프롬프트 개수만큼 반복함
         if(reportInfo.prompts){
+
+            console.log(reportInfo.prompts);
             for(var i=0; i<reportInfo.prompts.length; i++){
                 var reportDetail = {'reportId': reportInfo.reportId, 'reportNm': reportInfo.reportNm}
 
@@ -929,7 +931,7 @@
 
         `;
 
-        $("#promptDiv").prepend(makeHtml);
+        $("#promptDiv").append(makeHtml);
     }
 
     // 값 프롬프트 세팅
@@ -953,7 +955,7 @@
 
 ;
 
-        $("#promptDiv").prepend(makeHtml);
+        $("#promptDiv").append(makeHtml);
 
     }
 
@@ -1023,7 +1025,7 @@
 
 `;
 
-        $("#promptDiv").prepend(makeHtml);
+        $("#promptDiv").append(makeHtml);
     }
 
     function getMain() {

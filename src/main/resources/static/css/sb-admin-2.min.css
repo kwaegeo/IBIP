@@ -51,13 +51,16 @@
     border-color: #007ca5;
     box-shadow: 0 0 0 0.2rem rgba(105, 136, 228, 0.5);
 }
+.custom-table-responsive{display:block;margin-right:10px;-webkit-overflow-scrolling:touch}
 
 .btn-dg.disabled, .btn-dg:disabled {
     color: #fff;
     background-color: #007ca5;
     border-color: #007ca5;
 }
-
+.custom-col-md-2 {
+    flex: 0 0 16.66667%;
+}
 .btn-dg:not(:disabled):not(.disabled):active, .btn-dg:not(:disabled):not(.disabled).active,
 .show > .btn-dg.dropdown-toggle {
     color: #fff;

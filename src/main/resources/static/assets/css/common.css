@@ -1124,6 +1124,16 @@ button:disabled {
 }
 
 /* 테이블 위 */
+.custom-tbl-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+.custom-tbl-top select {
+  width: 100%;
+}
+/* 테이블 위 */
 .tbl-top {
   display: flex;
   align-items: center;
@@ -1148,6 +1158,13 @@ button:disabled {
   flex: 1;
   gap: 7px;
 }
+
+.custom-table-thead-th{
+  vertical-align: middle;
+  border-bottom: 2px solid #e3e6f0;
+}
+
+
 .tbl-top button {
   display: flex;
   align-items: center;
@@ -1249,6 +1266,7 @@ button:disabled {
   min-width: 34px;
   height: 33px;
   border: 1px solid var(--gray-4);
+  background: #0a6aa1;
 }
 .paging li > a {
   display: flex;

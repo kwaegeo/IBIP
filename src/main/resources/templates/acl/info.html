@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ACL</title>
+
+
+        <link rel="stylesheet" href="/assets/css/style2.css" />
+
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined" rel="stylesheet" />
+        <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
+
+
+        <!-- JS -->
+        <script type="text/javascript" src="/assets/js/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript" src="/assets/js/common.js" defer></script>
+
+
+        <link rel="stylesheet" href="/css/summernote/summernote-lite.css" />
+        <script type="text/javascript" src="/js/summernote/lang/summernote-ko-KR.js"></script>
+        <script type="text/javascript" src="/js/summernote/summernote-lite.js"></script>
+
+    </head>
+
+    <body>
+    <div class="popup-window">
+        <!--헤더,바디,푸터 레이아웃 레이어 팝업과 동일-->
+        <div class="popup__head">
+            <h1>ACL</h1>
+            <button class="btn btn-close js-close"><span class="hide">닫기</span></button>
+        </div>
+        <div class="popup__body">
+        <section>
+            <div class="tbl-top">
+                <div class="left"><h2>ACL 목록</h2></div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="title" style="width: calc(100% - 6px);" th:value="${reportInfo}" disabled>
+            </div>
+        </section>
+        <section>
+            <div class="tbl-top">
+                <div class="left"></div>
+                <div class="right">
+                </div>
+            </div>
+        </section>
+        </div>
+        <div class="popup__footer">
+            <button type="button" class="pop-close bg-gray"><span>취소</span></button>
+        </div>
+    </div>
+    <script th:inline="javascript">
+
+    </script>
+  </body>
+</html>

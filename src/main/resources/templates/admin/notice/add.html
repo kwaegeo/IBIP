@@ -92,6 +92,8 @@
             const content = $('#summernote').val();
             const popupYn = $("input[name='rd']:checked").val();
 
+            console.log(content.length);
+
             if(validData(title)){
                 alert("제목을 입력해주세요");
                 $('#title').focus();

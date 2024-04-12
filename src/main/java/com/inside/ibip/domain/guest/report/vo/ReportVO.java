@@ -59,4 +59,6 @@ public class ReportVO {
 
     /** 즐겨찾기 유무 추가 **/
     private boolean favorite = false;
+
+    private List<AclVO> aclList;
 }

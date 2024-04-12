@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>인사이드정보</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+    <!-- 글자크기에 따른 크기 조정 css-->
+    <link href="/css/custom.css" rel="stylesheet">
+
+    <link href="/dist/themes/default/style.min.css" rel="stylesheet"/>
+
+    <!-- Custom styles for this page -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/js/jqueryui/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/js/treeview/jquery.treeview.css">
+
+
+    <!-- Custom styles for this template-->
+    <!--    <link href="/css/sb-admin-2.min.css" rel="stylesheet">-->
+    <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Sharp|Material+Icons+Two+Tone|Material+Icons+Outlined"
+          rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-dg sidebar sidebar-dark accordion" id="accordionSidebar">
+
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/main/admin">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-laugh-wink"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">인사이드정보 <sup>V1</sup></div>
+        </a>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
+
+        <!-- Nav Item - Pages Collapse Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" onclick="getGroupList()" href="#" >
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>메인 페이지</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - Utilities Collapse Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" onclick="getUserList()" href="#">
+                <i class="fas fa-fw fa-table"></i>
+                <span>News 조회</span>
+            </a>
+        </li>
+
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
+
+
+            </nav>
+            <!-- End of Topbar -->
+
+            <div id="main-content">
+                <div class="container-fluid" name="">
+
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h5 class="text-gray-800 md-18">뉴스기사 총<strong style="color: #007ca5">3</strong>건</h5>
+                    </div>
+
+                    <div class="rows">
+                        <div id="contentDiv">
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div style="width: 50%;">
+                                            <div class="form-group">
+                                                <form>
+                                                    <div class="custom-tbl-top">
+                                                        <div class="" style="margin-right: 10px;">
+                                                            <label for="date" class=" col-form-label">시작 날짜</label>
+                                                            <input type="date" name="date" id="date" class="form-control">
+                                                        </div>
+                                                        <div class="" style="margin-right: 10px;">
+                                                            <label for="date2" class="col-form-label">종료 날짜</label>
+                                                            <input type="date" name="date2" id="date2" class="form-control">
+                                                        </div>
+                                                        <div class="" style="margin-right: 10px;">
+                                                            <label for="date2" class="col-form-label" style="margin-right: 10px;">검색어</label>
+                                                            <input type="radio" id="all" name="category" value="all">
+                                                            <label for="all">전체</label>
+                                                            <input type="radio" id="title" name="category" value="title">
+                                                            <label for="title">제목</label>
+                                                            <input type="radio" id="body" name="category" value="body">
+                                                            <label for="body">본문</label>
+                                                            <input type="text" name="search" id="search" class="form-control">
+                                                        </div>
+                                                        <div class=""  style="margin-right: 10px;">
+                                                            <div style="width: 34.39px; height: 33.5px;" >
+                                                            </div>
+                                                            <button class="btn btn-primary" type="button" style="height: calc(1.5em + 0.75rem + 2px); margin-right: 10px;">
+                                                                조회
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="custom-tbl-top">
+                                                        <div style="margin-right: 20px;">
+                                                            <label for="123" class=" col-form-label">언론사</label>
+                                                            <select  name="123" id="123" class="form-control">
+                                                                <option value="volvo">전체</option>
+                                                                <option value="volvo">세계일보</option>
+                                                                <option value="saab">스포츠조선</option>
+                                                                <option value="mercedes">경양신문</option>
+                                                                <option value="audi">국민일보</option>
+                                                            </select>
+                                                        </div>
+                                                        <div style="margin-right: 20px;">
+                                                            <label for="456" class=" col-form-label">카테고리</label>
+                                                            <select  name="456" id="456" class="form-control">
+                                                                <option value="volvo">전체</option>
+                                                                <option value="volvo">스포츠</option>
+                                                                <option value="saab">경제</option>
+                                                                <option value="mercedes">날씨</option>
+                                                                <option value="audi">정치</option>
+                                                                <option value="audi">연애</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="tbl-top">
+                                                        <div class="right" style="margin-right: 10px;">
+                                                            <select>
+                                                                <option>3</option>
+                                                                <option>5</option>
+                                                                <option>10</option>
+                                                                <option>30</option>
+                                                            </select>
+                                                            <button type="button" class="btn-renew"><span class="hide">새로고침</span></button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="custom-table-responsive">
+                                                <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                                                    <div class="row" id="searchDiv">
+                                                        <div class="col-sm-12">
+                                                            <table class="table-bmb-test table" id="dataTable" aria-describedby="dataTable_info" style="width: 100%;">
+                                                                <thead>
+                                                                <tr role="row">
+                                                                    <th class="custom-table-thead-th" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;" aria-sort="ascending">No.
+                                                                    </th>
+                                                                    <th class="custom-table-thead-thsorting sorting_desc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;" aria-sort="ascending">날짜
+                                                                    </th>
+                                                                    <th class="custom-table-thead-thsorting sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;" aria-sort="ascending">언론사
+                                                                    </th>
+                                                                    <th class="custom-table-thead-thsorting sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 10%;">카테고리
+                                                                    </th>
+                                                                    <th class="custom-table-thead-th" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 20%;">제목
+                                                                    </th>
+                                                                    <th class="custom-table-thead-th" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 30%;">본문
+                                                                    </th>
+                                                                    <th class="custom-table-thead-th" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;">작성자
+                                                                    </th>
+                                                                    <th class="custom-table-thead-th" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;">조회수
+                                                                    </th>
+                                                                    <th class="custom-table-thead-th" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" style="width: 5%;">댓글수
+                                                                    </th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <tr class="odd" onclick="getLicenseInfo('7')">
+                                                                    <td>3</td>
+                                                                    <td class="_title"><a href="#">2024-02-15</a></td>
+                                                                    <td>스포츠 조선</td>
+                                                                    <td>스포츠</td>
+                                                                    <td>아시안컵 16강 상대로 대진표 결과</td>
+                                                                    <td>2024년 아시안컵의 등장한...</td>
+                                                                    <td>이운재</td>
+                                                                    <td>378150</td>
+                                                                    <td>123</td>
+                                                                </tr>
+
+                                                                <tr class="odd" onclick="getLicenseInfo('8')">
+                                                                    <td>2</td>
+                                                                    <td class="_title"><a href="#">2024-03-12</a></td>
+                                                                    <td>세계일보</td>
+                                                                    <td>날씨</td>
+                                                                    <td>충청.남부에 비 눈 그친 뒤 추워져</td>
+                                                                    <td>남부지방의 비 눈이 그친 뒤...</td>
+                                                                    <td>김상태</td>
+                                                                    <td>112672</td>
+                                                                    <td>22</td>
+                                                                </tr>
+
+                                                                <tr class="odd" onclick="getLicenseInfo('9')">
+                                                                    <td>1</td>
+                                                                    <td class="_title"><a href="#" >2024-05-11</a></td>
+                                                                    <td>국민일보</td>
+                                                                    <td>IT</td>
+                                                                    <td>KT, AWS와 생성형 AI 모바일 사업 강화</td>
+                                                                    <td>KT에서 지난달 생성형 모바일 ...</td>
+                                                                    <td>이석훈</td>
+                                                                    <td>552123</td>
+                                                                    <td>35</td>
+                                                                </tr>
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <ul class="paging">
+                                                    <!--비활성화일경우 disabled 클
+                                                      래스 추가-->
+                                                    <li class="btn-first disabled"><a href="#">맨 앞으로</a></li>
+                                                    <li class="btn-prev disabled"><a href="#">이전 페이지로</a></li>
+                                                    <li><a href="#" class="active">1</a></li>
+                                                    <li><a href="#">2</a></li>
+                                                    <li><a href="#">3</a></li>
+                                                    <li><a href="#">4</a></li>
+                                                    <li><a href="#">5</a></li>
+                                                    <li class="btn-next"><a href="#">다음 페이지로</a></li>
+                                                    <li class="btn-last"><a href="#">맨 뒤으로</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="gray-border" style="width:50%;">
+
+                                                <div class="card shadow">
+                                                    <div class="card-body" style="overflow-y: auto; height: 600px;">
+                                                        <h5 class="text-gray-800 md-18" style="margin-bottom: 10px; font-weight:bold;" >KT, AWS와 생성형 AI 모바일 사업 강화</h5>
+                                                        <div class="popup-window test-border">
+                                                            <p class="font-15" style="white-space: pre-wrap;">
+                                                                ◀ＡＮＣ▶
+
+                                                                지난해 채소값 등이 많이 올라서 부담이 컸는데요.
+
+                                                                그래서 올해부터는 물가안정을 위해서 마늘을 비롯한 ２４개 수입품의 관세가 내립니다.
+
+                                                                오늘부터 달라지는 것들 어떤 것들이 있을까요？
+
+                                                                송양환 기자가 정리했습니다.
+
+                                                                ◀ＶＣＲ▶
+
+                                                                앞으로 6개월 동안
+                                                                관세율이 인하되는
+                                                                대표적인 수입품목은
+                                                                마늘과 유모차입니다.
+
+                                                                마늘은 어제까지 50%였던
+                                                                관세율이 10%로 내리고,
+                                                                유모차는 8%였던 게 아예 없어집니다.
+
+                                                                유아복은 13%에서 8%로,
+                                                                올리브유와 포도씨 등 식용 기름은
+                                                                8%에서 4%로 각각 낮아집니다.
+
+                                                                ================================
+
+                                                                자녀가 2명 이상인 가구의
+                                                                소득공제 범위도 확대됩니다.
+
+                                                                지난해 자녀가 2명인 경우는 연 50만 원을,
+                                                                2명을 넘는 경우엔 추가 1명 당
+                                                                100만 원을 더 공제받았지만,
+
+                                                                올해부터는 각각 100만 원과 200만 원으로
+                                                                늘어납니다.
+
+                                                                또 만 18세 이상 근로자면
+                                                                누구나 가입 가능한
+                                                                연금저축펀드에 대한 소득공제 한도도
+                                                                300만 원에서 400만 원으로 확대됩니다.
+
+                                                                ================================
+
+                                                                부동산 분야에선 신혼부부와 다자녀가정,
+                                                                노부모 부양가정에 대한 지원이 확충됩니다.
+
+                                                                결혼한지 5년 이내인 부부가
+                                                                근로자·서민주택구입자금을
+                                                                대출받을 때의 소득 요건이
+                                                                2천만 원에서 3천만 원으로 완화되고,
+
+                                                                3자녀 이상 다자녀 가정의
+                                                                주택구입자금 대출금리는
+                                                                연 4.7%에서 4.2%로 인하됩니다.
+
+                                                                또 65세 이상의 노부모를
+                                                                3년 이상 부양 중인 무주택 가구주는
+                                                                85제곱미터 이상 중대형 민영주택도
+                                                                특별분양으로 공급받을 수 있습니다
+
+                                                                ================================
+
+                                                                이밖에 오늘부터 아파트 전·월세의
+                                                                매매 실거래가 같은 정보가
+                                                                인터넷을 통해 공개되며,
+
+                                                                해외에 10억 원 이상의
+                                                                금융 계좌가 있는 사람은 오는 6월까지
+                                                                계좌 내용을 신고해야 합니다.
+
+                                                                MBC뉴스 송양환입니다.
+
+                                                            </p>
+                                                        </div>
+                                                        <hr>
+                                                        <div>
+                                                            <div class="tbl-top" style="margin-top: 30px; margin-bottom: 10px;">
+                                                                <div class="left">
+                                                                    <h5 class="text-gray-800 md-18"><strong style="color: #007ca5">4</strong>개의 댓글</h5>
+                                                                </div>
+                                                                <div class="right">
+                                                                    <a href="#" class="btn btn-primary btn-icon-split">
+                                                                        <span class="text">댓글작성</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <input type="text" name="search" id="asd" class="form-control" placeholder="댓글을 입력해주세요." style="margin-bottom: 10px;">
+                                                            </div>
+                                                            <div>
+                                                                <div class="comment" style="margin-bottom: 20px;">
+                                                                    <div class="comment-header" style="margin-bottom: 5px;">
+                                                                        <div class="username" style="font-weight: bold; margin-bottom: 5px; font-size: 1.1em;">이도현</div>
+                                                                        <div class="date" style="color: #999; font-size: 0.9em; margin-bottom: 5px;">등록일: <span class="light-gray small-text" style="color: #999; font-size: 0.9em;">2024-03-18</span></div>
+                                                                    </div>
+                                                                    <div class="comment-content" style="margin-top: 10px; font-size: 1.1em;">
+                                                                        AI 전망이 정말 밝네요
+                                                                    </div>
+                                                                    <div class="reply-count" style="font-weight: bold; color: blue; margin-bottom: 5px; font-size: 1.1em; margin-top: 10px;"><strong>2</strong> 답글</div>
+                                                                </div>
+                                                                <div class="comment" style="margin-bottom: 20px; margin-left: 20px;">
+                                                                    <div class="comment-header" style="margin-bottom: 5px;">
+                                                                        <div class="username" style="font-weight: bold; margin-bottom: 5px; font-size: 1.1em;">김철수</div>
+                                                                        <div class="date" style="color: #999; font-size: 0.9em; margin-bottom: 5px;">등록일: <span class="light-gray small-text" style="color: #999; font-size: 0.9em;">2024-03-18</span></div>
+                                                                    </div>
+                                                                    <div class="comment-content" style="margin-top: 10px; font-size: 1.1em;">
+                                                                        다양한 범위에 사용할 수 있겠네요.
+                                                                    </div>
+                                                                </div>
+                                                                <div class="comment" style="margin-bottom: 20px; margin-left: 20px;">
+                                                                    <div class="comment-header" style="margin-bottom: 5px;">
+                                                                        <div class="username" style="font-weight: bold; margin-bottom: 5px; font-size: 1.1em;">김영희</div>
+                                                                        <div class="date" style="color: #999; font-size: 0.9em; margin-bottom: 5px;">등록일: <span class="light-gray small-text" style="color: #999; font-size: 0.9em;">2024-03-18</span></div>
+                                                                    </div>
+                                                                    <div class="comment-content" style="margin-top: 10px; font-size: 1.1em;">
+                                                                        혜택이 많네요.
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; INSIDEINFO_BI_PORTAL 2023</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">로그아웃 하시겠습니까?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">현재 세션을 종료할 준비가 되었다면 아래 로그아웃을 클릭해주세요.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-primary" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="/js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="/vendor/chart.js/Chart.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="/js/demo/chart-area-demo.js"></script>
+<script src="/js/demo/chart-pie-demo.js"></script>
+
+<script src="/dist/jstree.min.js"></script>
+
+<!--custom js, css-->
+<script src="/js/leedo_custom.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</body>
+
+
+
+
+</html>
