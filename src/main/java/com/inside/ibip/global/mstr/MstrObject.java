@@ -44,7 +44,6 @@ public class MstrObject extends MstrSession{
     private WebObjectSource objectSource = factory.getObjectSource();
     private WebDocumentSource documentSource = factory.getDocumentSource();
     private WebReportSource reportSource = factory.getReportSource();
-
     private LicenseSource licenseSource = factory.getLicenseSource();
 
     /**
@@ -516,32 +515,6 @@ public class MstrObject extends MstrSession{
             reportInfo.setPrompts(promptList);
             return reportInfo;
         }
-
-    public List<GroupVO> getGroupTest() throws WebObjectsException {
-
-        WebObjectSource wos = factory.getObjectSource();
-        WebSearch search = wos.getNewSearchObject();
-        search.setNamePattern("*" + "" + "*");
-        search.setSearchFlags(search.getSearchFlags() + EnumDSSXMLSearchFlags.DssXmlSearchNameWildCard + EnumDSSXMLSearchFlags.DssXmlSearchRootRecursive);
-
-        search.setAsync(false);
-        search.types().add(EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup);
-        search.setDomain(EnumDSSXMLSearchDomain.DssXmlSearchDomainConfiguration);
-
-        search.submit();
-
-        WebFolder f = search.getResults();
-//        f.populate();
-        System.out.println("After search: " + f.size());
-
-        if (f.size() > 0) {
-            for (int i = 0; i < f.size(); i++) {
-                WebUserGroup groups= (WebUserGroup) f.get(i);
-                System.out.println(groups.getDisplayName());
-            }
-        }
-        return new ArrayList<>();
-    }
 
     /**
      * 그룹 리스트를 조회

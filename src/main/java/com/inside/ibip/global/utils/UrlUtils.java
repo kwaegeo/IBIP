@@ -143,7 +143,7 @@ public class UrlUtils {
         int evtType = 4001; // 리포트 단순 조회
         String idType = "reportID";
         if("D".equals(reportInfo.getDocumentType())){
-            evtType = 2048001; // 다큐먼트 단순 조회
+            evtType = 3140; // 다큐먼트 단순 조회
             idType = "documentID";
         }
 
@@ -170,6 +170,9 @@ public class UrlUtils {
         if("N".equals(reportInfo.getEditYn())){
             //조회 모드일 경우에 해당 옵션 추가
             urlSB.append(",dockTop,dockLeft");
+        }
+        if("D".equals(reportInfo.getDocumentType())){
+            urlSB.append("&share=1");
         }
 
         System.out.println(urlSB.toString());
@@ -241,7 +244,7 @@ public class UrlUtils {
      */
     public String getDashboardURL(ReportVO reportInfo, String usrSmgr){
 
-        int evtType = 2048001; // 리포트 단순 조회
+        int evtType = 3140; // 리포트 단순 조회
         String idType = "documentID";
 
         // Return session
@@ -255,6 +258,7 @@ public class UrlUtils {
         urlSB.append("&"+idType+"=").append(reportInfo.getReportId()); //Report ID
         urlSB.append("&currentViewMedia=").append(1);
         urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append(evtType);
+        urlSB.append("&share=1");
         urlSB.append("&usrSmgr=").append(usrSmgr);
 
         //프롬프트 유무에 따른 기본 답변 적용
