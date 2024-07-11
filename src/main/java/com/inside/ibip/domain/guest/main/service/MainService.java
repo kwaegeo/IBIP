@@ -107,6 +107,30 @@ public class MainService {
     }
 
     /**
+     * 내 구독물 URL 조회 (로그인 계정)
+     * @Method Name   : getSubscriptionURL
+     * @Date / Author : 2023.12.01  이도현
+     * @param usrSmgr 사용자 세션 정보
+     * @return 사용자 정보
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public String getAtypical(String usrSmgr){
+
+        String subscriptionURL = urlUtils.getAtypicalURL(usrSmgr);
+
+        return subscriptionURL;
+    }
+
+    public String getDataset(String usrSmgr){
+
+        String subscriptionURL = urlUtils.getDatasetURL(usrSmgr);
+
+        return subscriptionURL;
+    }
+
+
+    /**
      * 대시보드 URL 조회
      * @Method Name   : getDashboardURL
      * @Date / Author : 2023.12.01  이도현

@@ -235,6 +235,50 @@ public class UrlUtils {
 
 
     /**
+     * 내 구독물 URL 조회 (로그인 계정)
+     * @Method Name   : getSubscriptionURL
+     * @Date / Author : 2023.12.01  이도현
+     * @return 사용자 정보
+     * @History
+     * 2023.12.01	최초생성
+     */
+    public String getAtypicalURL(String usrSmgr){
+
+        // Return session
+        StringBuilder urlSB = new StringBuilder();
+        urlSB.append("http").append("://").append(serverName).append(":").append(mstrWebPort); //Web Server name and port
+        urlSB.append("/MicroStrategy/servlet/mstrWeb");
+        urlSB.append("?server=").append(serverName); //I Server name
+        urlSB.append("&port=0");
+        urlSB.append("&project=").append(mstrProjectName); // Project name
+        urlSB.append("&evt=").append("3187");
+        urlSB.append("&src=mstrWeb").append("3187");
+        urlSB.append("&usrSmgr=").append(usrSmgr);
+
+        System.out.println(urlSB.toString());
+
+        return urlSB.toString();
+    }
+
+    public String getDatasetURL(String usrSmgr){
+
+        // Return session
+        StringBuilder urlSB = new StringBuilder();
+        urlSB.append("http").append("://").append(serverName).append(":").append(mstrWebPort); //Web Server name and port
+        urlSB.append("/MicroStrategy/servlet/mstrWeb");
+        urlSB.append("?server=").append(serverName); //I Server name
+        urlSB.append("&port=0");
+        urlSB.append("&project=").append(mstrProjectName); // Project name
+        urlSB.append("&evt=").append("3011");
+        urlSB.append("&src=mstrWeb").append("3011");
+        urlSB.append("&usrSmgr=").append(usrSmgr);
+
+        System.out.println(urlSB.toString());
+
+        return urlSB.toString();
+    }
+
+    /**
      * 대시보드 URL 조회 (로그인 계정)
      * @Method Name   : getDashboardURL
      * @Date / Author : 2023.12.01  이도현

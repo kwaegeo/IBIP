@@ -73,12 +73,39 @@
 
         <!-- Heading -->
         <div class="sidebar-heading">
-            대시보드
+            공유리포트
         </div>
 
         <div id="jstree">
 
         </div>
+
+        <!-- 240711 수정 전 -->
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            정형보고서
+        </div>
+
+        <div id="jstree3">
+
+        </div>
+
+        <!-- 240711 수정 전 -->
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            반정형보고서
+        </div>
+
+        <div id="jstree4">
+
+        </div>
+
 
 
         <!-- Divider -->
@@ -86,7 +113,7 @@
 
         <!-- Heading -->
         <div class="sidebar-heading">
-            My Data
+            개인 개체
         </div>
 
 
@@ -94,8 +121,25 @@
 
         </div>
 
+
+
         <!-- Divider -->
         <hr class="sidebar-divider">
+
+        <!-- Nav Item - Charts -->
+        <li class="nav-item">
+            <a class="nav-link" href="#" onclick="getDataset()">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>데이터셋 생성</span></a>
+        </li>
+
+        <!-- Nav Item - Charts -->
+        <li class="nav-item">
+            <a class="nav-link" href="#" onclick="getAtypical()">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>비정형보고서 생성</span></a>
+        </li>
+
 
         <!-- Nav Item - Charts -->
         <li class="nav-item">
@@ -447,6 +491,139 @@
         });
 
 
+        $('#jstree3').jstree({
+            'core': {
+                'data': {
+                    'url': function (node) {
+                        return node.id === '#' ? '/folder/get/folders?folderId=FC2196F04DFFA2E63E644896990DEA91' : '/folder/subList?folderId='+node.id;
+                        // Adjust the URLs based on your server-side implementation
+                    },
+                    'data': function (node) {
+                        console.log(node);
+                        return { 'id': node.id };
+                        // Send any additional data along with the request
+                    }
+                },
+                "check_callback":true,
+            },
+            'plugins' : ["types", "contextmenu", "sort"], // plugin 목록에 추가
+            'types': {
+                8: { // tp 8= 폴더
+                    "icon": "jstree-folder",
+                },
+                3:{ // tp 3= 리포트
+                    "icon": "fa fa-file",
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                55:{ // tp 55= 다큐먼트
+                    "icon":"fa fa-file text-success",
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                "default":{
+                    "icon": "jstree-icon jstree-folder"
+                }
+            },
+            'sort': function(a,b){
+                a1 = this.get_node(a);
+                b1 = this.get_node(b);
+                if (a1.icon == b1.icon) {
+                    return (a1.text > b1.text) ? 1 : -1;
+                }
+                else{
+                    return (a1.icon < b1.icon) ? 1 : -1;
+                }
+            },
+            'contextmenu': {
+                "items": function($node){
+                    console.log($node)
+                    var tree = $("#tree").jstree(true);
+                    if($node.type == 8){
+                        return {
+                            "Menu1": {
+                                "separator_before": false,
+                                "separator_after": true,
+                                "label": "폴더 상세정보 보기", //메뉴 표기 (제목)
+                                "icon": 'jstree-folder', //menu icon
+                                action: function(obj){
+                                    console.log(obj);
+                                    alert("이 폴더의 ID는 : "+ $node.id);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        $('#jstree4').jstree({
+            'core': {
+                'data': {
+                    'url': function (node) {
+                        return node.id === '#' ? '/folder/get/folders?folderId=9CB9031943CF9CF1249F79A89D6BC14D' : '/folder/subList?folderId='+node.id;
+                        // Adjust the URLs based on your server-side implementation
+                    },
+                    'data': function (node) {
+                        console.log(node);
+                        return { 'id': node.id };
+                        // Send any additional data along with the request
+                    }
+                },
+                "check_callback":true,
+            },
+            'plugins' : ["types", "contextmenu", "sort"], // plugin 목록에 추가
+            'types': {
+                8: { // tp 8= 폴더
+                    "icon": "jstree-folder",
+                },
+                3:{ // tp 3= 리포트
+                    "icon": "fa fa-file",
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                55:{ // tp 55= 다큐먼트
+                    "icon":"fa fa-file text-success",
+                    "max_children": 0, //leaf이므로 자식을 못갖도록 설정
+                    "max_depth":0,
+                },
+                "default":{
+                    "icon": "jstree-icon jstree-folder"
+                }
+            },
+            'sort': function(a,b){
+                a1 = this.get_node(a);
+                b1 = this.get_node(b);
+                if (a1.icon == b1.icon) {
+                    return (a1.text > b1.text) ? 1 : -1;
+                }
+                else{
+                    return (a1.icon < b1.icon) ? 1 : -1;
+                }
+            },
+            'contextmenu': {
+                "items": function($node){
+                    console.log($node)
+                    var tree = $("#tree").jstree(true);
+                    if($node.type == 8){
+                        return {
+                            "Menu1": {
+                                "separator_before": false,
+                                "separator_after": true,
+                                "label": "폴더 상세정보 보기", //메뉴 표기 (제목)
+                                "icon": 'jstree-folder', //menu icon
+                                action: function(obj){
+                                    console.log(obj);
+                                    alert("이 폴더의 ID는 : "+ $node.id);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
         // 클릭 된 노드 확인 bind to events triggered on the tree
         $('#jstree').on("changed.jstree", function (e, data) {
             console.log(data.selected);
@@ -574,6 +751,127 @@
         })
 
 
+        $('#jstree3').on("select_node.jstree", function(e, data){
+            var node = data.node;
+
+            if (node.type === 3){
+                var requestData = {'reportId': node.id, 'documentType' : 'R'}
+
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/report/get',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        console.log(responseData)
+                        if(responseData.promptExist){
+                            promptSetting(responseData);
+                        }
+                        else{
+                            if(responseData.code){
+                                alert(responseData.msg);
+                            }
+                            else{
+                                alert("해당 다큐먼트 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
+
+            } else if (node.type === 55){ //다큐먼트
+                var requestData = {'reportId': node.id, 'documentType' : 'D'}
+
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/report/get',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        if(responseData.promptExist){
+                            promptSetting(responseData);
+                        }
+                        else{
+                            if(responseData.code){
+                                alert(responseData.msg);
+                            }
+                            else{
+                                alert("해당 다큐먼트 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
+            }
+        })
+
+
+        $('#jstree4').on("select_node.jstree", function(e, data){
+            var node = data.node;
+
+            if (node.type === 3){
+                var requestData = {'reportId': node.id, 'documentType' : 'R'}
+
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/report/get',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        console.log(responseData)
+                        if(responseData.promptExist){
+                            promptSetting(responseData);
+                        }
+                        else{
+                            if(responseData.code){
+                                alert(responseData.msg);
+                            }
+                            else{
+                                alert("해당 다큐먼트 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
+
+            } else if (node.type === 55){ //다큐먼트
+                var requestData = {'reportId': node.id, 'documentType' : 'D'}
+
+                $.ajax({
+                    // url: '/folder/report',
+                    url: '/report/get',
+                    data: requestData,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function (responseData) {
+                        if(responseData.promptExist){
+                            promptSetting(responseData);
+                        }
+                        else{
+                            if(responseData.code){
+                                alert(responseData.msg);
+                            }
+                            else{
+                                alert("해당 다큐먼트 문제가 발견되었습니다. 확인 후 다시 실행해주세요.");
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("서버에 접속할 수 없습니다.")
+                    }
+                })
+            }
+        })
+
     });
 
 
@@ -659,6 +957,7 @@
             promptInfo.promptType = 'element';
             console.log(promptInfo);
 
+            console.log("이번에 찍은 index + "+ index);
             var attrParser = $("[name='attr']").eq(index);
 
             attrInfo.attrId = attrParser.attr('id');
@@ -891,7 +1190,7 @@
 
                         <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
                                 <div class="popup__body_custom">
-                                    <h3 class="font-weight-bold">${promptInfo.title}</h3>
+                                    <h3 class="font-weight-bold" name="attr", id="#">${promptInfo.title}</h3>
 `;
         if(tagName === "select"){
             makeHtml +=`<div className=checkbox-container"><select style="margin-left: 9px;">`
@@ -940,7 +1239,7 @@
 
                         <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value" pt="${promptInfo.pt}" subType="${promptInfo.promptSubType}">
                                 <div class="popup__body_custom">
-                                    <h3 class="font-weight-bold">${promptInfo.promptNm}</h3>
+                                    <h3 class="font-weight-bold" name="attr", id="#">${promptInfo.promptNm}</h3>
                                     <div class=checkbox-container">
                         `;
         if(promptInfo.promptSubType === "date"){
@@ -1005,16 +1304,12 @@
                 <div class=checkbox-container">
                 `;
             for(var i=0; i<elementsArray.length; i++){
-                if (i % 10 === 0) {
-                    makeHtml += '<div class="row" style="margin: 10px">';
-                }
+
                 makeHtml +=`
                         <input type="${tagName}" name="${promptInfo.promptId}" id="${elementsArray[i].elementId}" text="${elementsArray[i].elementNm}" value="${elementsArray[i].elementId}" ${elementsArray[i].defaultAnswerYn === 'Y' ? 'checked' : ''}>
                         <label style="margin: 5px" for="${elementsArray[i].elementId}">${elementsArray[i].elementNm}</label>
             `;
-                if ((i + 1) % 10 === 0 || i === elementsArray.length - 1) {
-                    makeHtml += '</div>';
-                }
+
             }
         }
         makeHtml += `           </div>
@@ -1065,6 +1360,72 @@
 
                         <div class="container-fluid">
                             <h3 class="h5 text-gray-800 md-18">내 사용내역목록</h3>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                            </div>
+                            <div class="gray-border">
+                                <iframe src="${responseData}", style="height: 720px; width: 100%;">
+                                </iframe>
+                            </div>
+                        </div>
+
+`;
+                $("#main-content").empty();
+                $("#main-content").append(makeHtml);
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        })
+
+    }
+
+    function getDataset() {
+
+        $.ajax({
+            url: '/main/dataset',
+            data: JSON.stringify(),
+            contentType: "application/json",
+            method: 'POST',
+            dataType: "text",
+            success: function (responseData) {
+                console.log(responseData)
+                var makeHtml = `
+
+                        <div class="container-fluid">
+                            <h3 class="h5 text-gray-800 md-18">데이터셋 생성</h3>
+                            <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                            </div>
+                            <div class="gray-border">
+                                <iframe src="${responseData}", style="height: 720px; width: 100%;">
+                                </iframe>
+                            </div>
+                        </div>
+
+`;
+                $("#main-content").empty();
+                $("#main-content").append(makeHtml);
+            },
+            error: function () {
+                alert("서버에 접속할 수 없습니다.")
+            }
+        })
+
+    }
+
+    function getAtypical() {
+
+        $.ajax({
+            url: '/main/atypical',
+            data: JSON.stringify(),
+            contentType: "application/json",
+            method: 'POST',
+            dataType: "text",
+            success: function (responseData) {
+                console.log(responseData)
+                var makeHtml = `
+
+                        <div class="container-fluid">
+                            <h3 class="h5 text-gray-800 md-18">비정형 보고서 생성</h3>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
                             </div>
                             <div class="gray-border">

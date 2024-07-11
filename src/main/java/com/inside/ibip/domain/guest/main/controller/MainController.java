@@ -144,6 +144,56 @@ public class MainController {
     }
 
     /**
+     * 내 구독물 URL 조회
+     * @Method Name   : getSubscription
+     * @Date / Author : 2023.12.01  이도현
+     * @param request request 객체
+     * @param response response 객체
+     * @return 사용내역 목록 URL
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     *  1. 사용자 세션 (MSTR) 유효성 검사
+     *  2. usrSmgr 조회
+     *  3. subscription 기본 웹 URL 조합 후 반환
+     */
+    @PostMapping("/atypical")
+    @ResponseBody
+    public String getAtypical(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
+        String usrSmgr = comUtils.getUsrSmgr();
+        String subscriptionURL = mainService.getAtypical(usrSmgr);
+
+        return subscriptionURL;
+    }
+
+    @PostMapping("/dataset")
+    @ResponseBody
+    public String getDataset(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
+        String usrSmgr = comUtils.getUsrSmgr();
+        String subscriptionURL = mainService.getDataset(usrSmgr);
+
+        return subscriptionURL;
+    }
+
+
+    /**
      * 내 DashBoard URL 조회
      * @Method Name   : getSubscription
      * @Date / Author : 2023.12.01  이도현

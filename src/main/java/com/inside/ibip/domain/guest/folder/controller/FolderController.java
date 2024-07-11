@@ -105,6 +105,23 @@ public class FolderController {
     }
 
 
+    @GetMapping("/get/folders")
+    @ResponseBody
+    public List<TreeVO> getFolders(@RequestParam(name = "folderId") String folderId, HttpServletRequest request, HttpServletResponse response){
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
+        //전달 받은 폴더의 하위 목록 조회
+        List<TreeVO> subList = folderService.getFolders(folderId);
+        return subList;
+
+    }
+
+
     /**
      * 내 리포트, 즐겨찾기 데이터 조회
      * @Method Name   : getMyData
@@ -134,5 +151,33 @@ public class FolderController {
 
     }
 
+    /**
+     * 내 리포트, 즐겨찾기 데이터 조회
+     * @Method Name   : getMyData
+     * @Date / Author : 2023.12.01  이도현
+     * @param request request 객체
+     * @param response response 객체
+     * @return 폴더 리스트 (내 리포트, 즐겨찾기)
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    @GetMapping("/myData2")
+    @ResponseBody
+    public List<TreeVO> getMyData2(HttpServletRequest request, HttpServletResponse response) throws WebObjectsException {
+
+
+        HttpSession httpSession = request.getSession(true);
+        String mstrSessionId = (String) httpSession.getAttribute("mstrSessionId");
+
+        //1. 세션 체크
+        comUtils.sessionCheck(mstrSessionId, request, response);
+
+        //전달 받은 폴더의 하위 목록 조회
+        List<TreeVO> myData = folderService.getMyData();
+        return myData;
+
+    }
 
 }

@@ -90,6 +90,17 @@ public class FolderService {
         return shareReportList;
     }
 
+    public List<TreeVO> getFolders(String folderId){
+
+        //1. 공유 리포트 하위 폴더 목록 담을 리스트 생성
+        List<TreeVO> shareReportList;
+
+        //2. 폴더 ID로 하위 목록 조회
+        shareReportList = mstrObject.getShareReport(folderId);
+
+        return shareReportList;
+    }
+
     /**
      * 내 리포트 하위 목록 조회
      * @Method Name   : getMyData
@@ -120,6 +131,36 @@ public class FolderService {
         return myData;
     }
 
+
+    /**
+     * 내 리포트 하위 목록 조회
+     * @Method Name   : getMyData
+     * @Date / Author : 2023.12.01  이도현
+     * @return 폴더 리스트 (내 리포트 하위 목록, 즐겨찾기)
+     * @History
+     * 2023.12.01	최초생성
+     *
+     * @Description
+     */
+    public List<TreeVO> getMyData2() {
+
+        //1. 내 리포트 및 즐겨찾기 목록 담을 리스트 생성
+        List<TreeVO> myData = new ArrayList<>();
+
+//        //1-1. 내 리포트, 즐겨찾기 ID 조회
+//        String myReportId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileReports);
+//        String myFavoriteId = mstrObject.getFolderId(EnumDSSXMLFolderNames.DssXmlFolderNameProfileFavorites);
+
+        //2. 폴더 ID로 폴더 정보 조회
+        FolderVO myReportInfo = mstrObject.getFolderInfo("1F9BDB704001C09009DEC2A3E5F8C994");
+        FolderVO myFavoriteInfo = mstrObject.getFolderInfo("334DBC1A42CF1E7F766AAEB44E7E8B86");
+
+        //3. 2개의 Root Tree로 나눠서 전달 (내 리포트, 즐겨찾기)
+        myData.add(new TreeVO(myReportInfo.getId(), EnumFolderNamesKR.myReport, "#", myReportInfo.getTp(), true));
+        myData.add(new TreeVO(myFavoriteInfo.getId(), EnumFolderNamesKR.myFavorite, "#", myFavoriteInfo.getTp(), true));
+
+        return myData;
+    }
 
     /**
      * 로그인 한 MSTR 세션의 사용자 정보를 가져온다.
