@@ -254,7 +254,7 @@ public class UrlUtils {
         urlSB.append("&evt=").append("3187");
         urlSB.append("&src=mstrWeb").append("3187");
         urlSB.append("&usrSmgr=").append(usrSmgr);
-
+        urlSB.append("&hiddensections=path");
         System.out.println(urlSB.toString());
 
         return urlSB.toString();
@@ -272,7 +272,7 @@ public class UrlUtils {
         urlSB.append("&evt=").append("3011");
         urlSB.append("&src=mstrWeb").append("3011");
         urlSB.append("&usrSmgr=").append(usrSmgr);
-
+        urlSB.append("&hiddensections=path");
         System.out.println(urlSB.toString());
 
         return urlSB.toString();
