@@ -34,6 +34,21 @@
     <link rel="stylesheet" type="text/css" href="/assets/js/treeview/jquery.treeview.css">
 
 
+    <!-- Custom styles for this template -->
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+    <!-- 글자크기에 따른 크기 조정 css-->
+    <link href="/css/custom.css" rel="stylesheet">
+
+    <link href="/dist/themes/default/style.min.css" rel="stylesheet"/>
+
+    <!-- Custom styles for this page -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/js/jqueryui/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/js/treeview/jquery.treeview.css">
+
+
     <!-- Custom styles for this template-->
     <!--    <link href="/css/sb-admin-2.min.css" rel="stylesheet">-->
     <link href="/css/leedo_custom.css" rel="stylesheet" type="text/css">
@@ -632,6 +647,9 @@
         $('#jstree').on("select_node.jstree", function(e, data){
             var node = data.node;
 
+            $('#jstree2 .jstree-clicked').removeClass('jstree-clicked custom-clicked');
+            $('#jstree2').jstree('deselect_all');
+
             if (node.type === 3){
                 var requestData = {'reportId': node.id, 'documentType' : 'R'}
 
@@ -692,6 +710,9 @@
 
         $('#jstree2').on("select_node.jstree", function(e, data){
             var node = data.node;
+
+            $('#jstree .jstree-clicked').removeClass('jstree-clicked custom-clicked');
+            $('#jstree').jstree('deselect_all');
 
             if (node.type === 3){
                 var requestData = {'reportId': node.id, 'documentType' : 'R'}
@@ -896,7 +917,7 @@
             <div class="container-fluid" name="reportDiv">
                 <h3 class="h5 text-gray-800 md-18">${reportInfo.reportPath}</h3>
                             <div class="d-sm-flex align-items-center justify-content-end mb-4">
-                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N', '', '${reportInfo.documentType}')"> 조회</button>
+                                <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-dg shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'N', '', '${reportInfo.documentType}')"> 조회</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="getReportURL('${reportInfo.reportId}', 'Y','', '${reportInfo.documentType}')"> 편집</button>
                                 <button href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" popupYn = 'Y' onclick="getReportURL('${reportInfo.reportId}', 'N', '','${reportInfo.documentType}' )"> 새창으로 열기</button>
                                 <button href="#" id="foldAndOpen" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm md-4" onclick="promptToggle()">프롬프트 접기</button>
@@ -918,6 +939,7 @@
                                             <h5 class="h5_custom_leedo">${reportInfo.reportNm}</h5>
                                         </div>
                                         <div id="promptDiv">
+                                            <table id="promptTable" style="width: 100%;"></table>
                                         </div>
                                     </div>
                                     <div id="contentDiv">
@@ -1187,13 +1209,19 @@
         // 개체 적재 테이블 생성
 
         var makeHtml = `
-
+                <tr>
+                    <td class="prompt-td-label">
                         <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="object" pt="${promptInfo.pt}">
                                 <div class="popup__body_custom">
                                     <h3 class="font-weight-bold" name="attr", id="#">${promptInfo.title}</h3>
+                                </div>
+                        </div>
+                    </td>
+                <td>
+                    <div class="checkbox-container">
 `;
         if(tagName === "select"){
-            makeHtml +=`<div className=checkbox-container"><select style="margin-left: 9px;">`
+            makeHtml +=`<div className=checkbox-container"><select>`
 
             for(var i=0; i<entitiesArray.length; i++){
                 makeHtml += `
@@ -1211,7 +1239,7 @@
                 `;
             for(var i=0; i<entitiesArray.length; i++){
                 if (i % 10 === 0) {
-                    makeHtml += '<div class="row" style="margin: 10px">';
+                    makeHtml += '<div class="" style="margin: ">';
                 }
                 makeHtml +=`
                         <input type="${tagName}" name="${promptInfo.promptId}" id="${entitiesArray[i].entityId}" text="${entitiesArray[i].entityNm}" entityType="${entitiesArray[i].entityType}" value="${entitiesArray[i].entityId}" ${entitiesArray[i].defaultAnswerYn === 'Y' ? 'checked' : ''}>
@@ -1223,8 +1251,8 @@
             }
         }
         makeHtml += `           </div>
-                            </div>
-                       </div>
+                            </td>
+                        </tr>
 
         `;
 
@@ -1232,30 +1260,35 @@
     }
 
     // 값 프롬프트 세팅
-    function valuePromptSetting(reportInfo, promptInfo){
-
+    function valuePromptSetting(reportInfo, promptInfo) {
         //1. 값 프롬프트 적재 HTML 생성
         var makeHtml = `
+            <tr>
+                <td style="width: 10%;">
+                    <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value" pt="${promptInfo.pt}" subType="${promptInfo.promptSubType}">
+                        <div class="popup__body_custom">
+                            <h3 class="font-weight-bold" name="attr" id="#">${promptInfo.promptNm}</h3>
+                        </div>
+                    </div>
+                </td>
+                <td style="width: 90%;">
+                    <div class="checkbox-container">
+    `;
 
-                        <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" promptType="value" pt="${promptInfo.pt}" subType="${promptInfo.promptSubType}">
-                                <div class="popup__body_custom">
-                                    <h3 class="font-weight-bold" name="attr", id="#">${promptInfo.promptNm}</h3>
-                                    <div class=checkbox-container">
-                        `;
-        if(promptInfo.promptSubType === "date"){
-            makeHtml += `<input type="date" name="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" value="${promptInfo.val}" subType="${promptInfo.promptSubType}">
-                </div>`;
-        }else{
-            makeHtml += `<input type="text" name="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" value="${promptInfo.val}" subType="${promptInfo.promptSubType}">
-                </div>`;
+        if (promptInfo.promptSubType === "date") {
+            makeHtml += `<input type="date" name="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" value="${promptInfo.val}" subType="${promptInfo.promptSubType}">`;
+        } else {
+            makeHtml += `<input type="text" name="${promptInfo.promptId}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" value="${promptInfo.val}" subType="${promptInfo.promptSubType}">`;
         }
 
-;
+        makeHtml += `
+                    </div>
+                </td>
+            </tr>
+    `;
 
         $("#promptDiv").prepend(makeHtml);
-
     }
-
     // 구성요소 프롬프트 세팅
     function elementPromptSetting(reportInfo, promptInfo){
         // 프롬프트의 타입 설정
@@ -1282,13 +1315,19 @@
 
         // 구성요소 적재 테이블 생성
         var makeHtml = `
-
+                <tr>
+                    <td class="prompt-td-label">
                         <div name="prompt" tabindex="0" id="${promptInfo.promptId}" title="${promptInfo.title}" minValue="${promptInfo.minValue}" maxValue="${promptInfo.maxValue}" childSize="${promptInfo.childSize}" promptType="element" pt="${promptInfo.pt}">
                                 <div class="popup__body_custom">
                                     <h3 class="font-weight-bold" name="attr", id="${promptInfo.attr.attrId}", attrType="${promptInfo.attr.attrType}">${promptInfo.attr.attrNm}</h3>
+                                </div>
+                        </div>
+                    </td>
+                <td>
+                    <div class="checkbox-container">
 `;
         if(tagName === "select"){
-            makeHtml +=`<div className=checkbox-container"><select style="margin-left: 9px;">`
+            makeHtml +=`<div className=checkbox-container"><select>`
 
             for(var i=0; i<elementsArray.length; i++){
                 makeHtml += `
@@ -1313,8 +1352,8 @@
             }
         }
         makeHtml += `           </div>
-                            </div>
-                       </div>
+                            </td>
+                       </tr>
 
 `;
 
@@ -1404,6 +1443,10 @@
 `;
                 $("#main-content").empty();
                 $("#main-content").append(makeHtml);
+
+                // JSTree1 및 JSTree2의 모든 노드를 닫고 선택 해제
+                $('#jstree').jstree('deselect_all').jstree('close_all');
+                $('#jstree2').jstree('deselect_all').jstree('close_all');
             },
             error: function () {
                 alert("서버에 접속할 수 없습니다.")
@@ -1437,6 +1480,10 @@
 `;
                 $("#main-content").empty();
                 $("#main-content").append(makeHtml);
+
+                // JSTree1 및 JSTree2의 모든 노드를 닫고 선택 해제
+                $('#jstree').jstree('deselect_all').jstree('close_all');
+                $('#jstree2').jstree('deselect_all').jstree('close_all');
             },
             error: function () {
                 alert("서버에 접속할 수 없습니다.")
@@ -1470,6 +1517,10 @@
 `;
                 $("#main-content").empty();
                 $("#main-content").append(makeHtml);
+
+                // JSTree1 및 JSTree2의 모든 노드를 닫고 선택 해제
+                $('#jstree').jstree('deselect_all').jstree('close_all');
+                $('#jstree2').jstree('deselect_all').jstree('close_all');
             },
             error: function () {
                 alert("서버에 접속할 수 없습니다.")
@@ -1528,6 +1579,10 @@
 `;
                     $("#main-content").empty();
                     $("#main-content").append(makeHtml);
+
+                    // JSTree1 및 JSTree2의 모든 노드를 닫고 선택 해제
+                    $('#jstree').jstree('deselect_all').jstree('close_all');
+                    $('#jstree2').jstree('deselect_all').jstree('close_all');
                 }
             },
             error: function () {
@@ -1807,14 +1862,18 @@
 
             // 값 프롬프트 템플릿
             if(templateInfo[i].entityType == 10000){
-                var $target = $('#'+ templateInfo[i].promptId);
+                var $target = $('#' + templateInfo[i].promptId).closest('tr'); // 해당 tr을 찾음
                 var $inputElement = $target.find('input');
                 $inputElement.val(templateInfo[i].entityNm);
+                console.log($target)
+
             }
 
             // 구성요소 프롬프트 템플릿
             else if(templateInfo[i].entityType == 20000){
-                var $target = $('#'+ templateInfo[i].promptId);
+                var $target = $('#' + templateInfo[i].promptId).closest('tr'); // 해당 tr을 찾음
+                console.log($target)
+
 
                 // $target 안에서 id가 templateInfo[i].entityId인 요소를 찾음
                 var $filteredElements = $target.find('[id="' + templateInfo[i].entityId + '"]');
@@ -1832,7 +1891,9 @@
             //개체 프롬프트 템플릿
             else{
 
-                var $target = $('#'+ templateInfo[i].promptId);
+                var $target = $('#' + templateInfo[i].promptId).closest('tr'); // 해당 tr을 찾음
+                console.log($target)
+
 
                 // $target 안에서 id가 templateInfo[i].entityId인 요소를 찾음
                 var $filteredElements = $target.find('[id="' + templateInfo[i].entityId + '"]');
