@@ -1136,6 +1136,9 @@
 
     //최소, 최대 값 유효성 검사
     function validMinMax(prompt){
+
+
+
         if(prompt.attr("promptType") === 'value' && prompt.attr("subType")==='date'){
             var parseMin = new Date(prompt.attr("minValue"));
             var parseMax = new Date(prompt.attr("maxValue"));
@@ -1147,28 +1150,31 @@
 
         // 각 태그에 맞게 선택 된 갯수로 검증한다.
         var childSize = 0;
-        var inputType = prompt.find("input").attr("type");
+        var trElement = prompt.closest('tr'); // tr 요소를 찾습니다.
+        var inputType = trElement.find("input:checked").attr("type");
         var subType = prompt.attr("subType");
 
+        console.log("???");
+        console.log(inputType);
         console.log(subType);
 
         if(inputType === "checkbox"){
-            childSize = prompt.find("input[type='checkbox']:checked").length;
+            childSize = trElement.find("input[type='checkbox']:checked").length;
         }
         else if(inputType === "radio"){
-            childSize = prompt.find("input[type='radio']:checked").length;
+            childSize = trElement.find("input[type='radio']:checked").length;
         }
         else if(inputType === "date"){
-            childSize = new Date(prompt.find("input[type='date']").val());
+            childSize = new Date(trElement.find("input[type='date']").val());
         }
         else if(inputType === "text" && subType === "double"){
-            childSize = prompt.find("input[type='text']").val();
+            childSize = trElement.find("input[type='text']").val();
         }
         else if(inputType === "text" && subType === "string") {
-            childSize = prompt.find("input[type='text']").val().length;
+            childSize = trElement.find("input[type='text']").val().length;
         }
         else{
-            childSize = prompt.find("select option:selected").length;
+            childSize = trElement.find("select option:selected").length;
         }
 
         console.log(inputType);
