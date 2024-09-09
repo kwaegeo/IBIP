@@ -252,7 +252,7 @@ public class UrlUtils {
         urlSB.append("&port=0");
         urlSB.append("&project=").append(mstrProjectName); // Project name
         urlSB.append("&evt=").append("3187");
-        urlSB.append("&src=mstrWeb").append("3187");
+        urlSB.append("&src=mstrWeb").append("NoHeaderNoFooterNoPath.").append("3187");
         urlSB.append("&usrSmgr=").append(usrSmgr);
         urlSB.append("&hiddensections=path");
         System.out.println(urlSB.toString());
